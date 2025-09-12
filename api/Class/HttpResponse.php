@@ -20,7 +20,7 @@ class HttpResponse implements Responseable
      * @param array $additionalInfo Informações adicionais opcionais da resposta HTTP
      */
     public function __construct(
-        private HttpStatusCode $status = HttpStatusCode::INTERNAL_SERVER_ERROR,
+        public HttpStatusCode $status = HttpStatusCode::INTERNAL_SERVER_ERROR,
         public Responseable|null|string $message = null,
         private Responseable|null|array $data = null,
         private Responseable|null|array $errors = null,
