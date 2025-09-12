@@ -11,6 +11,7 @@ namespace Bifrost\Core;
 
 use Redis;
 use Bifrost\Core\Settings;
+use Bifrost\Interface\Insertable;
 
 /**
  * It is responsible for managing the cache.
@@ -192,6 +193,11 @@ class Cache
             if (is_array($value)) {
                 $value = json_encode($value);
             }
+
+            if ($value instanceof Insertable) {
+                $value = $value->value();
+            }
+
             $parts[] = "{$field}:{$value}";
         }
         return $entity . ':' . implode(':', $parts);

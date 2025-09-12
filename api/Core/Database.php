@@ -6,6 +6,7 @@ use Bifrost\Class\HttpResponse;
 use Bifrost\Core\AppError;
 use Bifrost\Core\Functions;
 use Bifrost\Core\Settings;
+use Bifrost\Interface\Insertable;
 use PDO;
 use PDOException;
 
@@ -89,6 +90,10 @@ class Database
         $fields = [];
         $values = [];
         foreach ($data as $key => $value) {
+            if ($value instanceof Insertable) {
+                $value = $value->value();
+            }
+
             if (is_int($key)) {
                 $fields[] = $value;
                 $values[] = ":{$value}";
@@ -118,6 +123,10 @@ class Database
         $fields = [];
         $data = Functions::sanitizeArray($data);
         foreach ($data as $key => $value) {
+            if ($value instanceof Insertable) {
+                $value = $value->value();
+            }
+            
             if (is_string($value)) {
                 $value = "'{$value}'";
             }
@@ -143,6 +152,10 @@ class Database
         $whereStr = [];
 
         foreach ($where as $key => $value) {
+            if ($value instanceof Insertable) {
+                $value = $value->value();
+            }
+
             if (is_int($key)) {
                 $whereStr[] = $value;
             } elseif (strtoupper($key) === "OR") {
