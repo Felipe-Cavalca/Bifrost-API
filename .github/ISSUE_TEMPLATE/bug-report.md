@@ -1,37 +1,25 @@
 ---
 name: Bug Report
-about: Let us know about a bug so we can fix it
-title: 'Bug: '
+about: Report a bug
+title: '[BUG] '
 labels: bug
 assignees: ''
 ---
 
-## 🐛 Describe the Bug / Descreva o Erro
+## What's the bug?
 
-> A clear and concise description of what the bug is.
-> Uma descrição clara e concisa do que é o erro.
+Describe what went wrong.
 
-## 🔁 Steps to Reproduce / Como Reproduzir
+## How to reproduce
 
-> Steps to reproduce the behavior:
-> Passos para reproduzir o comportamento:
->
-> 1. Go to '...'
-> 2. Click on '...'
-> 3. Scroll down to '...'
-> 4. See error
+1. Step 1
+2. Step 2
+3. See error
 
-## ✅ Expected Behavior / Comportamento Esperado
+## Expected behavior
 
-> A clear and concise description of what you expected to happen.
-> Uma descrição clara e concisa do que você esperava que acontecesse.
+What should happen instead?
 
-## 💻 Screenshots / Capturas de Tela (opcional)
+## Screenshots (optional)
 
-> If applicable, add screenshots to help explain your problem.
-> Se aplicável, adicione capturas de tela para ajudar a explicar seu problema.
-
-## 🧾 Additional Context / Contexto Adicional
-
-> Add any other context about the problem here.
-> Adicione qualquer outro contexto sobre o problema aqui.
+Add screenshots if helpful.
