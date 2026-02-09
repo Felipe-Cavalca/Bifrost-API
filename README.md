@@ -181,7 +181,7 @@ $queue->addScheduledTask($task, 60); // Executar em 1 minuto
 
 ## Testes
 
-Os testes ainda não foram adicionados ao repositório. Contribuições com PHPUnit são bem-vindas!
+Os testes unitários estão sendo desenvolvidos usando PHPUnit. Para mais detalhes sobre a estrutura dos testes e como executá-los, consulte a pasta `tests/`.
 
 ---
 
