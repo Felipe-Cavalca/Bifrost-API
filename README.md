@@ -1,6 +1,6 @@
-# BifrostPHP – Módulo de Serviço Back-End
+# Bifrost – Módulo de Serviço Back-End
 
-BifrostPHP é um micro-framework escrito em PHP 8+ que prioriza produtividade e código limpo através do uso massivo de _Attributes_.
+Bifrost-API é um micro-framework escrito em PHP 8+ que prioriza produtividade e código limpo através do uso massivo de _Attributes_.
 Este repositório concentra o **núcleo de serviços HTTP** do framework – roteador, camadas de requisição e resposta, cache, fila de tarefas, validação, entre outros.
 
 <div align="center">
@@ -44,8 +44,8 @@ Este repositório concentra o **núcleo de serviços HTTP** do framework – rot
 
 ```bash
 # Clonar o projeto
-$ git clone https://github.com/SeuUsuario/BifrostPHP-Back.git
-$ cd BifrostPHP-Back
+$ git clone https://github.com/SeuUsuario/Bifrost-API.git
+$ cd Bifrost-API
 
 # Copie as variáveis de ambiente
 $ cp .env.example .env   # Ajuste as variáveis se necessário
