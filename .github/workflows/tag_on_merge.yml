@@ -124,17 +124,6 @@ jobs:
           git reset --hard origin/main
           git push --force origin latest-release
 
-  sync_labels:
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: micnncim/action-label-syncer@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          manifest: .github/labels.yml
-          prune: true
-
   # Publica a imagem docker da API no GitHub Container Registry
   # A imagem é publicada com a tag gerada no job anterior e também com a tag "latest"
   publish_docker_image_api:

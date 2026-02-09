@@ -1,16 +1,69 @@
 {
     "version": "2.0.0",
     "tasks": [
-        // Scrips base
+
+        // Scrips .github
         {
-            "label": "mesclar base/last-release com a branch atual",
+            "label": "mesclar .github/last-release com a branch atual",
             "type": "shell",
             "problemMatcher": [],
             "windows": {
-                "command": "if (git remote | findstr 'base') { git remote set-url base https://github.com/Felipe-Cavalca/base-repo.git } else { git remote add base https://github.com/Felipe-Cavalca/base-repo.git }; git fetch base; git merge base/latest-release --allow-unrelated-histories"
+                "command": "if (git remote | findstr 'Github') { git remote set-url Github https://github.com/Felipe-Cavalca/.github.git } else { git remote add Github https://github.com/Felipe-Cavalca/.github.git }; git fetch Github; git merge Github/latest-release --allow-unrelated-histories"
             },
             "linux": {
-                "command": "git remote | grep base && git remote set-url base https://github.com/Felipe-Cavalca/base-repo.git || git remote add base https://github.com/Felipe-Cavalca/base-repo.git; git fetch base && git merge base/latest-release --allow-unrelated-histories"
+                "command": "git remote | grep Github && git remote set-url Github https://github.com/Felipe-Cavalca/.github.git || git remote add Github https://github.com/Felipe-Cavalca/.github.git; git fetch Github && git merge Github/latest-release --allow-unrelated-histories"
+            }
+        },
+
+        // Scripts Bifrost
+        {
+            "label": "Mesclar Bifrost/last-release com a branch atual",
+            "type": "shell",
+            "problemMatcher": [],
+            "windows": {
+                "command": "if (git remote | findstr 'Bifrost') { git remote set-url Bifrost https://github.com/Felipe-Cavalca/Bifrost.git } else { git remote add Bifrost https://github.com/Felipe-Cavalca/Bifrost.git }; git fetch Bifrost; git merge Bifrost/latest-release --allow-unrelated-histories"
+            },
+            "linux": {
+                "command": "git remote | grep Bifrost && git remote set-url Bifrost https://github.com/Felipe-Cavalca/Bifrost.git || git remote add Bifrost https://github.com/Felipe-Cavalca/Bifrost.git; git fetch Bifrost && git merge Bifrost/latest-release --allow-unrelated-histories"
+            }
+        },
+
+        // Scripts Front
+        {
+            "label": "Mesclar Bifrost-Front/last-release com a branch atual",
+            "type": "shell",
+            "problemMatcher": [],
+            "windows": {
+                "command": "if (git remote | findstr 'Front') { git remote set-url Front https://github.com/Felipe-Cavalca/Bifrost-Front.git } else { git remote add Front https://github.com/Felipe-Cavalca/Bifrost-Front.git }; git fetch Front; git merge Front/latest-release --allow-unrelated-histories"
+            },
+            "linux": {
+                "command": "git remote | grep Front && git remote set-url Front https://github.com/Felipe-Cavalca/Bifrost-Front.git || git remote add Front https://github.com/Felipe-Cavalca/Bifrost-Front.git; git fetch Front && git merge Front/latest-release --allow-unrelated-histories"
+            }
+        },
+
+        // Scripts API
+        {
+            "label": "Mesclar Bifrost-API/last-release com a branch atual",
+            "type": "shell",
+            "problemMatcher": [],
+            "windows": {
+                "command": "if (git remote | findstr 'API') { git remote set-url API https://github.com/Felipe-Cavalca/Bifrost-API.git } else { git remote add API https://github.com/Felipe-Cavalca/Bifrost-API.git }; git fetch API; git merge API/latest-release --allow-unrelated-histories"
+            },
+            "linux": {
+                "command": "git remote | grep API && git remote set-url API https://github.com/Felipe-Cavalca/Bifrost-API.git || git remote add API https://github.com/Felipe-Cavalca/Bifrost-API.git; git fetch API && git merge API/latest-release --allow-unrelated-histories"
+            }
+        },
+
+        // Scripts Database
+        {
+            "label": "Mesclar Bifrost-Database/last-release com a branch atual",
+            "type": "shell",
+            "problemMatcher": [],
+            "windows": {
+                "command": "if (git remote | findstr 'Database') { git remote set-url Database https://github.com/Felipe-Cavalca/Bifrost-Database.git } else { git remote add Database https://github.com/Felipe-Cavalca/Bifrost-Database.git }; git fetch Database; git merge Database/latest-release --allow-unrelated-histories"
+            },
+            "linux": {
+                "command": "git remote | grep banco && git remote set-url banco https://github.com/Felipe-Cavalca/Bifrost-Database.git || git remote add banco https://github.com/Felipe-Cavalca/Bifrost-Database.git; git fetch banco && git merge banco/latest-release --allow-unrelated-histories"
             }
         },
 
@@ -28,5 +81,6 @@
             ],
             "group": { "kind": "build", "isDefault": true }
         }
+
     ]
 }
