@@ -202,3 +202,43 @@ Por favor, mantenha um estilo de código consistente e escreva testes sempre que
 Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para obter mais informações.
 
 > Documentação desenvolvida com auxilio de I.A.
+
+---
+
+## Composer e S3 (suporte opcional)
+
+O framework agora suporta Composer sem remover o autoload nativo:
+
+- Se `vendor/autoload.php` existir, ele e carregado primeiro.
+- O autoloader interno do Bifrost continua ativo para manter compatibilidade.
+
+Instalacao basica:
+
+```bash
+composer install
+```
+
+Integracao com S3 via SDK oficial da AWS:
+
+```bash
+composer require aws/aws-sdk-php
+```
+
+Exemplo rapido:
+
+```php
+use Bifrost\Integration\S3Storage;
+
+$s3 = S3Storage::fromSettings();
+$s3->put("documents/report.txt", "conteudo", ["ContentType" => "text/plain"]);
+$url = $s3->createPresignedUrl("documents/report.txt");
+```
+
+Variaveis opcionais para `S3Storage::fromSettings()`:
+
+- `BFR_API_S3_BUCKET`
+- `BFR_API_S3_REGION`
+- `BFR_API_S3_KEY`
+- `BFR_API_S3_SECRET`
+- `BFR_API_S3_ENDPOINT`
+- `BFR_API_S3_PATH_STYLE`

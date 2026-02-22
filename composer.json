@@ -1,0 +1,22 @@
+{
+  "name": "bifrost/api",
+  "description": "Bifrost API micro-framework core",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bifrost\\\\": "api/"
+    }
+  },
+  "suggest": {
+    "aws/aws-sdk-php": "S3 integration via Bifrost\\\\Integration\\\\S3Storage"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

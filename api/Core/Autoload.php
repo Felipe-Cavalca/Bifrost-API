@@ -2,6 +2,18 @@
 
 namespace Bifrost\Core;
 
+$composerAutoloadCandidates = [
+    dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php",
+    dirname(__DIR__) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php",
+];
+
+foreach ($composerAutoloadCandidates as $composerAutoload) {
+    if (is_readable($composerAutoload)) {
+        require_once $composerAutoload;
+        break;
+    }
+}
+
 /**
  * Função responsável por importar classes do sistema.
  *

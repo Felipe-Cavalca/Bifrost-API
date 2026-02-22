@@ -2,3 +2,5 @@ tmp/*
 ./api/tmp/*
 .env
 tests/api/.phpunit.result.cache
+/vendor/
+/api/vendor/
