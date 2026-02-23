@@ -5,8 +5,9 @@ namespace Bifrost\Integration;
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 use Bifrost\Core\Settings;
+use Bifrost\Interface\Storage as StorageInterface;
 
-class S3Storage
+class S3Storage implements StorageInterface
 {
     private S3Client $client;
     private string $bucket;
