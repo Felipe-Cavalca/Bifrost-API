@@ -10,7 +10,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Bifrost\\\\": "api/"
+      "Bifrost\\\\": "./"
     }
   },
   "suggest": {
