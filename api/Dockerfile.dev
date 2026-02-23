@@ -1,22 +1,34 @@
 # Dockerfile.dev
 FROM php:8.3-fpm
 
-# Atualizando pacotes do sistema e instalando dependências necessárias
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+WORKDIR /var/www/html
+
+# Atualizando pacotes do sistema e instalando dependencias necessarias
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         supervisor \
         libpq-dev \
-    && docker-php-ext-install pdo_mysql pdo_pgsql \
+        libcurl4-openssl-dev \
+        git \
+        unzip \
+    && docker-php-ext-install curl pdo_mysql pdo_pgsql \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiando os arquivos da aplicação
-COPY ./ /var/www/html
+# Copiando os arquivos da aplicacao (build context: raiz do repositorio)
+COPY api/composer.json /var/www/html/composer.json
+COPY api/ /var/www/html/
 
-# Configurações do PHP para desenvolvimento (sem opcache)
+# Instala dependencias PHP de desenvolvimento
+RUN composer install --prefer-dist --no-interaction
+
+# Configuracoes do PHP para desenvolvimento (sem opcache)
 RUN mkdir -p /usr/local/etc/php/conf.d \
     && echo "upload_max_filesize = 1G" > /usr/local/etc/php/conf.d/bifrost.ini \
     && echo "post_max_size = 1G" >> /usr/local/etc/php/conf.d/bifrost.ini \
@@ -38,15 +50,15 @@ RUN pecl install xdebug \
     && echo "xdebug.profiler_output_name=callgrind.out.%t" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.profiler_enable_trigger=1" >> /usr/local/etc/php/conf.d/xdebug.ini
 
-# Criando o diretório de sessões e configurando permissões
+# Criando o diretorio de sessoes e configurando permissoes
 RUN mkdir -p /var/lib/php/sessions \
-    && chown -R www-data:www-data /var/lib/php/sessions
+    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html
 
-# Copiando a configuração do Supervisor
+# Copiando a configuracao do Supervisor
 RUN mkdir -p /var/run/supervisor /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY api/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expõe a porta do PHP-FPM
+# Expoe a porta do PHP-FPM
 EXPOSE 9000
 
 # Inicia supervisor para rodar PHP-FPM e o worker

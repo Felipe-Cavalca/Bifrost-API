@@ -1,13 +1,12 @@
 x-template-api:
   template-api: &template-api
-    build:
-      dockerfile: ./Dockerfile.dev
+    image: ${BFR_API_IMAGE:-ghcr.io/felipe-cavalca/bifrost-api:latest}
+    pull_policy: always
     env_file:
       - ./../.env
-    volumes:
-      - ./:/var/www/html
     networks:
       - bifrost-back-network
+    restart: unless-stopped
     # mem_limit: 256m
     # cpus: '0.25'
 
@@ -15,7 +14,7 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "${BFR_API_HTTP_PORT:-80}:80"
     depends_on:
       - api1
       - api2
@@ -23,6 +22,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - bifrost-back-network
+    restart: unless-stopped
 
   api1:
     <<: *template-api

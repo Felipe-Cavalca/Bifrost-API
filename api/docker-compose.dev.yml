@@ -1,0 +1,55 @@
+x-template-api:
+  template-api: &template-api
+    build:
+      context: ..
+      dockerfile: api/Dockerfile.dev
+    env_file:
+      - ./../.env
+    volumes:
+      - ./:/var/www/html
+      - ./composer.json:/tmp/composer.json:ro
+      - api_vendor:/var/www/html/vendor
+    command: >
+      sh -lc "LOCK_DIR=/var/www/html/vendor/.composer-install-lock;
+      if [ ! -f /var/www/html/vendor/autoload.php ]; then
+        LOCKED=0;
+        while [ \"$LOCKED\" = \"0\" ]; do
+          if mkdir \"$LOCK_DIR\" 2>/dev/null; then LOCKED=1; break; fi;
+          if [ -f /var/www/html/vendor/autoload.php ]; then break; fi;
+          sleep 1;
+        done;
+        if [ ! -f /var/www/html/vendor/autoload.php ]; then COMPOSER=/tmp/composer.json composer install --working-dir /var/www/html --prefer-dist --no-interaction; fi;
+        if [ \"$LOCKED\" = \"1\" ]; then rmdir \"$LOCK_DIR\" 2>/dev/null || true; fi;
+      fi;
+      exec /usr/bin/supervisord"
+    networks:
+      - bifrost-back-network
+    # mem_limit: 256m
+    # cpus: '0.25'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - api1
+      - api2
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - bifrost-back-network
+
+  api1:
+    <<: *template-api
+    container_name: api1
+
+  api2:
+    <<: *template-api
+    container_name: api2
+
+networks:
+  bifrost-back-network:
+
+volumes:
+  api_vendor:

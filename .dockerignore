@@ -1,0 +1,10 @@
+.git
+.github
+.vscode
+tests
+tmp
+api/tmp
+vendor
+api/vendor
+*.log
+.env
