@@ -53,6 +53,36 @@
                 "command": "git remote | grep API && git remote set-url API https://github.com/Felipe-Cavalca/Bifrost-API.git || git remote add API https://github.com/Felipe-Cavalca/Bifrost-API.git; git fetch API && git merge API/latest-release --allow-unrelated-histories"
             }
         },
+        {
+            "label": "Back-end docker-compose up (dev)",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "api/docker-compose.dev.yml",
+                "up",
+                "--build",
+                "-d"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Back-end docker-compose up (prod)",
+            "type": "shell",
+            "command": "docker-compose",
+            "options": {},
+            "args": [
+                "-f",
+                "api/docker-compose.prod.yml",
+                "up",
+                "-d"
+            ],
+            "problemMatcher": []
+        },
 
         // Scripts Database
         {
@@ -65,21 +95,6 @@
             "linux": {
                 "command": "git remote | grep banco && git remote set-url banco https://github.com/Felipe-Cavalca/Bifrost-Database.git || git remote add banco https://github.com/Felipe-Cavalca/Bifrost-Database.git; git fetch banco && git merge banco/latest-release --allow-unrelated-histories"
             }
-        },
-
-        // Scripts do Back-end
-        {
-            "label": "Back-end docker-compose up",
-            "type": "shell",
-            "command": "docker-compose",
-            "args": [
-                "-f",
-                "api/docker-compose.yml",
-                "up",
-                "--build",
-                "-d"
-            ],
-            "group": { "kind": "build", "isDefault": true }
         }
 
     ]
