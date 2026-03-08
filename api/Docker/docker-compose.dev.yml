@@ -1,13 +1,15 @@
+name: bifrost-api
+
 x-template-api:
   template-api: &template-api
     build:
-      context: ..
-      dockerfile: api/Dockerfile.dev
+      context: ../..
+      dockerfile: api/Docker/Dockerfile.dev
     env_file:
-      - ./../.env
+      - ./../../.env
     volumes:
-      - ./:/var/www/html
-      - ./composer.json:/tmp/composer.json:ro
+      - ../:/var/www/html
+      - ../composer.json:/tmp/composer.json:ro
       - api_vendor:/var/www/html/vendor
     command: >
       sh -lc "LOCK_DIR=/var/www/html/vendor/.composer-install-lock;
@@ -36,7 +38,7 @@ services:
       - api1
       - api2
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - bifrost-back-network
 

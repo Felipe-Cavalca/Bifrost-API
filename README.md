@@ -51,7 +51,7 @@ $ cd Bifrost-API
 $ cp .env.example .env   # Ajuste as variáveis se necessário
 
 # Suba a stack
-$ docker compose -f api/docker-compose.dev.yml up -d --build
+$ docker compose -f api/Docker/docker-compose.dev.yml up -d --build
 ```
 
 O Nginx ficará disponível em `http://localhost/api/` expondo dois workers PHP (`api1`, `api2`).
@@ -61,13 +61,13 @@ O Nginx ficará disponível em `http://localhost/api/` expondo dois workers PHP 
 Desenvolvimento (build local, volumes e hot-reload):
 
 ```bash
-$ docker compose -f api/docker-compose.dev.yml up -d --build
+$ docker compose -f api/Docker/docker-compose.dev.yml up -d --build
 ```
 
 Producao (imagem publicada, sem volume de codigo da API):
 
 ```bash
-$ BFR_API_IMAGE=ghcr.io/felipe-cavalca/bifrost-api:latest docker compose -f api/docker-compose.prod.yml up -d
+$ BFR_API_IMAGE=ghcr.io/felipe-cavalca/bifrost-api:latest docker compose -f api/Docker/docker-compose.prod.yml up -d
 ```
 
 ### Acesso rápido
@@ -97,10 +97,12 @@ Resposta esperada (código 200):
 
 ```
 api/
-│   docker-compose.dev.yml   # Orquestracao local (desenvolvimento)
-│   docker-compose.prod.yml  # Orquestracao por imagem (producao)
-│   Dockerfile.dev           # Imagem de desenvolvimento
-│   Dockerfile.prod          # Imagem de producao
+│
+├── Docker/
+│   │   docker-compose.dev.yml   # Orquestracao local (desenvolvimento)
+│   │   docker-compose.prod.yml  # Orquestracao por imagem (producao)
+│   │   Dockerfile.dev           # Imagem de desenvolvimento
+│   │   Dockerfile.prod          # Imagem de producao
 │
 ├── Attributes/          # Implementações dos PHP Attributes
 ├── Class/               # Classes auxiliares (HttpResponse, …)

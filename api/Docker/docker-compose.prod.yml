@@ -1,9 +1,11 @@
+name: bifrost-api
+
 x-template-api:
   template-api: &template-api
     image: ${BFR_API_IMAGE:-ghcr.io/felipe-cavalca/bifrost-api:latest}
     pull_policy: always
     env_file:
-      - ./../.env
+      - ./../../.env
     networks:
       - bifrost-back-network
     restart: unless-stopped
@@ -19,7 +21,7 @@ services:
       - api1
       - api2
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - bifrost-back-network
     restart: unless-stopped
