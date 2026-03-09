@@ -13,13 +13,13 @@ x-template-api:
       sh -lc "LOCK_DIR=/var/www/html/vendor/.composer-install-lock;
       if [ ! -f /var/www/html/vendor/autoload.php ]; then
         LOCKED=0;
-        while [ \"$LOCKED\" = \"0\" ]; do
-          if mkdir \"$LOCK_DIR\" 2>/dev/null; then LOCKED=1; break; fi;
+        while [ \"$$LOCKED\" = \"0\" ]; do
+          if mkdir \"$$LOCK_DIR\" 2>/dev/null; then LOCKED=1; break; fi;
           if [ -f /var/www/html/vendor/autoload.php ]; then break; fi;
           sleep 1;
         done;
         if [ ! -f /var/www/html/vendor/autoload.php ]; then COMPOSER=/tmp/composer.json composer install --working-dir /var/www/html --prefer-dist --no-interaction; fi;
-        if [ \"$LOCKED\" = \"1\" ]; then rmdir \"$LOCK_DIR\" 2>/dev/null || true; fi;
+        if [ \"$$LOCKED\" = \"1\" ]; then rmdir \"$$LOCK_DIR\" 2>/dev/null || true; fi;
       fi;
       exec /usr/bin/supervisord"
     networks:
@@ -29,14 +29,14 @@ x-template-api:
 
 services:
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile.nginx
     ports:
       - "80:80"
     depends_on:
       - api1
       - api2
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - bifrost-back-network
 
