@@ -1,0 +1,38 @@
+name: bifrost-api
+
+x-template-api:
+  template-api: &template-api
+    image: ${BFR_API_IMAGE:-ghcr.io/felipe-cavalca/bifrost-api:latest}
+    pull_policy: always
+    env_file:
+      - ./../../.env
+    networks:
+      - bifrost-back-network
+    restart: unless-stopped
+    # mem_limit: 256m
+    # cpus: '0.25'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "${BFR_API_HTTP_PORT:-80}:80"
+    depends_on:
+      - api1
+      - api2
+    volumes:
+      - ../nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - bifrost-back-network
+    restart: unless-stopped
+
+  api1:
+    <<: *template-api
+    container_name: api1
+
+  api2:
+    <<: *template-api
+    container_name: api2
+
+networks:
+  bifrost-back-network:

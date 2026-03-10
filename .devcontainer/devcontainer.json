@@ -11,7 +11,7 @@
       "moby": false
     }
   },
-  "initializeCommand": "docker compose -f api/docker-compose.dev.yml up -d",
+  "initializeCommand": "docker compose -f ${localWorkspaceFolder}/api/Docker/docker-compose.dev.yml up -d",
   "customizations": {
     "vscode": {
       "extensions": [
