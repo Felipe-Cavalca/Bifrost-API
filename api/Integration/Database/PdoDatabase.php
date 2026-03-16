@@ -196,7 +196,7 @@ class PdoDatabase implements DatabaseInterface
             $stmt->execute($params);
 
             // Verifica o tipo de query e retorna o resultado apropriado
-            if (stripos($sql, 'SELECT') === 0) {
+            if (stripos($sql, 'SELECT') === 0 || stripos($sql, 'PRAGMA') === 0) {
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } elseif (stripos($sql, 'INSERT') === 0 || stripos($sql, 'UPDATE') === 0 || stripos($sql, 'DELETE') === 0) {
                 // Verifica se a consulta contém a cláusula RETURNING
@@ -335,9 +335,9 @@ class PdoDatabase implements DatabaseInterface
     public function exists(string $table, array|string $where): bool
     {
         $whereSql = $where ? self::buildWhereQuery($where) : '';
-        $sql = "SELECT EXISTS(SELECT 1 FROM $table" . ($whereSql ? " WHERE $whereSql" : "") . ") AS exists";
+        $sql = "SELECT EXISTS(SELECT 1 FROM $table" . ($whereSql ? " WHERE $whereSql" : "") . ") AS row_exists";
         $res = $this->executeQuery($sql);
-        return !empty($res) && ($res[0]["exists"] ?? $res[0]["EXISTS"] ?? false);
+        return !empty($res) && ($res[0]["row_exists"] ?? $res[0]["ROW_EXISTS"] ?? $res[0]["exists"] ?? $res[0]["EXISTS"] ?? false);
     }
 
     public function query(
@@ -409,4 +409,3 @@ class PdoDatabase implements DatabaseInterface
         return false;
     }
 }
-
