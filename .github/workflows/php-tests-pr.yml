@@ -1,0 +1,107 @@
+name: PHP Tests On PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  phpunit:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: json, pdo_sqlite
+
+      - name: Install dependencies
+        run: |
+          if [ -d api/vendor ]; then
+            echo "Committed vendor directory found, skipping composer install."
+          else
+            composer install --working-dir=api --no-interaction --no-progress --prefer-dist
+          fi
+
+      - name: Run PHPUnit
+        id: phpunit
+        run: ./vendor/bin/phpunit -c phpunit.xml
+        working-directory: api
+
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo "## PHP tests"
+            echo ""
+            if [ "${{ steps.phpunit.outcome }}" = "success" ]; then
+              echo "- Status: passed"
+            else
+              echo "- Status: failed"
+            fi
+            echo "- Workflow: \`${{ github.workflow }}\`"
+            echo "- Commit: \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment PR with result
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- bifrost-php-tests -->';
+            const passed = '${{ steps.phpunit.outcome }}' === 'success';
+            const body = [
+              marker,
+              '## PHP tests',
+              '',
+              `Status: **${passed ? 'passed' : 'failed'}**`,
+              '',
+              `Workflow: \`${context.workflow}\``,
+              `Commit: \`${context.sha}\``,
+              '',
+              passed
+                ? 'The PHPUnit suite finished successfully for this PR.'
+                : 'The PHPUnit suite failed for this PR. Check the workflow logs for details.',
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const previous = comments.find(comment => comment.body && comment.body.includes(marker));
+
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
