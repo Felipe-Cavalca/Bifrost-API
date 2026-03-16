@@ -97,6 +97,11 @@ final class Settings
     {
         ini_set("display_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
         ini_set("display_startup_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
+        }
+
         ini_set('session.save_handler', static::getEnv("BFR_API_SESSION_SAVE_HANDLER") ?? "files");
         ini_set('session.save_path', static::getEnv("BFR_API_SESSION_SAVE_PATH") ?? "/var/lib/php/sessions");
         ini_set('session.gc_maxlifetime', static::getEnv("BFR_API_SESSION_GC_MAXLIFETIME") ?? 1440);
