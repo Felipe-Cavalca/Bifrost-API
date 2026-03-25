@@ -71,7 +71,7 @@ class RequiredParams implements AttributeInterface, AttributeBefore
                 $this->errors[$field] = "Field not found";
             }
 
-            if (!static::validateType($field, $filter) && empty($this->errors[$field])) {
+            if (empty($this->errors[$field]) && !static::validateType($field, $filter)) {
                 $this->errors[$field] = "Invalid parameter type";
             }
         }

@@ -1,6 +1,4 @@
 tmp/*
-./api/tmp/*
+/api/tmp/*
+/api/vendor
 .env
-tests/api/.phpunit.result.cache
-/vendor/
-/api/vendor/

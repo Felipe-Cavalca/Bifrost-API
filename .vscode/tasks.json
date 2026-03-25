@@ -59,7 +59,7 @@
             "command": "docker-compose",
             "args": [
                 "-f",
-                "api/docker-compose.dev.yml",
+                "api/Docker/docker-compose.dev.yml",
                 "up",
                 "--build",
                 "-d"
@@ -77,7 +77,7 @@
             "options": {},
             "args": [
                 "-f",
-                "api/docker-compose.prod.yml",
+                "api/Docker/docker-compose.prod.yml",
                 "up",
                 "-d"
             ],

@@ -1,0 +1,44 @@
+name: bifrost-api
+
+x-template-api:
+  template-api: &template-api
+    build:
+      context: ../..
+      dockerfile: api/Docker/Dockerfile.dev
+    env_file:
+      - ./../../.env
+    volumes:
+      - ../:/var/www/html
+      - ../composer.json:/tmp/composer.json:ro
+      - api_vendor:/var/www/html/vendor
+    networks:
+      - bifrost-back-network
+    # mem_limit: 256m
+    # cpus: '0.25'
+
+services:
+  nginx:
+    build:
+      context: ../
+      dockerfile: Docker/Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - api1
+      - api2
+    networks:
+      - bifrost-back-network
+
+  api1:
+    <<: *template-api
+    container_name: api1
+
+  api2:
+    <<: *template-api
+    container_name: api2
+
+networks:
+  bifrost-back-network:
+
+volumes:
+  api_vendor:

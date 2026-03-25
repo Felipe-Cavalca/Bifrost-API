@@ -1,0 +1,66 @@
+# Dockerfile.dev
+FROM php:8.3-fpm
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+WORKDIR /var/www/html
+
+# Atualizando pacotes do sistema e instalando dependencias necessarias
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+        supervisor \
+        libpq-dev \
+        libcurl4-openssl-dev \
+        git \
+        unzip \
+    && docker-php-ext-install curl pdo_mysql pdo_pgsql \
+    && pecl install redis apcu \
+    && docker-php-ext-enable redis apcu \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiando os arquivos da aplicacao (build context: raiz do repositorio)
+COPY api/composer.json /var/www/html/composer.json
+COPY api/ /var/www/html/
+
+# Instala dependencias PHP de desenvolvimento
+RUN composer install --prefer-dist --no-interaction
+
+# Configuracoes do PHP para desenvolvimento (sem opcache)
+RUN mkdir -p /usr/local/etc/php/conf.d \
+    && echo "upload_max_filesize = 1G" > /usr/local/etc/php/conf.d/bifrost.ini \
+    && echo "post_max_size = 1G" >> /usr/local/etc/php/conf.d/bifrost.ini \
+    && echo "memory_limit = 1G" >> /usr/local/etc/php/conf.d/bifrost.ini \
+    && echo "session.save_path = /var/lib/php/sessions" >> /usr/local/etc/php/conf.d/bifrost.ini \
+    && echo "apc.enable_cli=1" >> /usr/local/etc/php/conf.d/bifrost.ini
+
+# Instalando e configurando o Xdebug para desenvolvimento
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && mkdir -p /var/log/xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.mode=debug,develop" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.log_level=7" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.output_dir=/var/log/xdebug" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.profiler_output_name=callgrind.out.%t" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.profiler_enable_trigger=1" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+# Criando o diretorio de sessoes e configurando permissoes
+RUN mkdir -p /var/lib/php/sessions \
+    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html
+
+# Copiando a configuracao do Supervisor
+RUN mkdir -p /var/run/supervisor /var/log/supervisor
+COPY api/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expoe a porta do PHP-FPM
+EXPOSE 9000
+
+# Em dev, garante install do vendor em runtime com lock compartilhado e inicia o supervisor
+CMD ["sh", "-lc", "LOCK_DIR=/var/www/html/vendor/.composer-install-lock; if [ ! -f /var/www/html/vendor/autoload.php ]; then LOCKED=0; while [ \"$$LOCKED\" = \"0\" ]; do if mkdir \"$$LOCK_DIR\" 2>/dev/null; then LOCKED=1; break; fi; if [ -f /var/www/html/vendor/autoload.php ]; then break; fi; sleep 1; done; if [ ! -f /var/www/html/vendor/autoload.php ]; then COMPOSER=/tmp/composer.json composer install --working-dir /var/www/html --prefer-dist --no-interaction; fi; if [ \"$$LOCKED\" = \"1\" ]; then rmdir \"$$LOCK_DIR\" 2>/dev/null || true; fi; fi; exec /usr/bin/supervisord"]
