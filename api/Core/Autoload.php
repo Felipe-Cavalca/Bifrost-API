@@ -9,7 +9,14 @@ $composerAutoloadCandidates = [
 
 foreach ($composerAutoloadCandidates as $composerAutoload) {
     if (is_readable($composerAutoload)) {
-        require_once $composerAutoload;
+        $loader = require_once $composerAutoload;
+
+        if ($loader instanceof \Composer\Autoload\ClassLoader) {
+            $apcuEnabled = filter_var(getenv('BFR_API_CACHE_APCU_ENABLED'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+            if ($apcuEnabled === null || $apcuEnabled === true) {
+                $loader->setApcuPrefix(getenv('BFR_API_CACHE_APCU_PREFIX') ?: 'bifrost_autoload');
+            }
+        }
         break;
     }
 }

@@ -17,7 +17,7 @@ class RedisQueue implements QueueInterface
     {
         if (empty(self::$redis)) {
             $settings = new Settings();
-            self::$queue = $settings->BFR_API_REDIS_QUEUE ?? 'bifrost_queue';
+            self::$queue = $settings->BFR_API_QUEUE_NAME ?? 'bifrost_queue';
             self::conn();
         }
     }
@@ -25,8 +25,8 @@ class RedisQueue implements QueueInterface
     private static function conn(): void
     {
         $settings = new Settings();
-        $host = $settings->BFR_API_REDIS_HOST;
-        $port = $settings->BFR_API_REDIS_PORT;
+        $host = $settings->BFR_API_QUEUE_REDIS_HOST;
+        $port = $settings->BFR_API_QUEUE_REDIS_PORT;
 
         if (empty($host) || empty($port)) {
             self::$enabled = false;
@@ -132,4 +132,3 @@ class RedisQueue implements QueueInterface
         self::$redis->lpush(self::$queue, serialize($task));
     }
 }
-
