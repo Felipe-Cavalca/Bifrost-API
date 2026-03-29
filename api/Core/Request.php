@@ -14,6 +14,7 @@ use Bifrost\Core\AppError;
 use Bifrost\Core\Get;
 use Bifrost\Core\Settings;
 use Bifrost\Enum\Path;
+use Bifrost\Integration\Apcu;
 use Bifrost\Interface\Attribute;
 use Bifrost\Interface\AttributeAfter;
 use Bifrost\Interface\AttributeBefore;
@@ -54,16 +55,11 @@ final class Request
     public static function run(string|Controller $controller, string $action): Responseable
     {
         try {
-
-            if ($controller instanceof Controller) {
-                $objController = $controller;
-            } else {
-                if (empty($controller) || !self::validateControllerName($controller)) {
-                    throw new AppError(HttpResponse::notFound(["controller" => $controller], "Controller not found"));
-                }
-
-                $objController = self::loadController($controller);
+            if (is_string($controller) && (empty($controller) || !self::validateControllerName($controller))) {
+                throw new AppError(HttpResponse::notFound(["controller" => $controller], "Controller not found"));
             }
+
+            $objController = self::resolveController($controller);
 
             if (!self::validateActionName($objController, $action)) {
                 throw new AppError(HttpResponse::notFound(["action" => $action], "Action not found"));
@@ -96,12 +92,18 @@ final class Request
      */
     private static function validateControllerName(string $controller): bool
     {
-        $nameController = Path::FOLDER->toDirectory() . Path::CONTROLLERS->toDirectory() . $controller . ".php";
-        $controller = Path::NAMESPACE->value . Path::CONTROLLERS->value . $controller;
-        if (!is_readable($nameController) || !class_exists($controller)) {
-            return false;
+        $cacheKey = self::getCacheKey('controller_exists', $controller);
+        $cached = Apcu::fetch($cacheKey);
+        if (is_bool($cached)) {
+            return $cached;
         }
-        return true;
+
+        $nameController = Path::FOLDER->toDirectory() . Path::CONTROLLERS->toDirectory() . $controller . ".php";
+        $controllerClass = Path::NAMESPACE->value . Path::CONTROLLERS->value . $controller;
+        $exists = is_readable($nameController) && class_exists($controllerClass);
+
+        Apcu::store($cacheKey, $exists);
+        return $exists;
     }
 
     /**
@@ -123,7 +125,15 @@ final class Request
      */
     private static function validateActionName(Controller $controller, string $action): bool
     {
-        return method_exists($controller, $action);
+        $cacheKey = self::getCacheKey('action_exists', $controller::class, $action);
+        $cached = Apcu::fetch($cacheKey);
+        if (is_bool($cached)) {
+            return $cached;
+        }
+
+        $exists = method_exists($controller, $action);
+        Apcu::store($cacheKey, $exists);
+        return $exists;
     }
 
     /**
@@ -133,11 +143,28 @@ final class Request
      */
     private static function getAttributes(ReflectionMethod $reflectionMethod): array
     {
+        $cacheKey = self::getCacheKey(
+            'method_attributes',
+            $reflectionMethod->getDeclaringClass()->getName(),
+            $reflectionMethod->getName()
+        );
+        $cached = Apcu::fetch($cacheKey);
+        if (is_array($cached)) {
+            return self::hydrateAttributes($cached);
+        }
+
         $attributesReturn = [];
+        $attributesMetadata = [];
         $attributes = $reflectionMethod->getAttributes();
         foreach ($attributes as $attribute) {
+            $attributesMetadata[] = [
+                'name' => $attribute->getName(),
+                'arguments' => $attribute->getArguments(),
+            ];
             $attributesReturn[] = $attribute->newInstance();
         }
+
+        Apcu::store($cacheKey, $attributesMetadata);
         return $attributesReturn;
     }
 
@@ -207,19 +234,41 @@ final class Request
      */
     public static function getOptionsAttributes(string|Controller $controller, string $action): array
     {
-        if (! $controller instanceof Controller) {
-            $controller = self::loadController($controller);
-        }
-
-        $reflectionMethod = new ReflectionMethod($controller, $action);
-        $attributes = $reflectionMethod->getAttributes();
+        $controller = self::resolveController($controller);
+        $attributes = self::getAttributes(new ReflectionMethod($controller, $action));
         $options = [];
         foreach ($attributes as $attribute) {
-            $attribute = $attribute->newInstance();
             if ($attribute instanceof Attribute) {
                 $options = array_merge($options, $attribute->getOptions());
             }
         }
         return $options;
     }
+
+    private static function resolveController(string|Controller $controller): Controller
+    {
+        if ($controller instanceof Controller) {
+            return $controller;
+        }
+
+        return self::loadController($controller);
+    }
+
+    private static function hydrateAttributes(array $attributesMetadata): array
+    {
+        $attributes = [];
+        foreach ($attributesMetadata as $attributeMetadata) {
+            $className = $attributeMetadata['name'];
+            $arguments = $attributeMetadata['arguments'];
+            $attributes[] = new $className(...$arguments);
+        }
+
+        return $attributes;
+    }
+
+    private static function getCacheKey(string ...$parts): string
+    {
+        return Cache::buildKey('request', ...$parts);
+    }
+
 }

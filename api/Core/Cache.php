@@ -8,27 +8,26 @@ use Bifrost\Interface\Insertable;
 
 class Cache extends RedisCache implements CacheInterface
 {
-
     /**
-     * Gera a chave de cache no formato 'entidade:campo:valor'.
-     *
-     * @param array $conditions Condições utilizadas na busca
-     * @return string Chave para o cache
+     * Gera uma chave de cache estável usando namespace e partes arbitrárias.
      */
-    public static function buildCacheKey(string $entity, array $conditions): string
+    public static function buildKey(string $namespace, mixed ...$parts): string
     {
-        $parts = [];
-        foreach ($conditions as $field => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
+        $normalized = array_map(
+            static function ($value): string {
+                if ($value instanceof Insertable) {
+                    $value = $value->value();
+                }
 
-            if ($value instanceof Insertable) {
-                $value = $value->value();
-            }
+                if (is_scalar($value) || $value === null) {
+                    return (string) $value;
+                }
 
-            $parts[] = "{$field}:{$value}";
-        }
-        return $entity . ':' . implode(':', $parts);
+                return serialize($value);
+            },
+            $parts
+        );
+
+        return "{$namespace}:" . md5(implode('|', $normalized));
     }
 }
