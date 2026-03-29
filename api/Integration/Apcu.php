@@ -17,7 +17,10 @@ class Apcu
         $ttl = $ttl ?? self::defaultTtl();
 
         if (function_exists('apcu_store')) {
-            return apcu_store($key, $value, $ttl);
+            $stored = apcu_store($key, $value, $ttl);
+            if ($stored) {
+                return true;
+            }
         }
 
         self::$fallback[$key] = $value;
@@ -33,7 +36,9 @@ class Apcu
         if (function_exists('apcu_fetch')) {
             $success = false;
             $value = apcu_fetch($key, $success);
-            return $success ? $value : null;
+            if ($success) {
+                return $value;
+            }
         }
 
         return self::$fallback[$key] ?? null;
@@ -46,7 +51,9 @@ class Apcu
         }
 
         if (function_exists('apcu_exists')) {
-            return apcu_exists($key);
+            if (apcu_exists($key)) {
+                return true;
+            }
         }
 
         return array_key_exists($key, self::$fallback);
@@ -59,7 +66,9 @@ class Apcu
         }
 
         if (function_exists('apcu_delete')) {
-            return (bool) apcu_delete($key);
+            if (apcu_delete($key)) {
+                return true;
+            }
         }
 
         if (!array_key_exists($key, self::$fallback)) {
