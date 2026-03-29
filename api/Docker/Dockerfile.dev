@@ -16,8 +16,8 @@ RUN apt-get update \
         git \
         unzip \
     && docker-php-ext-install curl pdo_mysql pdo_pgsql \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
+    && pecl install redis apcu \
+    && docker-php-ext-enable redis apcu \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,7 +33,8 @@ RUN mkdir -p /usr/local/etc/php/conf.d \
     && echo "upload_max_filesize = 1G" > /usr/local/etc/php/conf.d/bifrost.ini \
     && echo "post_max_size = 1G" >> /usr/local/etc/php/conf.d/bifrost.ini \
     && echo "memory_limit = 1G" >> /usr/local/etc/php/conf.d/bifrost.ini \
-    && echo "session.save_path = /var/lib/php/sessions" >> /usr/local/etc/php/conf.d/bifrost.ini
+    && echo "session.save_path = /var/lib/php/sessions" >> /usr/local/etc/php/conf.d/bifrost.ini \
+    && echo "apc.enable_cli=1" >> /usr/local/etc/php/conf.d/bifrost.ini
 
 # Instalando e configurando o Xdebug para desenvolvimento
 RUN pecl install xdebug \

@@ -60,14 +60,16 @@ final class Settings
      */
     protected static function getEnv(string $param, bool $required = false): mixed
     {
-        if ($required && !getenv($param)) {
+        $value = getenv($param);
+
+        if ($required && ($value === false || $value === '')) {
             throw new AppError(HttpResponse::internalServerError(
                 message: "The environment variable '{$param}' is required.",
                 errors: ["{$param}" => "The environment variable '{$param}' is required."]
             ));
         }
 
-        return getenv($param) ?: null;
+        return $value === false ? null : $value;
     }
 
     /**

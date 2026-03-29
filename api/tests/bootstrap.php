@@ -25,6 +25,8 @@ putenv('BFR_API_SQL_HOST');
 putenv('BFR_API_SQL_PORT');
 putenv('BFR_API_REDIS_HOST');
 putenv('BFR_API_REDIS_PORT');
+putenv('BFR_API_APCU_ENABLED=1');
+putenv('BFR_API_APCU_TTL=3600');
 putenv('BFR_API_REDIS_QUEUE');
 putenv('BFR_API_S3_BUCKET');
 putenv('BFR_API_S3_REGION');
