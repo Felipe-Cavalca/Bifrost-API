@@ -10,13 +10,13 @@ final class SettingsTest extends TestCase
 {
     public function testReadsEnvironmentVariablesAndDatabaseSettings(): void
     {
-        putenv('BFR_API_SQL_DRIVER=sqlite');
-        putenv('BFR_API_SQL_DATABASE=' . bifrost_sqlite_path());
+        putenv('BFR_API_DB_DRIVER=sqlite');
+        putenv('BFR_API_DB_NAME=' . bifrost_sqlite_path());
 
         $settings = new Settings();
         $config = $settings->getSettingsDatabase();
 
-        self::assertSame('sqlite', $settings->BFR_API_SQL_DRIVER);
+        self::assertSame('sqlite', $settings->BFR_API_DB_DRIVER);
         self::assertSame('sqlite', $config['driver']);
         self::assertSame(bifrost_sqlite_path(), $config['database']);
         self::assertNull($config['host']);
@@ -24,7 +24,7 @@ final class SettingsTest extends TestCase
 
     public function testMissingRequiredEnvironmentVariableThrowsAppError(): void
     {
-        putenv('BFR_API_TEST_SQL_DRIVER');
+        putenv('BFR_API_TEST_DB_DRIVER');
 
         $settings = new Settings();
 

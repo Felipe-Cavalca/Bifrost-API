@@ -31,8 +31,16 @@ class RedisCache implements CacheInterface
     private static function conn(): void
     {
         $settings = new Settings();
-        $host = $settings->BFR_API_REDIS_HOST;
-        $port = $settings->BFR_API_REDIS_PORT;
+        $driver = strtolower($settings->BFR_API_CACHE_DRIVER ?? 'redis');
+
+        if ($driver !== 'redis') {
+            self::$enabled = false;
+            self::$redis = null;
+            return;
+        }
+
+        $host = $settings->BFR_API_CACHE_REDIS_HOST;
+        $port = $settings->BFR_API_CACHE_REDIS_PORT;
 
         if (empty($host) || empty($port)) {
             self::$enabled = false;

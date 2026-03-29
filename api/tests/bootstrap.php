@@ -14,20 +14,22 @@ use Bifrost\Core\Post;
 use Bifrost\Core\Session;
 use Bifrost\Integration\Database\PdoDatabase;
 
-putenv('BFR_API_DISPLAY_ERRORS=0');
-putenv('BFR_API_SESSION_SAVE_HANDLER=files');
-putenv('BFR_API_SESSION_SAVE_PATH=/tmp');
-putenv('BFR_API_SQL_DRIVER=sqlite');
-putenv('BFR_API_SQL_DATABASE=' . sys_get_temp_dir() . '/bifrost-api-phpunit.sqlite');
-putenv('BFR_API_SQL_USER');
-putenv('BFR_API_SQL_PASSWORD');
-putenv('BFR_API_SQL_HOST');
-putenv('BFR_API_SQL_PORT');
-putenv('BFR_API_REDIS_HOST');
-putenv('BFR_API_REDIS_PORT');
-putenv('BFR_API_APCU_ENABLED=1');
-putenv('BFR_API_APCU_TTL=3600');
-putenv('BFR_API_REDIS_QUEUE');
+putenv('BFR_API_DEBUG_SHOW_ERRORS=0');
+putenv('BFR_API_SESSION_HANDLER=files');
+putenv('BFR_API_SESSION_PATH=/tmp');
+putenv('BFR_API_DB_DRIVER=sqlite');
+putenv('BFR_API_DB_NAME=' . sys_get_temp_dir() . '/bifrost-api-phpunit.sqlite');
+putenv('BFR_API_DB_USER');
+putenv('BFR_API_DB_PASSWORD');
+putenv('BFR_API_DB_HOST');
+putenv('BFR_API_DB_PORT');
+putenv('BFR_API_CACHE_REDIS_HOST');
+putenv('BFR_API_CACHE_REDIS_PORT');
+putenv('BFR_API_CACHE_APCU_ENABLED=1');
+putenv('BFR_API_CACHE_APCU_TTL=3600');
+putenv('BFR_API_QUEUE_NAME');
+putenv('BFR_API_QUEUE_REDIS_HOST');
+putenv('BFR_API_QUEUE_REDIS_PORT');
 putenv('BFR_API_S3_BUCKET');
 putenv('BFR_API_S3_REGION');
 putenv('BFR_API_S3_KEY');
@@ -42,7 +44,7 @@ $_SESSION = [];
 
 function bifrost_sqlite_path(): string
 {
-    return (string) getenv('BFR_API_SQL_DATABASE');
+    return (string) getenv('BFR_API_DB_NAME');
 }
 
 function bifrost_reset_pdo_connections(): void

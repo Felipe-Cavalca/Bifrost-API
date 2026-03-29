@@ -82,7 +82,7 @@ class Apcu
     private static function enabled(): bool
     {
         $settings = new Settings();
-        $enabled = $settings->BFR_API_APCU_ENABLED;
+        $enabled = $settings->BFR_API_CACHE_APCU_ENABLED;
 
         if ($enabled === null || $enabled === '') {
             return true;
@@ -94,7 +94,7 @@ class Apcu
     private static function defaultTtl(): int
     {
         $settings = new Settings();
-        $ttl = (int) ($settings->BFR_API_APCU_TTL ?? 3600);
+        $ttl = (int) ($settings->BFR_API_CACHE_APCU_TTL ?? 3600);
 
         return $ttl > 0 ? $ttl : 3600;
     }

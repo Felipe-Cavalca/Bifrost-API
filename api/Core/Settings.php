@@ -97,17 +97,19 @@ final class Settings
      */
     private static function iniSet(): void
     {
-        ini_set("display_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
-        ini_set("display_startup_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
+        $displayErrors = static::getEnv("BFR_API_DEBUG_SHOW_ERRORS") ?? false;
+        ini_set("display_errors", (bool) $displayErrors);
+        ini_set("display_startup_errors", (bool) $displayErrors);
+        static::configureApcu();
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
 
-        ini_set('session.save_handler', static::getEnv("BFR_API_SESSION_SAVE_HANDLER") ?? "files");
-        ini_set('session.save_path', static::getEnv("BFR_API_SESSION_SAVE_PATH") ?? "/var/lib/php/sessions");
-        ini_set('session.gc_maxlifetime', static::getEnv("BFR_API_SESSION_GC_MAXLIFETIME") ?? 1440);
-        ini_set('session.cookie_lifetime', static::getEnv("BFR_API_SESSION_COOKIE_LIFETIME") ?? 0);
+        ini_set('session.save_handler', static::getEnv("BFR_API_SESSION_HANDLER") ?? "files");
+        ini_set('session.save_path', static::getEnv("BFR_API_SESSION_PATH") ?? "/var/lib/php/sessions");
+        ini_set('session.gc_maxlifetime', static::getEnv("BFR_API_SESSION_TTL") ?? 1440);
+        ini_set('session.cookie_lifetime', static::getEnv("BFR_API_SESSION_COOKIE_TTL") ?? 0);
     }
 
     /**
@@ -140,21 +142,45 @@ final class Settings
      */
     public function getSettingsDatabase(?string $databaseName = null): array
     {
-        $prefix = "BFR_API_";
+        $prefix = "BFR_API_DB_";
 
         if (!empty($databaseName)) {
             $databaseName = strtoupper($databaseName) . "_";
         }
 
-        $isNotSqlite = static::getEnv("{$prefix}{$databaseName}SQL_DRIVER", true) !== "sqlite";
+        $driver = static::getEnv("{$prefix}{$databaseName}DRIVER", true);
+        $isNotSqlite = $driver !== "sqlite";
 
         return [
-            "driver" => static::getEnv("{$prefix}{$databaseName}SQL_DRIVER", true),
-            "host" => static::getEnv("{$prefix}{$databaseName}SQL_HOST", $isNotSqlite),
-            "port" => static::getEnv("{$prefix}{$databaseName}SQL_PORT", $isNotSqlite),
-            "database" => static::getEnv("{$prefix}{$databaseName}SQL_DATABASE", true),
-            "username" => static::getEnv("{$prefix}{$databaseName}SQL_USER", $isNotSqlite),
-            "password" => static::getEnv("{$prefix}{$databaseName}SQL_PASSWORD", $isNotSqlite),
+            "driver" => $driver,
+            "host" => static::getEnv("{$prefix}{$databaseName}HOST", $isNotSqlite),
+            "port" => static::getEnv("{$prefix}{$databaseName}PORT", $isNotSqlite),
+            "database" => static::getEnv("{$prefix}{$databaseName}NAME", true),
+            "username" => static::getEnv("{$prefix}{$databaseName}USER", $isNotSqlite),
+            "password" => static::getEnv("{$prefix}{$databaseName}PASSWORD", $isNotSqlite),
         ];
+    }
+
+    /**
+     * Enables APCu when configured so runtime caches (including composer) benefit from it.
+     *
+     * @return void
+     */
+    private static function configureApcu(): void
+    {
+        $apcuEnabled = static::getEnv('BFR_API_CACHE_APCU_ENABLED');
+
+        if ($apcuEnabled === null || $apcuEnabled === '') {
+            return;
+        }
+
+        $enabled = filter_var($apcuEnabled, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+
+        if ($enabled === false) {
+            return;
+        }
+
+        // These directives are CLI-safe and help when running tests or workers.
+        @ini_set('apc.enable_cli', '1');
     }
 }

@@ -142,7 +142,7 @@ final class RequestTest extends TestCase
 
     public function testRequestDoesNotCacheMetadataWhenApcuIsDisabled(): void
     {
-        putenv('BFR_API_APCU_ENABLED=0');
+        putenv('BFR_API_CACHE_APCU_ENABLED=0');
 
         $controller = new class implements Controller {
             #[Method('GET')]
@@ -162,7 +162,7 @@ final class RequestTest extends TestCase
 
         self::assertNull(Apcu::fetch($cacheKey));
 
-        putenv('BFR_API_APCU_ENABLED=1');
+        putenv('BFR_API_CACHE_APCU_ENABLED=1');
     }
 
     public function testHydrateAttributesKeepsOptionsWhenLoadedFromCache(): void
