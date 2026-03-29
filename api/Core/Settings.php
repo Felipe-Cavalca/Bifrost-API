@@ -22,6 +22,7 @@ final class Settings
 {
     /** It is responsible for controlling the initialization of the settings. */
     private static bool $initialized = false;
+    private static array $requestEnvCache = [];
 
     /**
      * It is responsible for initializing the settings.
@@ -60,6 +61,21 @@ final class Settings
      */
     protected static function getEnv(string $param, bool $required = false): mixed
     {
+        $cacheKey = $param . ':' . ($required ? '1' : '0');
+        if (array_key_exists($cacheKey, self::$requestEnvCache)) {
+            return self::$requestEnvCache[$cacheKey];
+        }
+
+        $apcuKey = "settings:env:{$cacheKey}";
+        if (self::settingsApcuEnabled() && function_exists('apcu_fetch')) {
+            $success = false;
+            $cached = apcu_fetch($apcuKey, $success);
+            if ($success) {
+                self::$requestEnvCache[$cacheKey] = $cached;
+                return $cached;
+            }
+        }
+
         $value = getenv($param);
 
         if ($required && ($value === false || $value === '')) {
@@ -69,7 +85,94 @@ final class Settings
             ));
         }
 
-        return $value === false ? null : $value;
+        $parsedValue = $value === false ? null : $value;
+        self::$requestEnvCache[$cacheKey] = $parsedValue;
+        if (self::settingsApcuEnabled() && function_exists('apcu_store')) {
+            apcu_store($apcuKey, $parsedValue, self::settingsApcuTtl());
+        }
+
+        return $parsedValue;
+    }
+
+    /**
+     * It is responsible for returning the first non-empty environment variable value.
+     *
+     * @param array $params The environment variable aliases.
+     * @param bool $required Indicates whether one alias is required.
+     * @return mixed
+     */
+    protected static function getEnvFromAliases(array $params, bool $required = false): mixed
+    {
+        foreach ($params as $param) {
+            $value = static::getEnv($param);
+            if ($value !== null && $value !== '') {
+                return $value;
+            }
+        }
+
+        if ($required && !empty($params)) {
+            return static::getEnv($params[0], true);
+        }
+
+        return null;
+    }
+
+    /**
+     * Parse env booleans in a safer way.
+     *
+     * @param mixed $value The env value.
+     * @param bool $default Default value when parsing fails.
+     * @return bool
+     */
+    private static function parseEnvBool(mixed $value, bool $default = false): bool
+    {
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $default;
+    }
+
+    /**
+     * It is responsible for enabling APCu settings cache (non-CLI only).
+     *
+     * @return bool
+     */
+    private static function settingsApcuEnabled(): bool
+    {
+        if (PHP_SAPI === 'cli') {
+            return false;
+        }
+
+        $enabledRaw = getenv('BFR_API_SETTINGS_APCU_ENABLED');
+        if ($enabledRaw === false || $enabledRaw === '') {
+            $enabledRaw = getenv('BFR_API_CACHE_APCU_ENABLED');
+        }
+        if ($enabledRaw === false || $enabledRaw === '') {
+            $enabledRaw = getenv('BFR_API_APCU_ENABLED');
+        }
+        $enabled = static::parseEnvBool($enabledRaw === false ? null : $enabledRaw, false);
+
+        return $enabled && function_exists('apcu_enabled') ? apcu_enabled() : $enabled;
+    }
+
+    /**
+     * It is responsible for returning APCu settings cache TTL.
+     *
+     * @return int
+     */
+    private static function settingsApcuTtl(): int
+    {
+        $ttlRaw = getenv('BFR_API_SETTINGS_APCU_TTL');
+        if ($ttlRaw === false || $ttlRaw === '') {
+            $ttlRaw = getenv('BFR_API_CACHE_APCU_TTL');
+        }
+        if ($ttlRaw === false || $ttlRaw === '') {
+            $ttlRaw = getenv('BFR_API_APCU_TTL');
+        }
+        $ttl = (int) ($ttlRaw === false ? 60 : $ttlRaw);
+
+        return $ttl > 0 ? $ttl : 60;
     }
 
     /**
@@ -97,8 +200,12 @@ final class Settings
      */
     private static function iniSet(): void
     {
-        ini_set("display_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
-        ini_set("display_startup_errors", (bool) static::getEnv("BFR_API_DISPLAY_ERRORS") ?? false);
+        $displayErrors = static::parseEnvBool(
+            static::getEnvFromAliases(['BFR_API_PHP_DISPLAY_ERRORS', 'BFR_API_DISPLAY_ERRORS']),
+            false
+        );
+        ini_set("display_errors", $displayErrors ? '1' : '0');
+        ini_set("display_startup_errors", $displayErrors ? '1' : '0');
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
@@ -146,15 +253,34 @@ final class Settings
             $databaseName = strtoupper($databaseName) . "_";
         }
 
-        $isNotSqlite = static::getEnv("{$prefix}{$databaseName}SQL_DRIVER", true) !== "sqlite";
+        $driver = static::getEnvFromAliases([
+            "{$prefix}{$databaseName}DB_DRIVER",
+            "{$prefix}{$databaseName}SQL_DRIVER",
+        ], true);
+        $isNotSqlite = $driver !== "sqlite";
 
         return [
-            "driver" => static::getEnv("{$prefix}{$databaseName}SQL_DRIVER", true),
-            "host" => static::getEnv("{$prefix}{$databaseName}SQL_HOST", $isNotSqlite),
-            "port" => static::getEnv("{$prefix}{$databaseName}SQL_PORT", $isNotSqlite),
-            "database" => static::getEnv("{$prefix}{$databaseName}SQL_DATABASE", true),
-            "username" => static::getEnv("{$prefix}{$databaseName}SQL_USER", $isNotSqlite),
-            "password" => static::getEnv("{$prefix}{$databaseName}SQL_PASSWORD", $isNotSqlite),
+            "driver" => $driver,
+            "host" => static::getEnvFromAliases([
+                "{$prefix}{$databaseName}DB_HOST",
+                "{$prefix}{$databaseName}SQL_HOST",
+            ], $isNotSqlite),
+            "port" => static::getEnvFromAliases([
+                "{$prefix}{$databaseName}DB_PORT",
+                "{$prefix}{$databaseName}SQL_PORT",
+            ], $isNotSqlite),
+            "database" => static::getEnvFromAliases([
+                "{$prefix}{$databaseName}DB_NAME",
+                "{$prefix}{$databaseName}SQL_DATABASE",
+            ], true),
+            "username" => static::getEnvFromAliases([
+                "{$prefix}{$databaseName}DB_USER",
+                "{$prefix}{$databaseName}SQL_USER",
+            ], $isNotSqlite),
+            "password" => static::getEnvFromAliases([
+                "{$prefix}{$databaseName}DB_PASSWORD",
+                "{$prefix}{$databaseName}SQL_PASSWORD",
+            ], $isNotSqlite),
         ];
     }
 }

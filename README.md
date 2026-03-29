@@ -150,17 +150,21 @@ Principais variaveis:
 
 | Nome | Uso |
 |------|-----|
-| `BFR_API_DISPLAY_ERRORS` | Liga ou desliga exibicao de erros do PHP |
+| `BFR_API_PHP_DISPLAY_ERRORS` | Liga ou desliga exibicao de erros do PHP |
 | `BFR_API_SESSION_SAVE_HANDLER` | Handler de sessao |
 | `BFR_API_SESSION_SAVE_PATH` | Local de persistencia de sessao |
 | `BFR_API_SESSION_GC_MAXLIFETIME` | TTL da sessao |
 | `BFR_API_SESSION_COOKIE_LIFETIME` | TTL do cookie de sessao |
-| `BFR_API_SQL_DRIVER` | Driver do banco: `sqlite`, `mysql` ou `pgsql` |
-| `BFR_API_SQL_HOST` | Host do banco |
-| `BFR_API_SQL_PORT` | Porta do banco |
-| `BFR_API_SQL_DATABASE` | Nome do banco ou path do arquivo SQLite |
-| `BFR_API_SQL_USER` | Usuario do banco |
-| `BFR_API_SQL_PASSWORD` | Senha do banco |
+| `BFR_API_DB_DRIVER` | Driver do banco: `sqlite`, `mysql` ou `pgsql` |
+| `BFR_API_DB_HOST` | Host do banco |
+| `BFR_API_DB_PORT` | Porta do banco |
+| `BFR_API_DB_NAME` | Nome do banco ou path do arquivo SQLite |
+| `BFR_API_DB_USER` | Usuario do banco |
+| `BFR_API_DB_PASSWORD` | Senha do banco |
+| `BFR_API_CACHE_APCU_ENABLED` | Habilita cache APCu para metadata de request |
+| `BFR_API_CACHE_APCU_TTL` | TTL em segundos para cache APCu de metadata |
+| `BFR_API_SETTINGS_APCU_ENABLED` | Habilita cache APCu para leitura de settings (nao-CLI) |
+| `BFR_API_SETTINGS_APCU_TTL` | TTL em segundos para cache APCu de settings |
 | `BFR_API_REDIS_HOST` | Host do Redis |
 | `BFR_API_REDIS_PORT` | Porta do Redis |
 | `BFR_API_REDIS_QUEUE` | Nome da fila Redis |
@@ -174,6 +178,8 @@ Principais variaveis:
 | `BFR_API_HTTP_PORT` | Porta exposta pelo Nginx em producao |
 
 O arquivo [`.env.example`](/workspaces/Bifrost-API/.env.example) tem um ponto de partida para configuracao local.
+
+> Compatibilidade retroativa: os aliases legados (`BFR_API_DISPLAY_ERRORS`, `BFR_API_SQL_*` e `BFR_API_APCU_*`) continuam aceitos para manter compatibilidade.
 
 ## Como funciona o request
 
