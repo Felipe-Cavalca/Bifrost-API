@@ -6,6 +6,9 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
+  "containerEnv": {
+    "BIFROST_WORKSPACE": "${localWorkspaceFolder}"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
