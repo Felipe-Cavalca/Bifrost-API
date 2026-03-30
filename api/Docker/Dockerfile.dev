@@ -24,6 +24,8 @@ RUN apt-get update \
 # Copiando os arquivos da aplicacao (build context: raiz do repositorio)
 COPY api/composer.json /var/www/html/composer.json
 COPY api/ /var/www/html/
+COPY api/Docker/scripts/smoke.sh /usr/local/bin/smoke.sh
+RUN chmod +x /usr/local/bin/smoke.sh
 
 # Instala dependencias PHP de desenvolvimento
 RUN composer install --prefer-dist --no-interaction
@@ -36,24 +38,14 @@ RUN mkdir -p /usr/local/etc/php/conf.d \
     && echo "session.save_path = /var/lib/php/sessions" >> /usr/local/etc/php/conf.d/bifrost.ini \
     && echo "apc.enable_cli=1" >> /usr/local/etc/php/conf.d/bifrost.ini
 
-# Instalando e configurando o Xdebug para desenvolvimento
+# Instalando Xdebug (configuração carregada via xdebug.ini montado pelo docker-compose)
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
-    && mkdir -p /var/log/xdebug \
-    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.mode=debug,develop" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.start_with_request=trigger" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.log_level=7" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.output_dir=/var/log/xdebug" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.profiler_output_name=callgrind.out.%t" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.profiler_enable_trigger=1" >> /usr/local/etc/php/conf.d/xdebug.ini
+    && mkdir -p /var/log/xdebug /var/www/html/tmp/xdebug
 
 # Criando o diretorio de sessoes e configurando permissoes
 RUN mkdir -p /var/lib/php/sessions \
-    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html
+    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html/tmp/xdebug /var/www/html
 
 # Copiando a configuracao do Supervisor
 RUN mkdir -p /var/run/supervisor /var/log/supervisor
