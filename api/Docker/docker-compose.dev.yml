@@ -5,6 +5,8 @@ x-template-api:
     build:
       context: ../..
       dockerfile: api/Docker/Dockerfile.dev
+    environment:
+      - XDEBUG_TRIGGER=1
     env_file:
       - ./../../.env
     volumes:

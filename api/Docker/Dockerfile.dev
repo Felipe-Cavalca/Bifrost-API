@@ -43,7 +43,7 @@ RUN pecl install xdebug \
 
 # Criando o diretorio de sessoes e configurando permissoes
 RUN mkdir -p /var/lib/php/sessions \
-    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html/tmp/xdebug /var/www/html
+    && chown -R www-data:www-data /var/lib/php/sessions /var/www/html/tmp/xdebug /var/www/html /var/log/xdebug
 
 # Copiando a configuracao do Supervisor
 RUN mkdir -p /var/run/supervisor /var/log/supervisor
