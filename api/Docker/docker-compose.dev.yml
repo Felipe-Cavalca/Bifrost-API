@@ -11,7 +11,6 @@ x-template-api:
       - ${BIFROST_WORKSPACE:-../..}/api:/var/www/html
       - ${BIFROST_WORKSPACE:-../..}/api/composer.json:/tmp/composer.json:ro
       - ${BIFROST_WORKSPACE:-../..}/api/Docker/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini:ro
-      - ${BIFROST_WORKSPACE:-../..}/api/Docker/scripts/smoke.sh:/usr/local/bin/smoke.sh:ro
       - api_vendor:/var/www/html/vendor
     networks:
       - bifrost-back-network
@@ -25,19 +24,13 @@ services:
       dockerfile: Docker/Dockerfile.nginx
     ports:
       - "80:80"
-    depends_on:
-      - api1
-      - api2
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 20s
     volumes:
       - ${BIFROST_WORKSPACE:-../..}/api:/var/www/html:ro
     networks:
       - bifrost-back-network
+    depends_on:
+      - api1
+      - api2
 
   api1:
     <<: *template-api

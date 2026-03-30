@@ -24,8 +24,6 @@ RUN apt-get update \
 # Copiando os arquivos da aplicacao (build context: raiz do repositorio)
 COPY api/composer.json /var/www/html/composer.json
 COPY api/ /var/www/html/
-COPY api/Docker/scripts/smoke.sh /usr/local/bin/smoke.sh
-RUN chmod +x /usr/local/bin/smoke.sh
 
 # Instala dependencias PHP de desenvolvimento
 RUN composer install --prefer-dist --no-interaction

@@ -71,20 +71,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Smoke test API (dev)",
-            "type": "shell",
-            "command": "docker-compose",
-            "args": [
-                "-f",
-                "api/Docker/docker-compose.dev.yml",
-                "exec",
-                "-T",
-                "api1",
-                "/usr/local/bin/smoke.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
             "label": "Back-end docker-compose up (prod)",
             "type": "shell",
             "command": "docker-compose",
