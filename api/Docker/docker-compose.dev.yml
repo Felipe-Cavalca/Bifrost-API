@@ -10,9 +10,9 @@ x-template-api:
     env_file:
       - ./../../.env
     volumes:
-      - ../../api:/var/www/html
-      - ../../api/composer.json:/tmp/composer.json:ro
-      - ../../api/Docker/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini:ro
+      - ${BIFROST_WORKSPACE:-../..}/api:/var/www/html
+      - ${BIFROST_WORKSPACE:-../..}/api/composer.json:/tmp/composer.json:ro
+      - ${BIFROST_WORKSPACE:-../..}/api/Docker/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini:ro
       - api_vendor:/var/www/html/vendor
     networks:
       - bifrost-back-network

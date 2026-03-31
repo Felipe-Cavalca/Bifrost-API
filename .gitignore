@@ -1,4 +1,6 @@
 tmp/*
 /api/tmp/*
+!/api/tmp/.gitkeep
+!/api/tmp/xdebug/.gitkeep
 /api/vendor
 .env
