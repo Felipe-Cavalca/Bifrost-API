@@ -8,6 +8,9 @@ jobs:
 
   sync_labels:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     steps:
       - uses: actions/checkout@v4
