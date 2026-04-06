@@ -1,11 +1,17 @@
 name: Tag on merge
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     types: [closed]
 
 jobs:
   create_tag_and_draft_release:
+    permissions:
+      contents: write
+      actions: write
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     outputs:
@@ -90,6 +96,8 @@ jobs:
   update_release_draft:
     needs: create_tag_and_draft_release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: release-drafter/release-drafter@v6
         env:
@@ -98,6 +106,8 @@ jobs:
   publish_release:
     needs: [create_tag_and_draft_release, update_release_draft]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Publish Release
         uses: actions/github-script@v7
@@ -126,6 +136,8 @@ jobs:
     needs: publish_release
     if: contains(github.event.pull_request.labels.*.name, 'release')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
