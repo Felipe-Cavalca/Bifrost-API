@@ -6,6 +6,9 @@ on:
 
 jobs:
   publish_docker_image_api:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
