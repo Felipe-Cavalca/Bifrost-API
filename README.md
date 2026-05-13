@@ -144,36 +144,22 @@ curl "http://localhost/api/index/index"
 
 ## Variaveis de ambiente
 
-O projeto le as configuracoes principalmente via `api/Core/Settings.php` e pelas integracoes em `api/Integration/`.
+O projeto le as configuracoes principalmente via `api/Core/Settings.php`, pelas integracoes em `api/Integration/` e pelo compose de producao em `api/Docker/docker-compose.prod.yml`.
 
-Principais variaveis:
+O arquivo [`.env.example`](/workspaces/Bifrost-API/.env.example) documenta cada configuracao, valores esperados, defaults recomendados e variaveis sensiveis.
 
-| Nome | Uso |
-|------|-----|
-| `BFR_API_DISPLAY_ERRORS` | Liga ou desliga exibicao de erros do PHP |
-| `BFR_API_SESSION_SAVE_HANDLER` | Handler de sessao |
-| `BFR_API_SESSION_SAVE_PATH` | Local de persistencia de sessao |
-| `BFR_API_SESSION_GC_MAXLIFETIME` | TTL da sessao |
-| `BFR_API_SESSION_COOKIE_LIFETIME` | TTL do cookie de sessao |
-| `BFR_API_SQL_DRIVER` | Driver do banco: `sqlite`, `mysql` ou `pgsql` |
-| `BFR_API_SQL_HOST` | Host do banco |
-| `BFR_API_SQL_PORT` | Porta do banco |
-| `BFR_API_SQL_DATABASE` | Nome do banco ou path do arquivo SQLite |
-| `BFR_API_SQL_USER` | Usuario do banco |
-| `BFR_API_SQL_PASSWORD` | Senha do banco |
-| `BFR_API_REDIS_HOST` | Host do Redis |
-| `BFR_API_REDIS_PORT` | Porta do Redis |
-| `BFR_API_REDIS_QUEUE` | Nome da fila Redis |
-| `BFR_API_S3_BUCKET` | Bucket S3 |
-| `BFR_API_S3_REGION` | Regiao do bucket |
-| `BFR_API_S3_KEY` | Access key S3 |
-| `BFR_API_S3_SECRET` | Secret key S3 |
-| `BFR_API_S3_ENDPOINT` | Endpoint customizado de S3 |
-| `BFR_API_S3_PATH_STYLE` | Habilita path-style endpoint |
-| `BFR_API_IMAGE` | Imagem usada no compose de producao |
-| `BFR_API_HTTP_PORT` | Porta exposta pelo Nginx em producao |
+Principais grupos:
 
-O arquivo [`.env.example`](/workspaces/Bifrost-API/.env.example) tem um ponto de partida para configuracao local.
+| Grupo | Variaveis |
+|------|-----------|
+| Runtime | `BFR_API_DEBUG_SHOW_ERRORS`, `BFR_API_IMAGE`, `BFR_API_HTTP_PORT` |
+| Sessao | `BFR_API_SESSION_HANDLER`, `BFR_API_SESSION_PATH`, `BFR_API_SESSION_TTL`, `BFR_API_SESSION_COOKIE_TTL` |
+| Cache | `BFR_API_CACHE_DRIVER`, `BFR_API_CACHE_APCU_ENABLED`, `BFR_API_CACHE_APCU_PREFIX`, `BFR_API_CACHE_APCU_TTL`, `BFR_API_CACHE_REDIS_HOST`, `BFR_API_CACHE_REDIS_PORT`, `BFR_API_CACHE_QUERY_TTL` |
+| Fila | `BFR_API_QUEUE_NAME`, `BFR_API_QUEUE_REDIS_HOST`, `BFR_API_QUEUE_REDIS_PORT` |
+| Banco | `BFR_API_DB_DRIVER`, `BFR_API_DB_HOST`, `BFR_API_DB_PORT`, `BFR_API_DB_NAME`, `BFR_API_DB_USER`, `BFR_API_DB_PASSWORD` |
+| S3 | `BFR_API_S3_BUCKET`, `BFR_API_S3_REGION`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET`, `BFR_API_S3_ENDPOINT`, `BFR_API_S3_PATH_STYLE` |
+
+Variaveis sensiveis, como `BFR_API_DB_PASSWORD`, `BFR_API_S3_KEY` e `BFR_API_S3_SECRET`, nao devem ser commitadas com valores reais.
 
 ## Como funciona o request
 
