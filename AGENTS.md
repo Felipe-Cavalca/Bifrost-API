@@ -43,6 +43,12 @@
 - Encapsule fornecedores externos atrás de interfaces ou adapters do projeto.
 - Use fakes nomeados em testes quando precisar substituir I/O externo.
 
+## Git e pull requests
+
+- PRs devem receber labels existentes em `.github/labels.yml`.
+- Antes de criar ou atualizar labels de um PR, consulte `.github/labels.yml` e use somente labels listadas nesse arquivo, salvo orientação explícita diferente.
+- As labels são usadas por workflows e automações; não deixe PR criado por agente sem label quando a ferramenta permitir aplicar labels.
+
 ## Verificações
 
 - API: execute `cd api && composer check`.
