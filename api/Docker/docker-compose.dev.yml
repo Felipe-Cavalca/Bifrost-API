@@ -7,12 +7,14 @@ x-template-api:
       dockerfile: api/Docker/Dockerfile.dev
     environment:
       - XDEBUG_TRIGGER=1
+      - BFR_API_STORAGE_LOCAL_PATH=${BFR_API_STORAGE_LOCAL_PATH:-/var/www/html/storage}
     env_file:
       - ./../../.env
     volumes:
       - ${BIFROST_WORKSPACE:-../..}/api:/var/www/html
       - ${BIFROST_WORKSPACE:-../..}/api/composer.json:/tmp/composer.json:ro
       - ${BIFROST_WORKSPACE:-../..}/api/Docker/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini:ro
+      - api_storage:/var/www/html/storage
       - api_vendor:/var/www/html/vendor
     networks:
       - bifrost-back-network
@@ -46,4 +48,5 @@ networks:
   bifrost-back-network:
 
 volumes:
+  api_storage:
   api_vendor:

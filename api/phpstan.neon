@@ -21,5 +21,5 @@ parameters:
     ignoreErrors:
         -
             identifier: new.static
-            path: Integration/S3Storage.php
+            path: Integration/Storage/S3Storage.php
     treatPhpDocTypesAsCertain: false
