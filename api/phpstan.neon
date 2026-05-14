@@ -1,0 +1,25 @@
+parameters:
+    level: 0
+    paths:
+        - Attributes
+        - Class
+        - Controller
+        - Core
+        - DataTypes
+        - Enum
+        - Include
+        - Integration
+        - Interface
+        - Model
+        - Tasks
+        - Worker.php
+        - index.php
+    excludePaths:
+        analyse:
+            - vendor
+            - tmp
+    ignoreErrors:
+        -
+            identifier: new.static
+            path: Integration/S3Storage.php
+    treatPhpDocTypesAsCertain: false

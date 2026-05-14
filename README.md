@@ -10,14 +10,15 @@ O codigo principal fica em `api/` e a suite de testes fica em `api/tests/`.
 2. [Estrutura do projeto](#estrutura-do-projeto)
 3. [Requisitos](#requisitos)
 4. [Execucao local](#execucao-local)
-5. [Variaveis de ambiente](#variaveis-de-ambiente)
-6. [Como funciona o request](#como-funciona-o-request)
-7. [Atributos disponiveis](#atributos-disponiveis)
-8. [Banco, cache, fila e S3](#banco-cache-fila-e-s3)
-9. [Testes](#testes)
-10. [CI em Pull Request](#ci-em-pull-request)
-11. [Contribuicao](#contribuicao)
-12. [Licenca](#licenca)
+5. [Qualidade do framework](#qualidade-do-framework)
+6. [Variaveis de ambiente](#variaveis-de-ambiente)
+7. [Como funciona o request](#como-funciona-o-request)
+8. [Atributos disponiveis](#atributos-disponiveis)
+9. [Banco, cache, fila e S3](#banco-cache-fila-e-s3)
+10. [Testes](#testes)
+11. [CI em Pull Request](#ci-em-pull-request)
+12. [Contribuicao](#contribuicao)
+13. [Licenca](#licenca)
 
 ## Visao geral
 
@@ -141,6 +142,18 @@ Se estiver usando o Nginx do projeto, o acesso tipico fica em:
 ```bash
 curl "http://localhost/api/index/index"
 ```
+
+## Qualidade do framework
+
+O Bifrost-API e um micro-framework. Os checks devem proteger contrato publico, compatibilidade e integracoes opcionais sem transformar cada PR em uma migracao ampla de estilo.
+
+Execute a verificacao padrao dentro de `api/`:
+
+```bash
+composer check
+```
+
+Esse comando valida Composer, formatacao minima, sintaxe PHP, PHPStan e PHPUnit. No GitHub, o workflow de PR publica um unico comentario consolidado: se tudo passar, a mensagem e curta; se houver falha, a mensagem lista apenas os checks com problema.
 
 ## Variaveis de ambiente
 
