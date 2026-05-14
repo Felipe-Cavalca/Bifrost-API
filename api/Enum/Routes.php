@@ -11,6 +11,7 @@ Enum Routes: string
      */
     case login = "auth/login";
     case logout = "auth/logout";
+    case health = "index/health";
 
     /**
      * Converte o caminho da requisição para o formato de enumeração.

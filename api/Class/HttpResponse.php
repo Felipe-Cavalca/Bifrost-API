@@ -2,6 +2,7 @@
 
 namespace Bifrost\Class;
 
+use Bifrost\DataTypes\UUID;
 use Bifrost\Enum\HttpStatusCode;
 use Bifrost\Interface\Responseable;
 
@@ -50,6 +51,11 @@ class HttpResponse implements Responseable
     public function addAditionalInfo(array $additionalInfo): void
     {
         $this->additionalInfo = array_merge($this->additionalInfo, $additionalInfo);
+    }
+
+    public function addRequestId(UUID $requestId): void
+    {
+        $this->addAditionalInfo(['request_id' => $requestId->value()]);
     }
 
     // Métodos estáticos para construir respostas comuns

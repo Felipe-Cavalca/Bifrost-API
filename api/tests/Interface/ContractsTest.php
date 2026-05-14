@@ -9,6 +9,7 @@ use Bifrost\Core\Cache;
 use Bifrost\Core\Database;
 use Bifrost\Core\Queue;
 use Bifrost\DataTypes\UUID;
+use Bifrost\Integration\Database\MongoDatabase;
 use Bifrost\Integration\S3Storage;
 use PHPUnit\Framework\TestCase;
 
@@ -26,5 +27,6 @@ final class ContractsTest extends TestCase
         self::assertContains(Bifrost\Interface\Insertable::class, class_implements(UUID::class));
         self::assertContains(Bifrost\Interface\Responseable::class, class_implements(UUID::class));
         self::assertContains(Bifrost\Interface\Storage::class, class_implements(S3Storage::class));
+        self::assertContains(Bifrost\Interface\NoSqlDatabase::class, class_implements(MongoDatabase::class));
     }
 }

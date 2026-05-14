@@ -107,6 +107,7 @@ Contratos atuais:
 - `Controller`
 - `Database`
 - `Insertable`
+- `NoSqlDatabase`
 - `PdoDriverAdapter`
 - `Queue`
 - `Responseable`
@@ -130,7 +131,7 @@ Diretorios relacionados:
 
 Regras:
 
-- Redis, S3, banco e outros fornecedores devem ficar atras de contratos ou adapters.
+- Redis, S3, MongoDB, banco e outros fornecedores devem ficar atras de contratos ou adapters.
 - Codigo de core nao deve depender diretamente de SDKs quando houver contrato interno aplicavel.
 - Adapters devem traduzir detalhes externos para estruturas e excecoes coerentes com o framework.
 - Integracoes que dependem de ambiente externo devem ter testes que possam ser pulados claramente quando o ambiente nao estiver configurado, sem mascarar testes unitarios de configuracao.
@@ -169,6 +170,7 @@ Regras:
 - Quando logs estiverem desativados, o framework deve evitar gerar e expor request id sem necessidade.
 - Logs devem ter contexto suficiente para diagnostico sem expor segredos, tokens, dados privados, query strings completas ou caminhos internos sensiveis.
 - O logger deve ser generico e poder ser chamado por qualquer parte do framework.
+- Drivers de log externos, como MongoDB, devem ser opcionais e ter fallback para nao quebrar o fluxo de request quando a integracao estiver indisponivel.
 - O `Request` decide quando associar informacao de request a uma resposta HTTP; `HttpResponse` define como essa informacao entra no payload.
 
 ### Testes

@@ -33,12 +33,15 @@ use ReflectionMethod;
  */
 final class Request
 {
+    private const JSON_RESPONSE_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
     private Get $Get;
 
     public function __construct()
     {
         $this->Get = new Get();
         Settings::init();
+        Logger::sendRequestIdHeader();
     }
 
     public function __toString(): string
@@ -54,6 +57,16 @@ final class Request
      */
     public static function run(string|Controller $controller, string $action): Responseable
     {
+        $attributes = [];
+        $response = null;
+
+        Logger::info('Request started', [
+            'controller' => is_string($controller) ? $controller : $controller::class,
+            'action' => $action,
+            'method' => $_SERVER['REQUEST_METHOD'] ?? null,
+            'path' => parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?: null,
+        ]);
+
         try {
             if (is_string($controller) && (empty($controller) || !self::validateControllerName($controller))) {
                 throw new AppError(HttpResponse::notFound(["controller" => $controller], "Controller not found"));
@@ -71,18 +84,41 @@ final class Request
 
             // Se o método beforeRun retornar algo, não executa a ação do controller.
             if ($return !== null) {
-                return $return;
+                $response = $return;
+            } else {
+                $response = self::runAction($objController, $action);
+                Logger::info('Request finished', [
+                    'controller' => $objController::class,
+                    'action' => $action,
+                ]);
             }
-
-            $return = self::runAction($objController, $action);
-            self::runAfterAttributes($attributes, $return);
-            return $return;
         } catch (\Throwable $erro) {
             if ($erro instanceof AppError) {
-                return $erro->response;
+                Logger::error('Handled application error', [
+                    'status' => $erro->response->status->value,
+                    'message' => $erro->response->message,
+                ]);
+                $response = $erro->response;
+            } else {
+                Logger::exception($erro, [
+                    'controller' => is_string($controller) ? $controller : $controller::class,
+                    'action' => $action,
+                ]);
+                $response = HttpResponse::internalServerError([], $erro->getMessage());
             }
-            return HttpResponse::internalServerError([], $erro->getMessage());
         }
+
+        $afterAttributeError = self::runAfterAttributes($attributes, $response);
+        if ($afterAttributeError !== null) {
+            Logger::exception($afterAttributeError);
+            $response = HttpResponse::internalServerError([], 'After attribute failed');
+        }
+
+        if ($response instanceof HttpResponse && !Logger::isDisabled()) {
+            $response->addRequestId(Logger::requestId());
+        }
+
+        return $response;
     }
 
     /**
@@ -190,15 +226,20 @@ final class Request
      * Executa os métodos after dos atributos.
      * @param array $attributes Atributos do método.
      * @param Responseable $return Retorno da ação do Controller.
-     * @return void
+     * @return null|\Throwable Retorna a falha do atributo after, se houver.
      */
-    private static function runAfterAttributes(array $attributes, Responseable $return): void
+    private static function runAfterAttributes(array $attributes, Responseable $return): null|\Throwable
     {
         foreach ($attributes as $attribute) {
             if ($attribute instanceof AttributeAfter) {
-                $attribute->after($return);
+                try {
+                    $attribute->after($return);
+                } catch (\Throwable $exception) {
+                    return $exception;
+                }
             }
         }
+        return null;
     }
 
     /**
@@ -220,7 +261,7 @@ final class Request
     private static function handleResponse(mixed $return): string
     {
         if (is_array($return) || $return instanceof Responseable) {
-            return json_encode($return);
+            return json_encode($return, self::JSON_RESPONSE_OPTIONS);
         } else {
             return (string) $return;
         }

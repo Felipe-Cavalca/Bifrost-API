@@ -15,6 +15,8 @@ use Bifrost\Core\Session;
 use Bifrost\Integration\Database\PdoDatabase;
 
 putenv('BFR_API_DEBUG_SHOW_ERRORS=0');
+putenv('BFR_API_LOG_DRIVER=none');
+putenv('BFR_API_LOG_FILE');
 putenv('BFR_API_SESSION_HANDLER=files');
 putenv('BFR_API_SESSION_PATH=/tmp');
 putenv('BFR_API_DB_DRIVER=sqlite');

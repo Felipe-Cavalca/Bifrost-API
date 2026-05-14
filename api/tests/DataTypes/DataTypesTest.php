@@ -19,6 +19,17 @@ final class DataTypesTest extends TestCase
         self::assertSame('123e4567-e89b-12d3-a456-426614174000', $uuid->jsonSerialize());
     }
 
+    public function testUuidGenerateReturnsValidUuid(): void
+    {
+        $uuid = UUID::generate();
+
+        self::assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/',
+            $uuid
+        );
+        self::assertInstanceOf(UUID::class, new UUID($uuid));
+    }
+
     public function testOtherDataTypesValidateInput(): void
     {
         self::assertInstanceOf(Base64::class, new Base64(base64_encode('demo')));
