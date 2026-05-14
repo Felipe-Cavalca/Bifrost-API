@@ -14,10 +14,16 @@
     }
   },
   "scripts": {
+    "analyse": "phpstan analyse --configuration=phpstan.neon",
+    "format:check": "php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php",
+    "lint": "find . -path ./vendor -prune -o -path ./tmp -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l",
     "quality:composer": "composer validate --strict",
     "test": "phpunit -c phpunit.xml",
     "check": [
       "@quality:composer",
+      "@format:check",
+      "@lint",
+      "@analyse",
       "@test"
     ]
   },
@@ -29,6 +35,9 @@
     "sort-packages": true
   },
   "require-dev": {
+    "aws/aws-sdk-php": "^3.381",
+    "friendsofphp/php-cs-fixer": "^3.95",
+    "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^12.5"
   }
 }

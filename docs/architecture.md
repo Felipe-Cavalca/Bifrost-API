@@ -181,6 +181,7 @@ Estrategia:
 - Testes de core para request, settings, logger, cache, queue e database.
 - Testes de integracao para Redis, S3 e PDO quando houver ambiente configurado.
 - Testes de regressao para bugs corrigidos.
+- Analise estatica e formatacao devem comecar conservadoras, porque o Bifrost e um framework e precisa preservar compatibilidade publica enquanto melhora a qualidade.
 
 Regras:
 
@@ -189,6 +190,8 @@ Regras:
 - Testes devem focar comportamento, nao detalhes internos frageis.
 - Testes dependentes de servico externo devem declarar skip quando o ambiente nao estiver configurado.
 - A verificacao padrao da API deve ser `composer check` dentro de `api/`.
+- O `composer check` deve validar Composer, formato minimo, lint, PHPStan e PHPUnit.
+- O workflow de PR deve publicar no maximo um comentario consolidado. Quando tudo passar, o comentario deve ser curto; quando falhar, deve listar apenas os checks com problema.
 
 ## Variaveis de ambiente
 
