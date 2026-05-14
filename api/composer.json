@@ -28,7 +28,7 @@
     ]
   },
   "suggest": {
-    "aws/aws-sdk-php": "S3 integration via Bifrost\\\\Integration\\\\S3Storage",
+    "aws/aws-sdk-php": "S3 integration via Bifrost\\\\Integration\\\\Storage\\\\S3Storage or the compatibility alias Bifrost\\\\Integration\\\\S3Storage",
     "ext-mongodb": "MongoDB log driver via Bifrost\\\\Integration\\\\Database\\\\MongoDatabase"
   },
   "config": {
