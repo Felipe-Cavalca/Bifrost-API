@@ -1,363 +1,228 @@
-# Padrão de arquitetura
+# Padrao de arquitetura
 
-Este documento define o padrão de arquitetura do Dossier para orientar as próximas entregas da milestone M1 e manter a evolução do projeto consistente.
+Este documento define o padrao de arquitetura do Bifrost-API para orientar a evolucao do framework e manter o core pequeno, previsivel e reutilizavel.
 
 ## Objetivo
 
-O Dossier será um SaaS de gestão documental. A arquitetura deve favorecer:
+O Bifrost-API e um micro-framework PHP para APIs HTTP. A arquitetura deve favorecer:
 
-- separação clara entre interface, API, domínio, infraestrutura e tarefas assíncronas;
-- evolução incremental por milestones;
+- separacao clara entre entrada HTTP, core, contratos, integracoes e utilitarios;
 - baixo acoplamento com fornecedores externos;
-- testes focados em regras de negócio e integrações críticas;
-- suporte futuro a OCR, busca, permissões, auditoria, backup e storage externo.
+- comportamento previsivel para roteamento, respostas, atributos, cache, fila, banco, storage e logs;
+- evolucao incremental sem misturar melhorias de core com regras de produto;
+- testes focados em contratos publicos, regressao e integracoes criticas.
 
-## Visão geral
+## Visao geral
 
 ```text
 .
-|-- api/                  # Backend HTTP, domínio, integrações e workers
-|-- app/                  # Interface web estática
-|-- database/             # Banco PostgreSQL, instalação e updates SQL
-|-- docs/                 # Documentação técnica do projeto
-|-- scripts/              # Scripts auxiliares do repositório
-|-- .github/workflows/    # Pipelines e automações
+|-- api/                  # Framework PHP, contratos, core, integracoes e testes
+|-- docs/                 # Documentacao tecnica do projeto
+|-- .github/workflows/    # Pipelines e automacoes
 |-- .devcontainer/        # Ambiente de desenvolvimento
-|-- docker-compose.yml    # Orquestração local principal
-`-- .env.example          # Configuração local de referência
+|-- .env.example          # Configuracao local de referencia
+`-- README.md             # Documentacao de uso
 ```
 
-O projeto deve manter três áreas principais:
+Areas principais:
 
-- `api/`: backend responsável por regras, persistência, processamento e exposição HTTP.
-- `app/`: frontend responsável por interação do usuário, telas e consumo da API.
-- `database/`: estrutura do PostgreSQL, instalação e atualizações de schema.
+- `api/`: codigo PHP do framework.
+- `docs/`: padroes tecnicos e decisoes de arquitetura.
+- `.github/`: workflows, templates, labels e automacoes.
+- `.devcontainer/` e `api/Docker/`: ambiente de desenvolvimento e imagens da API.
 
-Também existem áreas de apoio:
+## Mapa rapido de alteracao
 
-- `scripts/`: automações auxiliares do repositório.
-- `.devcontainer/`: ambiente de desenvolvimento em container.
-- `.github/`: workflows, template de PR e automações do GitHub.
+- Entrada HTTP: `api/index.php`, `api/Core/Request.php`, `api/Core/Get.php`, `api/Core/Post.php` e `api/Controller/`.
+- Respostas HTTP: `api/Class/HttpResponse.php` e `api/Interface/Responseable.php`.
+- Attributes: `api/Attributes/` e contratos em `api/Interface/Attribute*.php`.
+- Configuracao: `api/Core/Settings.php`, `.env.example` e arquivos Docker.
+- Observabilidade: `api/Core/Logger.php`, headers de request id e testes de core.
+- Cache e fila: `api/Core/Cache.php`, `api/Core/Queue.php`, `api/Integration/Cache/` e `api/Integration/Queue/`.
+- Banco de dados: `api/Core/Database.php`, `api/Integration/Database/` e `api/Interface/Database.php`.
+- Storage: `api/Integration/`, `api/Interface/Storage.php` e adapters relacionados.
+- DataTypes e validacoes: `api/DataTypes/`, `api/Enum/Field.php` e `api/Include/`.
+- Testes: `api/tests/`.
 
-## Mapa rápido de alteração
-
-- Endpoint HTTP: `api/Controller/`, `api/index.php` e testes HTTP.
-- Regra de negócio: `api/Class/`, `api/DataTypes/` e `api/Enum/`.
-- Persistência: `api/Model/` e scripts SQL em `database/`.
-- Integração externa: `api/Integration/` e contratos em `api/Interface/`.
-- Tarefas assíncronas: `api/Tasks/`, `api/Worker.php` e fila.
-- Frontend: `app/pages/`, `app/js/`, `app/css/` e `app/components/`.
-- Scripts auxiliares: `scripts/`, `api/scripts/` e `app/scripts/`.
-- Configuração local: `.env.example`, `docker-compose.yml`, `.devcontainer/` e documentação relacionada.
-
-## Camadas do backend
-
-O backend deve seguir uma separação por responsabilidades.
+## Camadas do framework
 
 ### Entrada HTTP
 
-Responsável por receber requisições, validar contrato básico e devolver respostas HTTP.
+Responsavel por receber a requisicao, resolver controller/action, executar atributos e devolver uma resposta serializavel.
 
-Diretórios atuais relacionados:
+Diretorios e arquivos relacionados:
 
 - `api/index.php`
+- `api/Core/Request.php`
+- `api/Core/Get.php`
+- `api/Core/Post.php`
 - `api/Controller/`
 - `api/Attributes/`
 - `api/Class/HttpResponse.php`
+
+Regras:
+
+- Controllers devem ser finos e demonstrar o contrato HTTP esperado.
+- Controllers do framework nao devem concentrar regra de produto.
+- Validacoes transversais devem ficar em attributes, DataTypes ou objetos dedicados.
+- Respostas HTTP devem usar `HttpResponse` ou outro `Responseable`.
+- O ciclo de request deve preservar compatibilidade com attributes `before` e `after`.
+
+### Core
+
+Responsavel pelos comportamentos centrais do framework.
+
+Diretorios e arquivos relacionados:
+
 - `api/Core/Request.php`
-
-Regras:
-
-- Controllers devem ser finos.
-- Controllers não devem concentrar regra de negócio complexa.
-- Validações comuns devem ficar em atributos, serviços ou objetos dedicados.
-- Respostas devem usar o formato padronizado por `HttpResponse`.
-
-### Domínio
-
-Responsável pelas regras centrais do Dossier.
-
-Diretórios atuais relacionados:
-
-- `api/Class/`
-- `api/DataTypes/`
-- `api/Enum/`
-
-Regras:
-
-- Regras de documento, usuário, organização, permissões, tags, tipos e metadados devem ficar fora dos controllers.
-- Classes em `api/Class/` devem representar casos de uso ou operações de negócio claras, como autenticação, cadastro, upload, listagem, restauração e reprocessamento.
-- DataTypes devem encapsular validações recorrentes, como UUID, email, senha, caminho, URL e papéis de usuário.
-- Enums devem representar conjuntos fechados de estados, tipos ou opções do domínio.
-- Não introduza diretórios como `api/Service/` ou `api/ValueObject/` sem uma tarefa específica de arquitetura.
-
-### Persistência
-
-Responsável por acesso ao banco e montagem de queries.
-
-Diretórios atuais relacionados:
-
-- `api/Core/Database.php`
-- `api/Integration/Database/`
-- `api/Interface/Database.php`
-- `api/Model/`
-- `database/src/`
-- `database/install/`
-- `database/update/`
-
-Regras:
-
-- Acesso a tabelas e consultas deve ficar em `api/Model/` ou nas integrações de banco.
-- Classes de negócio em `api/Class/` podem chamar models quando precisarem inserir, consultar ou alterar dados.
-- Models devem ficar focados em persistência e consultas.
-- Scripts SQL em `database/` devem ser a fonte de verdade da estrutura do banco.
-- Não introduza `api/Repository/` sem uma tarefa específica de arquitetura.
-
-### Infraestrutura
-
-Responsável por integrações externas e detalhes técnicos.
-
-Diretórios atuais relacionados:
-
-- `api/Integration/`
+- `api/Core/Settings.php`
+- `api/Core/Logger.php`
 - `api/Core/Cache.php`
 - `api/Core/Queue.php`
+- `api/Core/Database.php`
+- `api/Core/Autoload.php`
+- `api/Core/AppError.php`
+
+Regras:
+
+- O core deve manter responsabilidades pequenas e pesquisaveis.
+- O core pode orquestrar contratos e adapters, mas nao deve depender de regra de produto.
+- Melhorias de observabilidade devem evitar exposicao de segredos, tokens, query strings sensiveis e caminhos internos.
+- Mudancas em `Request`, `Settings`, `Logger`, `Cache`, `Queue` ou `Database` exigem testes focados e, quando possivel, a suite completa.
+
+### Contratos
+
+Responsaveis por estabilizar pontos de extensao do framework.
+
+Diretorios relacionados:
+
+- `api/Interface/`
+
+Contratos atuais:
+
+- `Attribute`
+- `AttributeBefore`
+- `AttributeAfter`
+- `Cache`
+- `Controller`
+- `Database`
+- `Insertable`
+- `PdoDriverAdapter`
+- `Queue`
+- `Responseable`
+- `Storage`
+- `Task`
+
+Regras:
+
+- Crie interface quando houver mais de uma implementacao provavel ou quando a dependencia externa for relevante.
+- Evite interfaces para classes simples sem variacao prevista.
+- Classes de core e integracao devem depender de contratos quando isso reduzir acoplamento real.
+
+### Integracoes
+
+Responsaveis por detalhes tecnicos de fornecedores externos.
+
+Diretorios relacionados:
+
+- `api/Integration/`
 - `api/Docker/`
 
 Regras:
 
-- Storage, Redis, S3, banco, OCR e outros fornecedores devem ser acessados por interfaces ou adapters.
-- Código de domínio não deve depender diretamente de SDKs externos.
-- Adapters devem traduzir detalhes externos para contratos internos.
+- Redis, S3, banco e outros fornecedores devem ficar atras de contratos ou adapters.
+- Codigo de core nao deve depender diretamente de SDKs quando houver contrato interno aplicavel.
+- Adapters devem traduzir detalhes externos para estruturas e excecoes coerentes com o framework.
+- Integracoes que dependem de ambiente externo devem ter testes que possam ser pulados claramente quando o ambiente nao estiver configurado, sem mascarar testes unitarios de configuracao.
 
-### Tarefas assíncronas
+### DataTypes
 
-Responsável por processamento em segundo plano.
+Responsaveis por validar valores reutilizaveis e dar significado a dados importantes.
 
-Diretórios atuais relacionados:
+Diretorios relacionados:
 
-- `api/Tasks/`
-- `api/Worker.php`
-- `api/Core/Queue.php`
-- `api/Integration/Queue/`
-
-Regras:
-
-- OCR, indexação, geração de preview e reprocessamento devem rodar por fila quando forem operações demoradas.
-- Tarefas devem ser idempotentes sempre que possível.
-- Falhas devem registrar logs e permitir retry.
-- O worker não deve conter regra de negócio; ele deve executar tarefas.
-
-## Camadas do frontend
-
-O frontend atual é estático e deve permanecer simples enquanto o produto estiver nas primeiras milestones.
-
-Diretórios atuais:
-
-- `app/pages/`
-- `app/components/`
-- `app/js/`
-- `app/css/`
-- `app/assets/`
-- `app/config/`
-- `app/core/`
+- `api/DataTypes/`
+- `api/Enum/Field.php`
+- `api/Include/AbstractFieldValue.php`
 
 Regras:
 
-- Páginas devem coordenar a tela e chamar funções de domínio do frontend.
-- Componentes devem ser reutilizáveis e pequenos.
-- Código de chamada HTTP deve ser centralizado para evitar duplicação.
-- CSS de página deve ficar separado de CSS global.
-- Assets devem ficar organizados por finalidade.
+- Use DataTypes em assinaturas quando o valor tiver validacao propria ou significado de dominio tecnico, como `UUID`, `Url`, `FilePath` e `Base64`.
+- Nao crie DataType apenas para embrulhar primitivo sem regra.
+- Novos DataTypes devem ter testes.
+- DataTypes devem evitar I/O e efeitos colaterais.
 
-## Fluxo principal de documento
+### Observabilidade
 
-```text
-Usuário
-  -> App
-  -> API Controller
-  -> Class de negócio
-  -> Model
-  -> Database
-  -> Storage
-  -> Queue
-  -> Worker
-  -> OCR/Indexação
-```
+Responsavel por correlacionar execucoes, registrar eventos e facilitar diagnostico.
 
-Fluxo esperado:
+Arquivos relacionados:
 
-1. O usuário envia um arquivo pela interface ou API.
-2. O controller recebe a requisição e valida o contrato básico.
-3. Uma classe em `api/Class/` executa o caso de uso.
-4. O arquivo é salvo pelo adapter de storage.
-5. Os metadados são persistidos via model.
-6. Uma tarefa assíncrona é enviada para fila quando houver processamento posterior.
-7. O worker processa OCR, preview ou indexação.
-8. A API passa a devolver o documento com status atualizado.
-
-## Módulos funcionais
-
-Os módulos principais previstos são:
-
-- `auth`: login, sessão, JWT e proteção de rotas.
-- `user`: usuários, cadastro, senha e admin inicial.
-- `organization`: organizações e isolamento de dados.
-- `permission`: papéis, permissões e middleware.
-- `document`: entidade principal, metadados e status.
-- `file`: upload, validação, storage físico e download.
-- `folder`: organização em pastas.
-- `tag`: tags e relacionamento com documentos.
-- `document-type`: tipos de documento.
-- `metadata`: campos customizados e valores.
-- `storage`: storage local e S3-compatible.
-- `queue`: fila, worker e retry.
-- `ocr`: OCR e extração de texto.
-- `search`: indexação, busca textual e filtros.
-- `audit`: auditoria e timeline.
-- `dashboard`: indicadores e visão geral.
-
-## Contratos internos
-
-Integrações devem ser acessadas por contratos internos quando houver risco de troca de implementação.
-
-Contratos atuais:
-
-- `api/Interface/Database.php`
-- `api/Interface/Storage.php`
-- `api/Interface/Queue.php`
-- `api/Interface/Cache.php`
-- `api/Interface/Task.php`
-- `api/Interface/Controller.php`
-- `api/Interface/Responseable.php`
+- `api/Core/Logger.php`
+- `api/Core/Request.php`
+- `api/Class/HttpResponse.php`
+- `.env.example`
 
 Regras:
 
-- Crie interface quando houver mais de uma implementação provável ou quando a dependência externa for relevante.
-- Evite criar interfaces para classes simples sem variação prevista.
-- Classes de negócio devem depender de contratos quando isso reduzir acoplamento real.
+- Request id deve existir quando logs estiverem ativos.
+- Quando logs estiverem desativados, o framework deve evitar gerar e expor request id sem necessidade.
+- Logs devem ter contexto suficiente para diagnostico sem expor segredos, tokens, dados privados, query strings completas ou caminhos internos sensiveis.
+- O logger deve ser generico e poder ser chamado por qualquer parte do framework.
+- O `Request` decide quando associar informacao de request a uma resposta HTTP; `HttpResponse` define como essa informacao entra no payload.
 
-## Banco de dados
+### Testes
 
-O banco deve refletir os módulos do produto e fica organizado em `database/`.
+Estrategia:
 
-Diretórios atuais:
-
-- `database/src/`: scripts base e objetos SQL compartilhados.
-- `database/install/`: instalação inicial do schema.
-- `database/update/`: atualizações incrementais do banco.
-- `database/docker-compose.yml`: ambiente isolado do banco.
-- `database/Dockerfile`, `database/entrypoint.sh` e `database/update.sh`: automação do container e aplicação dos scripts.
-
-Entidades previstas:
-
-- usuários;
-- organizações;
-- documentos;
-- arquivos de documentos;
-- tags;
-- tipos de documento;
-- metadados;
-- permissões;
-- auditoria;
-- tarefas de processamento, se necessário.
+- Testes unitarios para DataTypes, respostas, attributes e helpers.
+- Testes de core para request, settings, logger, cache, queue e database.
+- Testes de integracao para Redis, S3 e PDO quando houver ambiente configurado.
+- Testes de regressao para bugs corrigidos.
 
 Regras:
 
-- Toda alteração estrutural deve ter script SQL em `database/`.
-- Instalação inicial e atualizações devem permanecer coerentes.
-- Soft delete deve ser usado para documentos e entidades sensíveis.
-- Dados devem ser isolados por organização quando multiusuário estiver ativo.
-- Auditoria deve registrar ações relevantes em documentos.
+- Nova funcao publica deve ter teste correspondente.
+- Mudanca de comportamento existente deve preservar compatibilidade quando possivel.
+- Testes devem focar comportamento, nao detalhes internos frageis.
+- Testes dependentes de servico externo devem declarar skip quando o ambiente nao estiver configurado.
+- A verificacao padrao da API deve ser `composer check` dentro de `api/`.
 
-## Storage
-
-O storage deve suportar implementação local no início e S3-compatible posteriormente.
+## Variaveis de ambiente
 
 Regras:
 
-- A API não deve espalhar caminhos físicos de arquivos.
-- O domínio deve tratar arquivos por identificadores e metadados.
-- Download deve passar por validação de permissão.
-- Adapters de storage devem implementar contrato comum.
+- Use prefixo `BFR_API_`.
+- Documente novas variaveis no `.env.example`.
+- Variaveis sensiveis nao devem aparecer com valores reais.
+- Ao adicionar variavel usada pelo codigo, atualize tambem README quando ela fizer parte da configuracao publica.
 
-## Busca e OCR
+## Seguranca operacional
 
-Busca e OCR devem ser tratados como pipeline de processamento.
+Regras minimas:
 
-Regras:
+- Nao exponha segredos, tokens ou credenciais em logs, respostas, commits ou PRs.
+- Nao registre query string completa por padrao.
+- Nao exponha detalhes internos de infraestrutura em mensagens de erro publicas sem decisao explicita.
+- Falhas de integracao devem produzir erros claros para diagnostico sem vazar dados sensiveis.
 
-- Upload não deve depender de OCR síncrono.
-- O documento deve ter status de processamento.
-- Texto extraído deve ser persistido de forma pesquisável.
-- Reprocessamento deve ser uma ação explícita.
-- Falhas de OCR devem ser observáveis.
-
-## Segurança
-
-Regras mínimas:
-
-- Validar tipo e tamanho de upload.
-- Sanitizar nomes e caminhos de arquivo.
-- Não confiar em MIME type informado pelo cliente sem validação.
-- Proteger downloads por autenticação e permissão.
-- Isolar dados por organização.
-- Registrar auditoria de criação, edição, exclusão e download.
-- Evitar exposição de caminhos internos e detalhes de infraestrutura.
-
-## Observabilidade
-
-Regras mínimas:
-
-- Toda requisição deve ter request id.
-- Erros devem ser registrados com contexto suficiente.
-- Healthcheck deve validar disponibilidade básica da API.
-- Falhas de fila, OCR e storage devem gerar logs claros.
-- Logs não devem expor segredos, tokens ou dados sensíveis.
-
-## Testes
-
-Estratégia:
-
-- Testes unitários para classes de negócio, validações e DataTypes.
-- Testes de integração para banco, storage, cache e fila.
-- Testes HTTP para controllers e contratos de resposta.
-- Testes de regressão para bugs corrigidos.
-
-Regras:
-
-- Nova regra de negócio deve ter teste correspondente.
-- Mudança em comportamento existente deve preservar compatibilidade quando possível.
-- Testes devem focar comportamento, não detalhes internos frágeis.
-
-## Como adicionar uma nova funcionalidade
+## Como adicionar uma melhoria de core
 
 Fluxo recomendado:
 
-1. Criar branch própria para a tarefa.
-2. Identificar o módulo funcional afetado.
-3. Definir ou ajustar contrato HTTP.
-4. Criar ou ajustar classe em `api/Class/` para o caso de uso.
-5. Criar ou ajustar model quando houver persistência.
-6. Criar ou ajustar adapter quando houver integração externa.
-7. Criar testes focados.
-8. Atualizar documentação quando a decisão afetar arquitetura, uso ou padrão.
+1. Criar branch propria no formato `module/function`.
+2. Identificar a camada afetada.
+3. Ler os contratos e testes existentes da area.
+4. Fazer a menor mudanca coerente com o padrao local.
+5. Criar testes focados.
+6. Atualizar `.env.example`, README ou docs quando a mudanca afetar configuracao, uso ou arquitetura.
+7. Rodar `composer check` dentro do container ou ambiente aprovado.
 
-## Regras de decisão
+## Regras de decisao
 
-- Prefira solução simples enquanto a milestone ainda não exigir abstração maior.
-- Introduza abstrações apenas quando reduzirem acoplamento real.
-- Não coloque regra de negócio em controller.
-- Não acesse SDK externo diretamente a partir do domínio.
-- Não misture frontend, backend e infraestrutura na mesma responsabilidade.
-- Não faça mudanças arquiteturais amplas junto com tarefas pequenas de produto.
-
-## Exceções
-
-O projeto ainda possui estruturas herdadas da base inicial. Código legado pode permanecer até que exista uma tarefa específica de migração.
-
-Ao alterar uma área legada:
-
-- preserve compatibilidade;
-- siga o padrão local existente quando a migração não fizer parte do escopo;
-- registre uma decisão se a mudança criar ou alterar regra arquitetural.
+- Prefira solucao simples enquanto o framework nao exigir abstracao maior.
+- Introduza abstracoes apenas quando reduzirem acoplamento real ou duplicacao relevante.
+- Nao misture melhoria funcional com migracao arquitetural ampla.
+- Preserve compatibilidade publica sempre que possivel.
+- Ao tocar area legada, siga o padrao local se a migracao nao fizer parte da tarefa.
+- Se uma regra nova conflitar com codigo legado, registre a excecao em `docs/conventions.md`.

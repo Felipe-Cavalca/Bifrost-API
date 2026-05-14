@@ -10,6 +10,7 @@
 - Não faça commit, push ou PR sem autorização explícita.
 - Preserve o padrão existente do módulo alterado.
 - Se uma instrução do usuário contrariar ou divergir de `AGENTS.md` ou da documentação em `docs/`, questione antes de executar e explique objetivamente o conflito.
+- Antes de alterar core, integrações, DataTypes, variáveis de ambiente, observabilidade ou fluxo HTTP, consulte `docs/architecture.md`.
 
 ## Ambiente
 
@@ -28,6 +29,7 @@
 - Não duplique regra de negócio; extraia para classe, função ou DataType apropriado.
 - Comentários devem explicar decisões, restrições, exceções ou contexto não óbvio.
 - Mensagens de erro devem ter contexto suficiente para debug sem expor dados sensíveis.
+- Melhorias de core devem manter responsabilidades pequenas e não devem introduzir regra de produto no framework.
 
 ## DataTypes
 
@@ -48,6 +50,7 @@
 - PRs devem receber labels existentes em `.github/labels.yml`.
 - Antes de criar ou atualizar labels de um PR, consulte `.github/labels.yml` e use somente labels listadas nesse arquivo, salvo orientação explícita diferente.
 - As labels são usadas por workflows e automações; não deixe PR criado por agente sem label quando a ferramenta permitir aplicar labels.
+- PRs de documentação devem usar a label `documentation` e PRs feitos por agente devem usar também a label `IA`, quando a ferramenta permitir aplicar labels.
 
 ## Verificações
 
@@ -60,6 +63,7 @@
 ## Documentação
 
 - Mudanças de padrão do projeto devem ser registradas em `docs/conventions.md`.
+- Mudanças de arquitetura, core, observabilidade, ambiente ou contratos públicos devem ser registradas em `docs/architecture.md` quando alterarem o padrão esperado do projeto.
 - Se uma regra nova conflitar com código legado, mantenha compatibilidade e registre a exceção no documento de convenções.
 
 ## Escopo
