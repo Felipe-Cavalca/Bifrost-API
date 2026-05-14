@@ -31,4 +31,31 @@ final class SettingsTest extends TestCase
         $this->expectException(AppError::class);
         $settings->getSettingsDatabase('test');
     }
+
+    public function testReadsMongoSettings(): void
+    {
+        putenv('BFR_API_MONGO_URI=mongodb://mongo:27017');
+        putenv('BFR_API_MONGO_HOST=mongo');
+        putenv('BFR_API_MONGO_PORT=27018');
+        putenv('BFR_API_MONGO_DATABASE=bifrost_logs');
+        putenv('BFR_API_MONGO_USER=bifrost');
+        putenv('BFR_API_MONGO_PASSWORD=secret');
+
+        $settings = new Settings();
+        $config = $settings->getSettingsMongo();
+
+        self::assertSame('mongodb://mongo:27017', $config['uri']);
+        self::assertSame('mongo', $config['host']);
+        self::assertSame('27018', $config['port']);
+        self::assertSame('bifrost_logs', $config['database']);
+        self::assertSame('bifrost', $config['username']);
+        self::assertSame('secret', $config['password']);
+
+        putenv('BFR_API_MONGO_URI');
+        putenv('BFR_API_MONGO_HOST');
+        putenv('BFR_API_MONGO_PORT');
+        putenv('BFR_API_MONGO_DATABASE');
+        putenv('BFR_API_MONGO_USER');
+        putenv('BFR_API_MONGO_PASSWORD');
+    }
 }

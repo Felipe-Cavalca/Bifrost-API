@@ -13,4 +13,16 @@ class Index implements Controller
     {
         return HttpResponse::success(message: "Operation completed successfully");
     }
+
+    public function health(): Responseable
+    {
+        return HttpResponse::success(
+            message: 'OK',
+            data: [
+                'status' => 'healthy',
+                'service' => 'bifrost-api',
+                'checked_at' => gmdate('c'),
+            ]
+        );
+    }
 }

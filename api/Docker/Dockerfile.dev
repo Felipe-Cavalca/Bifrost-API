@@ -16,8 +16,8 @@ RUN apt-get update \
         git \
         unzip \
     && docker-php-ext-install curl pdo_mysql pdo_pgsql \
-    && pecl install redis apcu \
-    && docker-php-ext-enable redis apcu \
+    && pecl install redis apcu mongodb \
+    && docker-php-ext-enable redis apcu mongodb \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

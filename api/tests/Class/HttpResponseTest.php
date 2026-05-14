@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bifrost\Class\HttpResponse;
+use Bifrost\DataTypes\UUID;
 use Bifrost\Enum\HttpStatusCode;
 use Bifrost\Interface\Responseable;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,17 @@ final class HttpResponseTest extends TestCase
         self::assertSame(HttpStatusCode::CREATED, $response->status);
         self::assertSame('User created successfully', $response->message);
         self::assertSame($payload, $response->jsonSerialize()['data']);
+    }
+
+    public function testAddRequestIdAddsRequestIdToPayload(): void
+    {
+        $response = HttpResponse::success('done');
+        $response->addRequestId(new UUID('123e4567-e89b-12d3-a456-426614174000'));
+
+        self::assertSame(
+            '123e4567-e89b-12d3-a456-426614174000',
+            $response->jsonSerialize()['request_id']
+        );
     }
 
     public function testNamedFactoriesProduceExpectedStatuses(): void

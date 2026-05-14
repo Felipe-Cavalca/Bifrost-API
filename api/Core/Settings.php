@@ -82,11 +82,11 @@ final class Settings
         header("X-Powered-By: PHP/" . phpversion());
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Request-Id");
         header("Content-Type: application/json; charset=utf-8");
         header("Access-Control-Max-Age: 3600");
         header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Expose-Headers: Authorization");
+        header("Access-Control-Expose-Headers: Authorization, X-Request-Id");
     }
 
     /**
@@ -158,6 +158,24 @@ final class Settings
             "database" => static::getEnv("{$prefix}{$databaseName}NAME", true),
             "username" => static::getEnv("{$prefix}{$databaseName}USER", $isNotSqlite),
             "password" => static::getEnv("{$prefix}{$databaseName}PASSWORD", $isNotSqlite),
+        ];
+    }
+
+    public function getSettingsMongo(?string $databaseName = null): array
+    {
+        $prefix = 'BFR_API_MONGO_';
+
+        if (!empty($databaseName)) {
+            $databaseName = strtoupper($databaseName) . '_';
+        }
+
+        return [
+            'uri' => static::getEnv("{$prefix}{$databaseName}URI"),
+            'host' => static::getEnv("{$prefix}{$databaseName}HOST"),
+            'port' => static::getEnv("{$prefix}{$databaseName}PORT") ?? '27017',
+            'database' => static::getEnv("{$prefix}{$databaseName}DATABASE"),
+            'username' => static::getEnv("{$prefix}{$databaseName}USER"),
+            'password' => static::getEnv("{$prefix}{$databaseName}PASSWORD"),
         ];
     }
 
