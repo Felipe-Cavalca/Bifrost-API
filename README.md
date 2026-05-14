@@ -153,6 +153,7 @@ Principais grupos:
 | Grupo | Variaveis |
 |------|-----------|
 | Runtime | `BFR_API_DEBUG_SHOW_ERRORS`, `BFR_API_IMAGE`, `BFR_API_HTTP_PORT` |
+| Logs | `BFR_API_LOG_DRIVER`, `BFR_API_LOG_FILE` |
 | Sessao | `BFR_API_SESSION_HANDLER`, `BFR_API_SESSION_PATH`, `BFR_API_SESSION_TTL`, `BFR_API_SESSION_COOKIE_TTL` |
 | Cache | `BFR_API_CACHE_DRIVER`, `BFR_API_CACHE_APCU_ENABLED`, `BFR_API_CACHE_APCU_PREFIX`, `BFR_API_CACHE_APCU_TTL`, `BFR_API_CACHE_REDIS_HOST`, `BFR_API_CACHE_REDIS_PORT`, `BFR_API_CACHE_QUERY_TTL` |
 | Fila | `BFR_API_QUEUE_NAME`, `BFR_API_QUEUE_REDIS_HOST`, `BFR_API_QUEUE_REDIS_PORT` |
@@ -264,7 +265,7 @@ Exemplo:
 use Bifrost\Integration\S3Storage;
 
 $storage = S3Storage::fromSettings();
-$storage->put('documents/report.txt', 'conteudo', [
+$storage->put('files/report.txt', 'conteudo', [
     'ContentType' => 'text/plain',
 ]);
 ```

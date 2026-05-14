@@ -1,6 +1,6 @@
 # Convenções de nomes
 
-Este documento define os padrões de nomes do Dossier para branches, commits, PRs, issues, arquivos, código, banco de dados e API.
+Este documento define os padrões de nomes do Bifrost-API para branches, commits, PRs, issues, arquivos, código, configuração e API.
 
 ## Princípios
 
@@ -87,10 +87,10 @@ Tipos permitidos:
 Exemplos:
 
 ```text
-feat: adiciona upload de documentos
-fix: corrige validação de tamanho do arquivo
+feat: adiciona logger estruturado
+fix: corrige validação de request
 docs: define convenções de nomes
-test: adiciona testes de login
+test: adiciona testes de cache
 ci: adiciona testes php no pull request
 ```
 
@@ -126,8 +126,8 @@ Exemplos:
 
 ```text
 [M1] docs: definir convenções de nomes
-[M2] feat: criar endpoint de login
-[M3] feat: implementar upload de documentos
+[M2] feat: adicionar driver de storage local
+[M3] test: cobrir atributos after
 ```
 
 Quando a issue for subissue, mantenha o título focado na tarefa concreta.
@@ -146,8 +146,7 @@ Exemplos:
 api/Core/Request.php
 api/Integration/Database/PdoDatabase.php
 api/tests/Core/RequestTest.php
-app/pages/index.html
-app/js/pages/document-list.js
+api/Controller/index.php
 docs/conventions.md
 ```
 
@@ -166,10 +165,10 @@ Classes, interfaces, traits e enums:
 Exemplos:
 
 ```text
-DocumentController
+IndexController
 LocalStorageAdapter
-DocumentUpload
-DocumentStatus
+RequestLogger
+HttpStatusCode
 ```
 
 Camadas de negócio e persistência:
@@ -193,10 +192,10 @@ Métodos e variáveis:
 Exemplos:
 
 ```text
-uploadDocument()
-validateFileSize()
+validateRequest()
 createPresignedUrl()
-$documentId
+buildCacheKey()
+$requestId
 $storageAdapter
 ```
 
@@ -219,7 +218,7 @@ Testes:
 Exemplos:
 
 ```text
-DocumentUploadTest.php
+LoggerTest.php
 StorageAdapterTest.php
 ```
 
@@ -236,14 +235,12 @@ Endpoints:
 Exemplos:
 
 ```text
-GET /documents
-POST /documents
-GET /documents?id={uuid}
-PATCH /documents?id={uuid}
-DELETE /documents?id={uuid}
-POST /documents/restore?id={uuid}
-GET /document-types
-POST /documents/reprocess?id={uuid}
+GET /health
+GET /users?id={uuid}
+POST /users
+PATCH /users?id={uuid}
+DELETE /users?id={uuid}
+POST /cache/clear
 ```
 
 Parâmetros e payloads:
@@ -254,8 +251,8 @@ Exemplos:
 
 ```json
 {
-  "document_type_id": "uuid",
-  "original_name": "contrato.pdf",
+  "user_id": "uuid",
+  "display_name": "Nome",
   "expires_at": "2026-12-31"
 }
 ```
