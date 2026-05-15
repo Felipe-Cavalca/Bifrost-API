@@ -9,6 +9,7 @@ class Session
     public function __construct()
     {
         if (session_status() == PHP_SESSION_NONE) {
+            $this->ensureSavePath();
             session_start();
         }
 
@@ -58,6 +59,25 @@ class Session
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
+        }
+    }
+
+    private function ensureSavePath(): void
+    {
+        $config = SessionConfig::fromRuntime();
+
+        if (!$config->shouldEnsureSavePath()) {
+            return;
+        }
+
+        $savePath = $config->resolvedSavePath();
+
+        if ($savePath === null || is_dir($savePath)) {
+            return;
+        }
+
+        if (!mkdir($savePath, 0775, true) && !is_dir($savePath)) {
+            throw new \RuntimeException('Unable to create session save path.');
         }
     }
 }
