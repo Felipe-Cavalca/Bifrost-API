@@ -9,6 +9,7 @@ class Session
     public function __construct()
     {
         if (session_status() == PHP_SESSION_NONE) {
+            $this->ensureSavePath();
             session_start();
         }
 
@@ -59,5 +60,37 @@ class Session
             session_unset();
             session_destroy();
         }
+    }
+
+    private function ensureSavePath(): void
+    {
+        if (session_module_name() !== 'files') {
+            return;
+        }
+
+        $savePath = $this->resolvedSavePath(session_save_path());
+        if ($savePath === null || is_dir($savePath)) {
+            return;
+        }
+
+        if (!mkdir($savePath, 0775, true) && !is_dir($savePath)) {
+            throw new \RuntimeException('Unable to create session save path.');
+        }
+    }
+
+    private function resolvedSavePath(string $savePath): ?string
+    {
+        if ($savePath === '' || str_contains($savePath, '://')) {
+            return null;
+        }
+
+        $parts = explode(';', $savePath);
+        $path = end($parts);
+
+        if (!is_string($path) || $path === '') {
+            return null;
+        }
+
+        return $path;
     }
 }
