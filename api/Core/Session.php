@@ -64,14 +64,11 @@ class Session
 
     private function ensureSavePath(): void
     {
-        $config = SessionConfig::fromRuntime();
-
-        if (!$config->shouldEnsureSavePath()) {
+        if (session_module_name() !== 'files') {
             return;
         }
 
-        $savePath = $config->resolvedSavePath();
-
+        $savePath = $this->resolvedSavePath(session_save_path());
         if ($savePath === null || is_dir($savePath)) {
             return;
         }
@@ -79,5 +76,21 @@ class Session
         if (!mkdir($savePath, 0775, true) && !is_dir($savePath)) {
             throw new \RuntimeException('Unable to create session save path.');
         }
+    }
+
+    private function resolvedSavePath(string $savePath): ?string
+    {
+        if ($savePath === '' || str_contains($savePath, '://')) {
+            return null;
+        }
+
+        $parts = explode(';', $savePath);
+        $path = end($parts);
+
+        if (!is_string($path) || $path === '') {
+            return null;
+        }
+
+        return $path;
     }
 }
