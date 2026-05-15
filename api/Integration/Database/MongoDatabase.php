@@ -14,21 +14,21 @@ class MongoDatabase implements NoSqlDatabase
     {
         self::assertExtensionAvailable();
 
-        $mongoConfig = self::normalizeConfig($config);
+        $config = self::normalizeConfig($config);
 
-        $this->database = (string) ($mongoConfig['database'] ?? '');
+        $this->database = (string) ($config['database'] ?? '');
         if ($this->database === '') {
             throw new \InvalidArgumentException('Mongo database is required.');
         }
 
-        $this->manager = $manager ?? new \MongoDB\Driver\Manager(self::buildUri($mongoConfig));
+        $this->manager = $manager ?? new \MongoDB\Driver\Manager(self::buildUri($config));
     }
 
     public static function fromSettings(?Settings $settings = null): self
     {
         $settings ??= new Settings();
 
-        return new self(self::buildConfigFromSettings($settings)->toArray());
+        return new self(self::buildConfigFromSettings($settings));
     }
 
     public function insertOne(string $collection, array $document): void
@@ -57,30 +57,48 @@ class MongoDatabase implements NoSqlDatabase
         return $this->manager;
     }
 
-    protected static function buildConfigFromSettings(Settings $settings): MongoDatabaseConfig
+    protected static function buildConfigFromSettings(Settings $settings): array
     {
-        return MongoDatabaseConfig::fromSettings($settings);
+        return self::normalizeConfig($settings->getSettingsMongo());
     }
 
     private static function buildUri(array $config): string
     {
-        return self::normalizeConfig($config)->uri();
-    }
+        $config = self::normalizeConfig($config);
 
-    private static function normalizeConfig(array|MongoDatabaseConfig $config): MongoDatabaseConfig
-    {
-        if ($config instanceof MongoDatabaseConfig) {
-            return $config;
+        if (!empty($config['uri'])) {
+            return (string) $config['uri'];
         }
 
-        return new MongoDatabaseConfig(
-            uri: self::optionalString($config['uri'] ?? null),
-            host: self::optionalString($config['host'] ?? null),
-            port: self::optionalString($config['port'] ?? null) ?? '27017',
-            database: self::optionalString($config['database'] ?? null),
-            username: self::optionalString($config['username'] ?? null),
-            password: self::optionalString($config['password'] ?? null)
-        );
+        if (empty($config['host'])) {
+            throw new \InvalidArgumentException('Mongo host is required.');
+        }
+
+        return 'mongodb://' . self::auth($config) . $config['host'] . ':' . $config['port'];
+    }
+
+    private static function normalizeConfig(array $config): array
+    {
+        return [
+            'uri' => self::optionalString($config['uri'] ?? null),
+            'host' => self::optionalString($config['host'] ?? null),
+            'port' => self::optionalString($config['port'] ?? null) ?? '27017',
+            'database' => self::optionalString($config['database'] ?? null),
+            'username' => self::optionalString($config['username'] ?? null),
+            'password' => self::optionalString($config['password'] ?? null),
+        ];
+    }
+
+    private static function auth(array $config): string
+    {
+        if (empty($config['username']) && empty($config['password'])) {
+            return '';
+        }
+
+        return rawurlencode((string) $config['username'])
+            . ':'
+            . rawurlencode((string) $config['password'])
+            . '@';
     }
 
     private static function optionalString(mixed $value): ?string
