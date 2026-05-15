@@ -171,7 +171,7 @@ Principais grupos:
 | Cache | `BFR_API_CACHE_DRIVER`, `BFR_API_CACHE_APCU_ENABLED`, `BFR_API_CACHE_APCU_PREFIX`, `BFR_API_CACHE_APCU_TTL`, `BFR_API_CACHE_REDIS_HOST`, `BFR_API_CACHE_REDIS_PORT`, `BFR_API_CACHE_QUERY_TTL` |
 | Fila | `BFR_API_QUEUE_NAME`, `BFR_API_QUEUE_REDIS_HOST`, `BFR_API_QUEUE_REDIS_PORT` |
 | Banco | `BFR_API_DB_DRIVER`, `BFR_API_DB_HOST`, `BFR_API_DB_PORT`, `BFR_API_DB_NAME`, `BFR_API_DB_USER`, `BFR_API_DB_PASSWORD` |
-| S3 | `BFR_API_S3_BUCKET`, `BFR_API_S3_REGION`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET`, `BFR_API_S3_ENDPOINT`, `BFR_API_S3_PATH_STYLE` |
+| Storage | `BFR_API_STORAGE_DRIVER`, `BFR_API_STORAGE_LOCAL_PATH`, `BFR_API_S3_BUCKET`, `BFR_API_S3_REGION`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET`, `BFR_API_S3_ENDPOINT`, `BFR_API_S3_PATH_STYLE` |
 
 Variaveis sensiveis, como `BFR_API_DB_PASSWORD`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET` e `BFR_API_MONGO_PASSWORD`, nao devem ser commitadas com valores reais.
 
@@ -263,9 +263,15 @@ executam a `Task` imediatamente no processo atual.
 
 O worker da fila fica em [`api/Worker.php`](/workspaces/Bifrost-API/api/Worker.php).
 
-### S3
+### Storage
 
-A integracao S3 e opcional e fica em [`api/Integration/S3Storage.php`](/workspaces/Bifrost-API/api/Integration/S3Storage.php).
+O storage pode ser resolvido por [`StorageFactory`](/workspaces/Bifrost-API/api/Integration/Storage/StorageFactory.php), usando `BFR_API_STORAGE_DRIVER=local|s3`.
+
+O driver `local` grava em [`LocalStorage`](/workspaces/Bifrost-API/api/Integration/Storage/LocalStorage.php). Configure `BFR_API_STORAGE_LOCAL_PATH` para apontar para um diretorio gravavel; em Docker, esse caminho pode ser um volume montado, por exemplo `/var/www/html/storage`.
+
+A integracao S3 e opcional e fica em [`api/Integration/Storage/S3Storage.php`](/workspaces/Bifrost-API/api/Integration/Storage/S3Storage.php). O namespace antigo `Bifrost\Integration\S3Storage` continua disponivel por compatibilidade.
+
+As operacoes recebem `Bifrost\DataTypes\StorageKey` para a chave do arquivo. URLs assinadas usam `Bifrost\DataTypes\DateTime` para representar a expiracao. `body` e `options` continuam genericos porque variam conforme o driver.
 
 Para usa-la, instale o SDK oficial:
 
@@ -277,10 +283,11 @@ composer require aws/aws-sdk-php
 Exemplo:
 
 ```php
-use Bifrost\Integration\S3Storage;
+use Bifrost\Integration\Storage\StorageFactory;
+use Bifrost\DataTypes\StorageKey;
 
-$storage = S3Storage::fromSettings();
-$storage->put('files/report.txt', 'conteudo', [
+$storage = StorageFactory::fromSettings();
+$storage->put(key: new StorageKey(key: 'files/report.txt'), body: 'conteudo', options: [
     'ContentType' => 'text/plain',
 ]);
 ```

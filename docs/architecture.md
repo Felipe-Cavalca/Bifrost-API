@@ -40,7 +40,7 @@ Areas principais:
 - Observabilidade: `api/Core/Logger.php`, headers de request id e testes de core.
 - Cache e fila: `api/Core/Cache.php`, `api/Core/Queue.php`, `api/Integration/Cache/` e `api/Integration/Queue/`.
 - Banco de dados: `api/Core/Database.php`, `api/Integration/Database/` e `api/Interface/Database.php`.
-- Storage: `api/Integration/`, `api/Interface/Storage.php` e adapters relacionados.
+- Storage: `api/Integration/Storage/`, `api/Integration/S3Storage.php`, `api/Interface/Storage.php` e adapters relacionados.
 - DataTypes e validacoes: `api/DataTypes/`, `api/Enum/Field.php` e `api/Include/`.
 - Testes: `api/tests/`.
 
