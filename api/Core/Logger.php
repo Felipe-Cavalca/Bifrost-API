@@ -82,6 +82,8 @@ final class Logger
             return;
         }
 
+        $driver = self::driver($settings);
+
         $entry = [
             'timestamp' => gmdate('c'),
             'level' => $level,
@@ -95,15 +97,13 @@ final class Logger
             return;
         }
 
-        $driver = strtolower((string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log'));
-
         if ($driver === 'mongo' && self::writeToMongo($entry, $settings)) {
             return;
         }
 
         if ($driver === 'file') {
-            $logFile = $settings->BFR_API_LOG_FILE;
-            if (!is_string($logFile) || $logFile === '') {
+            $logFile = self::optionalString($settings->BFR_API_LOG_FILE);
+            if ($logFile === null) {
                 error_log($encoded);
                 return;
             }
@@ -118,13 +118,33 @@ final class Logger
     {
         try {
             $database = self::$noSqlDatabase ?? MongoDatabase::fromSettings($settings);
-            $collection = $settings->BFR_API_LOG_COLLECTION ?: 'logs';
-            $database->insertOne($collection, $entry);
+            $database->insertOne(self::mongoCollection($settings), $entry);
 
             return true;
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    private static function driver(Settings $settings): string
+    {
+        return strtolower((string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log'));
+    }
+
+    private static function mongoCollection(Settings $settings): string
+    {
+        return self::optionalString($settings->BFR_API_LOG_COLLECTION) ?? 'logs';
+    }
+
+    private static function optionalString(mixed $value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
     }
 
     private static function resolveRequestId(): UUID

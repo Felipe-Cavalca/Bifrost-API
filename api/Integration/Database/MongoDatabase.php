@@ -14,6 +14,8 @@ class MongoDatabase implements NoSqlDatabase
     {
         self::assertExtensionAvailable();
 
+        $config = self::normalizeConfig($config);
+
         $this->database = (string) ($config['database'] ?? '');
         if ($this->database === '') {
             throw new \InvalidArgumentException('Mongo database is required.');
@@ -57,30 +59,57 @@ class MongoDatabase implements NoSqlDatabase
 
     protected static function buildConfigFromSettings(Settings $settings): array
     {
-        return $settings->getSettingsMongo();
+        return self::normalizeConfig($settings->getSettingsMongo());
     }
 
     private static function buildUri(array $config): string
     {
+        $config = self::normalizeConfig($config);
+
         if (!empty($config['uri'])) {
             return (string) $config['uri'];
         }
 
-        $host = (string) ($config['host'] ?? '');
-        if ($host === '') {
+        if (empty($config['host'])) {
             throw new \InvalidArgumentException('Mongo host is required.');
         }
 
-        $port = (string) ($config['port'] ?? '27017');
-        $username = (string) ($config['username'] ?? '');
-        $password = (string) ($config['password'] ?? '');
-        $auth = '';
+        return 'mongodb://' . self::auth($config) . $config['host'] . ':' . $config['port'];
+    }
 
-        if ($username !== '' || $password !== '') {
-            $auth = rawurlencode($username) . ':' . rawurlencode($password) . '@';
+    private static function normalizeConfig(array $config): array
+    {
+        return [
+            'uri' => self::optionalString($config['uri'] ?? null),
+            'host' => self::optionalString($config['host'] ?? null),
+            'port' => self::optionalString($config['port'] ?? null) ?? '27017',
+            'database' => self::optionalString($config['database'] ?? null),
+            'username' => self::optionalString($config['username'] ?? null),
+            'password' => self::optionalString($config['password'] ?? null),
+        ];
+    }
+
+    private static function auth(array $config): string
+    {
+        if (empty($config['username']) && empty($config['password'])) {
+            return '';
         }
 
-        return "mongodb://{$auth}{$host}:{$port}";
+        return rawurlencode((string) $config['username'])
+            . ':'
+            . rawurlencode((string) $config['password'])
+            . '@';
+    }
+
+    private static function optionalString(mixed $value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
     }
 
     private static function assertExtensionAvailable(): void
