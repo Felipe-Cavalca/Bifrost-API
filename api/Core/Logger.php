@@ -82,6 +82,8 @@ final class Logger
             return;
         }
 
+        $config = LoggerConfig::fromSettings($settings);
+
         $entry = [
             'timestamp' => gmdate('c'),
             'level' => $level,
@@ -95,31 +97,27 @@ final class Logger
             return;
         }
 
-        $driver = strtolower((string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log'));
-
-        if ($driver === 'mongo' && self::writeToMongo($entry, $settings)) {
+        if ($config->driver() === 'mongo' && self::writeToMongo($entry, $settings, $config)) {
             return;
         }
 
-        if ($driver === 'file') {
-            $logFile = $settings->BFR_API_LOG_FILE;
-            if (!is_string($logFile) || $logFile === '') {
+        if ($config->driver() === 'file') {
+            if ($config->file() === null) {
                 error_log($encoded);
                 return;
             }
-            file_put_contents($logFile, $encoded . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($config->file(), $encoded . PHP_EOL, FILE_APPEND | LOCK_EX);
             return;
         }
 
         error_log($encoded);
     }
 
-    private static function writeToMongo(array $entry, Settings $settings): bool
+    private static function writeToMongo(array $entry, Settings $settings, LoggerConfig $config): bool
     {
         try {
             $database = self::$noSqlDatabase ?? MongoDatabase::fromSettings($settings);
-            $collection = $settings->BFR_API_LOG_COLLECTION ?: 'logs';
-            $database->insertOne($collection, $entry);
+            $database->insertOne($config->collection(), $entry);
 
             return true;
         } catch (\Throwable) {
