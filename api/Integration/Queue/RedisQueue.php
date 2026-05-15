@@ -2,9 +2,9 @@
 
 namespace Bifrost\Integration\Queue;
 
-use Bifrost\Core\Settings;
 use Bifrost\Interface\Queue as QueueInterface;
 use Bifrost\Interface\Task;
+use Bifrost\Integration\Redis\RedisConfig;
 use Redis;
 
 class RedisQueue implements QueueInterface
@@ -16,19 +16,15 @@ class RedisQueue implements QueueInterface
     public function __construct()
     {
         if (empty(self::$redis)) {
-            $settings = new Settings();
-            self::$queue = $settings->BFR_API_QUEUE_NAME ?? 'bifrost_queue';
-            self::conn();
+            self::conn(RedisConfig::forQueue());
         }
     }
 
-    private static function conn(): void
+    private static function conn(RedisConfig $config): void
     {
-        $settings = new Settings();
-        $host = $settings->BFR_API_QUEUE_REDIS_HOST;
-        $port = $settings->BFR_API_QUEUE_REDIS_PORT;
+        self::$queue = $config->queueName();
 
-        if (empty($host) || empty($port)) {
+        if (!$config->isEnabled()) {
             self::$enabled = false;
             self::$redis = null;
             return;
@@ -36,7 +32,7 @@ class RedisQueue implements QueueInterface
 
         try {
             self::$redis = new Redis();
-            $connected = @self::$redis->connect($host, $port);
+            $connected = @self::$redis->connect($config->host(), $config->port());
             if (!$connected) {
                 self::$enabled = false;
                 self::$redis = null;

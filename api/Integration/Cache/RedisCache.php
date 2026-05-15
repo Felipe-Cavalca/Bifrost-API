@@ -10,8 +10,8 @@
 namespace Bifrost\Integration\Cache;
 
 use Redis;
-use Bifrost\Core\Settings;
 use Bifrost\Interface\Cache as CacheInterface;
+use Bifrost\Integration\Redis\RedisConfig;
 
 /**
  * It is responsible for managing the cache.
@@ -30,19 +30,9 @@ class RedisCache implements CacheInterface
      */
     private static function conn(): void
     {
-        $settings = new Settings();
-        $driver = strtolower($settings->BFR_API_CACHE_DRIVER ?? 'redis');
+        $config = RedisConfig::forCache();
 
-        if ($driver !== 'redis') {
-            self::$enabled = false;
-            self::$redis = null;
-            return;
-        }
-
-        $host = $settings->BFR_API_CACHE_REDIS_HOST;
-        $port = $settings->BFR_API_CACHE_REDIS_PORT;
-
-        if (empty($host) || empty($port)) {
+        if (!$config->isEnabled()) {
             self::$enabled = false;
             self::$redis = null;
             return;
@@ -50,7 +40,7 @@ class RedisCache implements CacheInterface
 
         try {
             self::$redis = new Redis();
-            $connected = @self::$redis->connect($host, $port);
+            $connected = @self::$redis->connect($config->host(), $config->port());
             if (!$connected) {
                 self::$enabled = false;
                 self::$redis = null;
