@@ -82,7 +82,7 @@ final class Logger
             return;
         }
 
-        $config = LoggerConfig::fromSettings($settings);
+        $driver = self::driver($settings);
 
         $entry = [
             'timestamp' => gmdate('c'),
@@ -97,32 +97,54 @@ final class Logger
             return;
         }
 
-        if ($config->driver() === 'mongo' && self::writeToMongo($entry, $settings, $config)) {
+        if ($driver === 'mongo' && self::writeToMongo($entry, $settings)) {
             return;
         }
 
-        if ($config->driver() === 'file') {
-            if ($config->file() === null) {
+        if ($driver === 'file') {
+            $logFile = self::optionalString($settings->BFR_API_LOG_FILE);
+            if ($logFile === null) {
                 error_log($encoded);
                 return;
             }
-            file_put_contents($config->file(), $encoded . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($logFile, $encoded . PHP_EOL, FILE_APPEND | LOCK_EX);
             return;
         }
 
         error_log($encoded);
     }
 
-    private static function writeToMongo(array $entry, Settings $settings, LoggerConfig $config): bool
+    private static function writeToMongo(array $entry, Settings $settings): bool
     {
         try {
             $database = self::$noSqlDatabase ?? MongoDatabase::fromSettings($settings);
-            $database->insertOne($config->collection(), $entry);
+            $database->insertOne(self::mongoCollection($settings), $entry);
 
             return true;
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    private static function driver(Settings $settings): string
+    {
+        return strtolower((string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log'));
+    }
+
+    private static function mongoCollection(Settings $settings): string
+    {
+        return self::optionalString($settings->BFR_API_LOG_COLLECTION) ?? 'logs';
+    }
+
+    private static function optionalString(mixed $value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
     }
 
     private static function resolveRequestId(): UUID
