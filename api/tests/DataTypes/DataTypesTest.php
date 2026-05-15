@@ -41,6 +41,20 @@ final class DataTypesTest extends TestCase
         self::assertInstanceOf(Url::class, new Url('https://example.com'));
     }
 
+    public function testLegacyDataTypesExposeValueAndJsonSerialization(): void
+    {
+        $base64 = new Base64(base64_encode('demo'));
+        $filePath = new FilePath('uploads/image.png');
+        $url = new Url('https://example.com');
+
+        self::assertSame(base64_encode('demo'), $base64->value());
+        self::assertSame('uploads/image.png', $filePath->value());
+        self::assertSame('https://example.com', $url->value());
+        self::assertSame($base64->value(), $base64->jsonSerialize());
+        self::assertSame($filePath->value(), (string) $filePath);
+        self::assertSame($url->value(), $url->jsonSerialize());
+    }
+
     public function testStorageKeyNormalizesSlashAndRejectsUnsafeSegments(): void
     {
         self::assertSame('uploads/image.png', (new StorageKey(key: 'uploads\\image.png'))->value());
