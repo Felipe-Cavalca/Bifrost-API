@@ -273,6 +273,17 @@ A integracao S3 e opcional e fica em [`api/Integration/Storage/S3Storage.php`](/
 
 As operacoes recebem `Bifrost\DataTypes\StorageKey` para a chave do arquivo. URLs assinadas usam `Bifrost\DataTypes\DateTime` para representar a expiracao. `body` e `options` continuam genericos porque variam conforme o driver.
 
+Shapes de retorno esperados:
+
+| Metodo | Campos minimos |
+| --- | --- |
+| `put` | `Key`, `ContentLength` |
+| `get` | `Key`, `Body`, `ContentLength` |
+| `delete` | `Key`, `Deleted` |
+| `createPresignedUrl` | string com URL assinada ou caminho local equivalente |
+
+Esses retornos permanecem como arrays por compatibilidade. Caso o contrato passe a retornar objetos dedicados no futuro, a mudanca deve ser tratada como `upgrade`.
+
 Para usa-la, instale o SDK oficial:
 
 ```bash
@@ -291,6 +302,34 @@ $storage->put(key: new StorageKey(key: 'files/report.txt'), body: 'conteudo', op
     'ContentType' => 'text/plain',
 ]);
 ```
+
+Teste S3 local temporario:
+
+```powershell
+docker rm -f bifrost-seaweedfs-test 2>$null
+docker run -d --name bifrost-seaweedfs-test --network bifrost-api_bifrost-back-network -e AWS_ACCESS_KEY_ID=admin -e AWS_SECRET_ACCESS_KEY=key chrislusf/seaweedfs:4.19 server -dir=/data -s3 -s3.port=8333 -ip.bind=0.0.0.0
+New-Item -ItemType Directory -Force api\tmp | Out-Null
+@'
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../tests/bootstrap.php';
+
+putenv('BFR_API_STORAGE_DRIVER=s3');
+putenv('BFR_API_S3_BUCKET=bifrost-test');
+putenv('BFR_API_S3_REGION=us-east-1');
+putenv('BFR_API_S3_KEY=admin');
+putenv('BFR_API_S3_SECRET=key');
+putenv('BFR_API_S3_ENDPOINT=http://bifrost-seaweedfs-test:8333');
+putenv('BFR_API_S3_PATH_STYLE=true');
+'@ | Set-Content api\tmp\s3-phpunit-bootstrap.php
+docker compose -f api\Docker\docker-compose.dev.yml run --rm -e BFR_API_STORAGE_DRIVER=s3 -e BFR_API_S3_BUCKET=bifrost-test -e BFR_API_S3_REGION=us-east-1 -e BFR_API_S3_KEY=admin -e BFR_API_S3_SECRET=key -e BFR_API_S3_ENDPOINT=http://bifrost-seaweedfs-test:8333 -e BFR_API_S3_PATH_STYLE=true api1 ./vendor/bin/phpunit --bootstrap tmp/s3-phpunit-bootstrap.php --display-skipped
+Remove-Item api\tmp\s3-phpunit-bootstrap.php
+docker rm -f bifrost-seaweedfs-test
+```
+
+O bootstrap temporario usado nesse fluxo deve ficar fora de commit. Ele deve carregar `tests/bootstrap.php` e reconfigurar apenas as variaveis `BFR_API_S3_*` para a execucao local.
 
 ## Testes
 

@@ -135,6 +135,8 @@ Regras:
 - Codigo de core nao deve depender diretamente de SDKs quando houver contrato interno aplicavel.
 - Adapters devem traduzir detalhes externos para estruturas e excecoes coerentes com o framework.
 - Integracoes que dependem de ambiente externo devem ter testes que possam ser pulados claramente quando o ambiente nao estiver configurado, sem mascarar testes unitarios de configuracao.
+- Testes reais de integracao podem usar servicos temporarios, como SeaweedFS para S3 compativel, desde que esses containers e bootstraps auxiliares nao sejam versionados quando forem apenas apoio local.
+- Contratos que retornam arrays devem documentar o shape minimo esperado. Trocar arrays por objetos dedicados em contrato publico deve ser tratado como `upgrade`.
 
 ### DataTypes
 
