@@ -30,10 +30,11 @@ foreach ($composerAutoloadCandidates as $composerAutoload) {
 spl_autoload_register(
     function (string $className): bool {
         $prefix = 'Bifrost\\';
-        if (strpos($className, $prefix) === 0) {
-            $className = substr($className, strlen($prefix));
+        if (!str_starts_with($className, $prefix)) {
+            return false;
         }
 
+        $className = substr($className, strlen($prefix));
         $relativeFile = str_replace("\\", DIRECTORY_SEPARATOR, $className) . ".php";
         $file = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $relativeFile;
         if (is_readable($file)) {
@@ -44,8 +45,9 @@ spl_autoload_register(
         $lowercaseFile = dirname($file) . DIRECTORY_SEPARATOR . lcfirst(basename($file));
         if (is_readable($lowercaseFile)) {
             require_once $lowercaseFile;
+            return true;
         }
 
-        return true;
+        return false;
     }
 );

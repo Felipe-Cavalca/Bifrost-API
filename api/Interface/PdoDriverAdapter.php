@@ -1,6 +1,6 @@
 <?php
 
-namespace Bifrost\Integration\Database\Driver;
+namespace Bifrost\Interface;
 
 use Bifrost\Integration\Database\PdoDatabase;
 use PDO;
@@ -15,3 +15,5 @@ interface PdoDriverAdapter
 
     public function setSystemIdentifier(PDO $connection, array $data): bool;
 }
+
+class_alias(PdoDriverAdapter::class, 'Bifrost\\Integration\\Database\\Driver\\PdoDriverAdapter');

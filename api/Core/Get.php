@@ -19,12 +19,15 @@ class Get
 
         $data = $_GET;
         $path = $data["_controller"] ?? "index";
+        $hasExplicitAction = !empty($data["_action"]);
         $action = empty($data["_action"]) ? "index" : $data["_action"];
         $route = Routes::fromRequest((string) $path);
         self::$routeMapped = $route !== null;
 
         if ($route) {
             [$controller, $action] = explode("/", $route->value);
+        } elseif (!$hasExplicitAction && str_contains((string) $path, "/")) {
+            [$controller, $action] = explode("/", (string) $path, 2);
         } else {
             $controller = (string) $path;
         }
