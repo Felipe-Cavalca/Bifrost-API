@@ -62,6 +62,13 @@ class Session
         }
     }
 
+    public static function close(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+    }
+
     private function ensureSavePath(): void
     {
         if (session_module_name() !== 'files') {
