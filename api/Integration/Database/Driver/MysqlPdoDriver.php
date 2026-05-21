@@ -3,6 +3,7 @@
 namespace Bifrost\Integration\Database\Driver;
 
 use Bifrost\Integration\Database\PdoDatabase;
+use Bifrost\Interface\PdoDriverAdapter;
 use PDO;
 
 class MysqlPdoDriver implements PdoDriverAdapter

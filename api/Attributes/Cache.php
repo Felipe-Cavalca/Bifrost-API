@@ -26,6 +26,8 @@ class Cache implements AttributesInterface, AttributeBefore, AttributeAfter
 
     private string $key;
     private int $time;
+    private bool $hit = false;
+
     public function __construct(...$parms)
     {
         $post = new Post();
@@ -49,13 +51,19 @@ class Cache implements AttributesInterface, AttributeBefore, AttributeAfter
     public function before(): null|Responseable
     {
         if (CoreCache::exists($this->key)) {
+            $this->hit = true;
             return CoreCache::get($this->key);
         }
+
         return null;
     }
 
     public function after(Responseable $response): void
     {
+        if ($this->hit) {
+            return;
+        }
+
         CoreCache::set($this->key, $response, $this->time);
     }
 

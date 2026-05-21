@@ -8,10 +8,10 @@ use Bifrost\Core\Functions;
 use Bifrost\Core\Settings;
 use Bifrost\Integration\Database\Driver\MysqlPdoDriver;
 use Bifrost\Integration\Database\Driver\PgsqlPdoDriver;
-use Bifrost\Integration\Database\Driver\PdoDriverAdapter;
 use Bifrost\Integration\Database\Driver\SqlitePdoDriver;
 use Bifrost\Interface\Database as DatabaseInterface;
 use Bifrost\Interface\Insertable;
+use Bifrost\Interface\PdoDriverAdapter;
 use PDO;
 use PDOException;
 
@@ -120,6 +120,10 @@ class PdoDatabase implements DatabaseInterface
             
             if (is_string($value)) {
                 $value = "'{$value}'";
+            } elseif (is_bool($value)) {
+                $value = $value ? 'TRUE' : 'FALSE';
+            } elseif ($value === null) {
+                $value = 'NULL';
             }
             $fields[] = "{$key} = {$value}";
         }
