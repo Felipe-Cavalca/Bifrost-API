@@ -10,6 +10,8 @@ final class Logger
 {
     private static ?UUID $requestId = null;
     private static ?NoSqlDatabase $noSqlDatabase = null;
+    private static ?string $driver = null;
+    private static string|false|null $driverEnv = null;
 
     public static function debug(string $message, array $context = []): void
     {
@@ -53,6 +55,8 @@ final class Logger
     public static function resetRequestId(?UUID $requestId = null): void
     {
         self::$requestId = $requestId;
+        self::$driver = null;
+        self::$driverEnv = null;
     }
 
     public static function setNoSqlDatabase(?NoSqlDatabase $noSqlDatabase): void
@@ -69,19 +73,21 @@ final class Logger
 
     public static function isDisabled(?Settings $settings = null): bool
     {
-        $settings ??= new Settings();
+        return !self::isEnabled($settings);
+    }
 
-        return strtolower((string) $settings->BFR_API_LOG_DRIVER) === 'none';
+    public static function isEnabled(?Settings $settings = null): bool
+    {
+        return self::driver($settings) !== 'none';
     }
 
     private static function write(string $level, string $message, array $context): void
     {
-        $settings = new Settings();
-
-        if (self::isDisabled(settings: $settings)) {
+        if (!self::isEnabled()) {
             return;
         }
 
+        $settings = new Settings();
         $driver = self::driver($settings);
 
         $entry = [
@@ -126,9 +132,19 @@ final class Logger
         }
     }
 
-    private static function driver(Settings $settings): string
+    private static function driver(?Settings $settings = null): string
     {
-        return strtolower((string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log'));
+        $driver = $settings !== null
+            ? (string) ($settings->BFR_API_LOG_DRIVER ?? 'error_log')
+            : (getenv('BFR_API_LOG_DRIVER') ?: 'error_log');
+
+        if (self::$driver !== null && self::$driverEnv === $driver) {
+            return self::$driver;
+        }
+
+        self::$driverEnv = $driver;
+
+        return self::$driver = strtolower((string) $driver);
     }
 
     private static function mongoCollection(Settings $settings): string

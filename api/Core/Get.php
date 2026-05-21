@@ -6,41 +6,36 @@ use Bifrost\Enum\Routes;
 
 class Get
 {
-    private static array $data;
+    private static array $data = [];
     public static string $controller;
     public static string $action;
+    public static bool $routeMapped = false;
 
     public function __construct()
     {
-        if (! $_GET instanceof Get) {
-
-            // Define o controlador e a ação padrão
-            $path = $_GET["_controller"] ?? "index";
-            $action = empty($_GET["_action"]) ? "index" : $_GET["_action"];
-
-            // Verifica se está nas rotas mapeadas
-            $route = Routes::fromRequest($path);
-
-            if ($route) {
-                // Divide "Controller/action"
-                [$controller, $action] = explode("/", $route->value);
-            } else {
-                $controller = $path;
-            }
-
-            // setando o controller e a ação
-            self::$controller = $controller;
-            self::$action = $action;
-
-            // Remove os parâmetros de controle e ação do array $_GET
-            unset($_GET["_controller"], $_GET["_action"]);
-
-            // Armazena os dados restantes em uma propriedade estática
-            self::$data = $_GET;
-
-            // Define $_GET como uma instância desta classe
-            $_GET = $this;
+        if ($_GET instanceof Get) {
+            return;
         }
+
+        $data = $_GET;
+        $path = $data["_controller"] ?? "index";
+        $action = empty($data["_action"]) ? "index" : $data["_action"];
+        $route = Routes::fromRequest((string) $path);
+        self::$routeMapped = $route !== null;
+
+        if ($route) {
+            [$controller, $action] = explode("/", $route->value);
+        } else {
+            $controller = (string) $path;
+        }
+
+        self::$controller = $controller;
+        self::$action = (string) $action;
+
+        unset($data["_controller"], $data["_action"]);
+
+        self::$data = $data;
+        $_GET = $this;
     }
 
     public function __toString()
@@ -58,6 +53,8 @@ class Get
                 return self::$controller;
             case "action":
                 return self::$action;
+            case "routeMapped":
+                return self::$routeMapped;
             default:
                 return self::$data[$name] ?? null;
         }

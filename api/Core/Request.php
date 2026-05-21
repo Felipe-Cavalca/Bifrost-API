@@ -36,17 +36,26 @@ final class Request
     private const JSON_RESPONSE_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
     private Get $Get;
+    private string $controller;
+    private string $action;
+    private bool $routeMapped;
+    private static array $controllerExistsCache = [];
+    private static array $actionExistsCache = [];
+    private static array $attributesMetadataCache = [];
 
     public function __construct()
     {
         $this->Get = new Get();
+        $this->controller = Get::$controller;
+        $this->action = Get::$action;
+        $this->routeMapped = Get::$routeMapped;
         Settings::init();
         Logger::sendRequestIdHeader();
     }
 
     public function __toString(): string
     {
-        return $this->handleResponse($this->run($this->Get->controller, $this->Get->action));
+        return $this->handleResponse($this->run($this->controller, $this->action, $this->routeMapped));
     }
 
     /**
@@ -55,31 +64,33 @@ final class Request
      * @param string $action Nome da ação do Controller.
      * @return mixed Retorna o resultado da ação do Controller.
      */
-    public static function run(string|Controller $controller, string $action): Responseable
+    public static function run(string|Controller $controller, string $action, bool $trustedRoute = false): Responseable
     {
         $attributes = [];
         $response = null;
+        $loggerEnabled = Logger::isEnabled();
 
-        Logger::info('Request started', [
-            'controller' => is_string($controller) ? $controller : $controller::class,
-            'action' => $action,
-            'method' => $_SERVER['REQUEST_METHOD'] ?? null,
-            'path' => parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?: null,
-        ]);
+        if ($loggerEnabled) {
+            Logger::info('Request started', [
+                'controller' => is_string($controller) ? $controller : $controller::class,
+                'action' => $action,
+                'method' => $_SERVER['REQUEST_METHOD'] ?? null,
+                'path' => parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?: null,
+            ]);
+        }
 
         try {
-            if (is_string($controller) && (empty($controller) || !self::validateControllerName($controller))) {
+            if (!$trustedRoute && is_string($controller) && (empty($controller) || !self::validateControllerName($controller))) {
                 throw new AppError(HttpResponse::notFound(["controller" => $controller], "Controller not found"));
             }
 
             $objController = self::resolveController($controller);
 
-            if (!self::validateActionName($objController, $action)) {
+            if (!$trustedRoute && !self::validateActionName($objController, $action)) {
                 throw new AppError(HttpResponse::notFound(["action" => $action], "Action not found"));
             }
 
-            $reflectionMethod = new ReflectionMethod($objController, $action);
-            $attributes = self::getAttributes($reflectionMethod);
+            $attributes = self::getAttributes($objController, $action);
             $return = self::runBeforeAttributes($attributes);
 
             // Se o método beforeRun retornar algo, não executa a ação do controller.
@@ -87,10 +98,12 @@ final class Request
                 $response = $return;
             } else {
                 $response = self::runAction($objController, $action);
-                Logger::info('Request finished', [
-                    'controller' => $objController::class,
-                    'action' => $action,
-                ]);
+                if ($loggerEnabled) {
+                    Logger::info('Request finished', [
+                        'controller' => $objController::class,
+                        'action' => $action,
+                    ]);
+                }
             }
         } catch (\Throwable $erro) {
             if ($erro instanceof AppError) {
@@ -114,7 +127,7 @@ final class Request
             $response = HttpResponse::internalServerError([], 'After attribute failed');
         }
 
-        if ($response instanceof HttpResponse && !Logger::isDisabled()) {
+        if ($response instanceof HttpResponse && $loggerEnabled) {
             $response->addRequestId(Logger::requestId());
         }
 
@@ -128,18 +141,22 @@ final class Request
      */
     private static function validateControllerName(string $controller): bool
     {
+        if (array_key_exists($controller, self::$controllerExistsCache)) {
+            return self::$controllerExistsCache[$controller];
+        }
+
         $cacheKey = self::getCacheKey('controller_exists', $controller);
         $cached = Apcu::fetch($cacheKey);
         if (is_bool($cached)) {
-            return $cached;
+            return self::$controllerExistsCache[$controller] = $cached;
         }
 
         $nameController = Path::FOLDER->toDirectory() . Path::CONTROLLERS->toDirectory() . $controller . ".php";
-        $controllerClass = Path::NAMESPACE->value . Path::CONTROLLERS->value . $controller;
+        $controllerClass = self::controllerClass($controller);
         $exists = is_readable($nameController) && class_exists($controllerClass);
 
         Apcu::store($cacheKey, $exists);
-        return $exists;
+        return self::$controllerExistsCache[$controller] = $exists;
     }
 
     /**
@@ -149,7 +166,7 @@ final class Request
      */
     private static function loadController(string $controllerName): Controller
     {
-        $controller = Path::NAMESPACE->value . Path::CONTROLLERS->value . $controllerName;
+        $controller = self::controllerClass($controllerName);
         return new $controller();
     }
 
@@ -161,15 +178,21 @@ final class Request
      */
     private static function validateActionName(Controller $controller, string $action): bool
     {
-        $cacheKey = self::getCacheKey('action_exists', $controller::class, $action);
+        $controllerClass = $controller::class;
+        $localCacheKey = $controllerClass . '::' . $action;
+        if (array_key_exists($localCacheKey, self::$actionExistsCache)) {
+            return self::$actionExistsCache[$localCacheKey];
+        }
+
+        $cacheKey = self::getCacheKey('action_exists', $controllerClass, $action);
         $cached = Apcu::fetch($cacheKey);
         if (is_bool($cached)) {
-            return $cached;
+            return self::$actionExistsCache[$localCacheKey] = $cached;
         }
 
         $exists = method_exists($controller, $action);
         Apcu::store($cacheKey, $exists);
-        return $exists;
+        return self::$actionExistsCache[$localCacheKey] = $exists;
     }
 
     /**
@@ -177,18 +200,26 @@ final class Request
      * @param ReflectionMethod $reflectionMethod Método a ser analisado.
      * @return array Retorna um array com os atributos do método.
      */
-    private static function getAttributes(ReflectionMethod $reflectionMethod): array
+    private static function getAttributes(Controller $controller, string $action): array
     {
+        $controllerClass = $controller::class;
         $cacheKey = self::getCacheKey(
             'method_attributes',
-            $reflectionMethod->getDeclaringClass()->getName(),
-            $reflectionMethod->getName()
+            $controllerClass,
+            $action
         );
+
+        if (array_key_exists($cacheKey, self::$attributesMetadataCache)) {
+            return self::hydrateAttributes(self::$attributesMetadataCache[$cacheKey]);
+        }
+
         $cached = Apcu::fetch($cacheKey);
         if (is_array($cached)) {
+            self::$attributesMetadataCache[$cacheKey] = $cached;
             return self::hydrateAttributes($cached);
         }
 
+        $reflectionMethod = new ReflectionMethod($controller, $action);
         $attributesReturn = [];
         $attributesMetadata = [];
         $attributes = $reflectionMethod->getAttributes();
@@ -200,6 +231,7 @@ final class Request
             $attributesReturn[] = $attribute->newInstance();
         }
 
+        self::$attributesMetadataCache[$cacheKey] = $attributesMetadata;
         Apcu::store($cacheKey, $attributesMetadata);
         return $attributesReturn;
     }
@@ -211,6 +243,10 @@ final class Request
      */
     private static function runBeforeAttributes(array $attributes): null|Responseable
     {
+        if ($attributes === []) {
+            return null;
+        }
+
         foreach ($attributes as $attribute) {
             if ($attribute instanceof AttributeBefore) {
                 $retorno = $attribute->before();
@@ -230,6 +266,10 @@ final class Request
      */
     private static function runAfterAttributes(array $attributes, Responseable $return): null|\Throwable
     {
+        if ($attributes === []) {
+            return null;
+        }
+
         foreach ($attributes as $attribute) {
             if ($attribute instanceof AttributeAfter) {
                 try {
@@ -250,7 +290,7 @@ final class Request
      */
     private static function runAction(Controller $controller, string $action): Responseable
     {
-        return call_user_func([$controller, $action]);
+        return $controller->{$action}();
     }
 
     /**
@@ -276,7 +316,7 @@ final class Request
     public static function getOptionsAttributes(string|Controller $controller, string $action): array
     {
         $controller = self::resolveController($controller);
-        $attributes = self::getAttributes(new ReflectionMethod($controller, $action));
+        $attributes = self::getAttributes($controller, $action);
         $options = [];
         foreach ($attributes as $attribute) {
             if ($attribute instanceof Attribute) {
@@ -312,4 +352,8 @@ final class Request
         return Cache::buildKey('request', ...$parts);
     }
 
+    private static function controllerClass(string $controller): string
+    {
+        return Path::NAMESPACE->value . Path::CONTROLLERS->value . ucfirst($controller);
+    }
 }

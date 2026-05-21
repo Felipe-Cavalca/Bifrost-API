@@ -10,8 +10,15 @@
   },
   "autoload": {
     "psr-4": {
-      "Bifrost\\\\": "./"
-    }
+      "Bifrost\\": "./"
+    },
+    "classmap": [
+      "Controller/index.php",
+      "DataTypes/base64.php",
+      "DataTypes/filePath.php",
+      "DataTypes/url.php",
+      "Interface/PdoDriverAdapter.php"
+    ]
   },
   "scripts": {
     "analyse": "phpstan analyse --configuration=phpstan.neon",

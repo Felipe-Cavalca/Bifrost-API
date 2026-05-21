@@ -34,9 +34,16 @@ spl_autoload_register(
             $className = substr($className, strlen($prefix));
         }
 
-        $file = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $className) . ".php";
+        $relativeFile = str_replace("\\", DIRECTORY_SEPARATOR, $className) . ".php";
+        $file = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $relativeFile;
         if (is_readable($file)) {
             require_once $file;
+            return true;
+        }
+
+        $lowercaseFile = dirname($file) . DIRECTORY_SEPARATOR . lcfirst(basename($file));
+        if (is_readable($lowercaseFile)) {
+            require_once $lowercaseFile;
         }
 
         return true;

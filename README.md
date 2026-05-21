@@ -95,12 +95,29 @@ docker compose -f api/Docker/docker-compose.dev.yml up -d --build
 
 O Nginx sobe na porta `80` e encaminha as requisicoes para dois workers PHP-FPM: `api1` e `api2`.
 
-Em producao, o compose usa a imagem definida em `BFR_API_IMAGE`:
+Em producao local, o compose builda a imagem `bifrost-api:prod-local` por padrao, usa `Dockerfile.prod` e sobe com configuracoes minimas de runtime. Logs estruturados e Redis de cache ficam desligados por padrao; sessao usa Redis local.
 
 ```bash
-BFR_API_IMAGE=ghcr.io/felipe-cavalca/bifrost-api:latest \
 docker compose -f api/Docker/docker-compose.prod.yml up -d
 ```
+
+Para usar outro nome/tag de imagem no build local, informe `BFR_API_IMAGE`.
+
+```bash
+BFR_API_IMAGE=bifrost-api:minha-tag \
+docker compose -f api/Docker/docker-compose.prod.yml up -d
+```
+
+No compose de producao, `GET /health`, `GET /index/health` e `GET /ping` passam pelo framework PHP. Para workloads de baixa latencia, como Rinha de Backend, prefira endpoints mapeados em `Bifrost\Enum\Routes`; esse caminho evita validacoes dinamicas de controller/action sem remover suporte a attributes, observabilidade e respostas HTTP quando usados.
+
+O compose prod local fica dentro de 1 CPU e 350 MB somados por padrao:
+
+- `nginx`: 0.08 CPU e 38 MB.
+- `api1`: 0.455 CPU e 140 MB.
+- `api2`: 0.455 CPU e 140 MB.
+- `redis`: 0.01 CPU e 32 MB.
+
+Para medir o menor overhead do framework, use `GET /ping` com `BFR_API_LOG_DRIVER=none`.
 
 ### Sem Docker
 
