@@ -2,6 +2,7 @@
 .github
 .vscode
 tests
+api/tests
 tmp
 api/tmp
 vendor

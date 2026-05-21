@@ -67,6 +67,7 @@ Regras:
 - Validacoes transversais devem ficar em attributes, DataTypes ou objetos dedicados.
 - Respostas HTTP devem usar `HttpResponse` ou outro `Responseable`.
 - O ciclo de request deve preservar compatibilidade com attributes `before` e `after`.
+- Rotas mapeadas em `Bifrost\Enum\Routes` podem usar o caminho rapido do core: o framework trata controller/action como confiaveis e evita validacoes dinamicas redundantes. Rotas livres continuam validando controller/action em tempo de execucao.
 
 ### Core
 

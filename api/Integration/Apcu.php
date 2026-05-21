@@ -2,11 +2,13 @@
 
 namespace Bifrost\Integration;
 
-use Bifrost\Core\Settings;
-
 class Apcu
 {
     private static array $fallback = [];
+    private static ?bool $enabled = null;
+    private static string|false|null $enabledEnv = null;
+    private static ?int $ttl = null;
+    private static string|false|null $ttlEnv = null;
 
     public static function store(string $key, mixed $value, ?int $ttl = null): bool
     {
@@ -81,21 +83,32 @@ class Apcu
 
     private static function enabled(): bool
     {
-        $settings = new Settings();
-        $enabled = $settings->BFR_API_CACHE_APCU_ENABLED;
+        $enabled = getenv('BFR_API_CACHE_APCU_ENABLED');
 
-        if ($enabled === null || $enabled === '') {
-            return true;
+        if (self::$enabled !== null && self::$enabledEnv === $enabled) {
+            return self::$enabled;
         }
 
-        return filter_var($enabled, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? true;
+        self::$enabledEnv = $enabled;
+
+        if ($enabled === false || $enabled === '') {
+            return self::$enabled = true;
+        }
+
+        return self::$enabled = filter_var($enabled, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? true;
     }
 
     private static function defaultTtl(): int
     {
-        $settings = new Settings();
-        $ttl = (int) ($settings->BFR_API_CACHE_APCU_TTL ?? 3600);
+        $ttlEnv = getenv('BFR_API_CACHE_APCU_TTL');
 
-        return $ttl > 0 ? $ttl : 3600;
+        if (self::$ttl !== null && self::$ttlEnv === $ttlEnv) {
+            return self::$ttl;
+        }
+
+        self::$ttlEnv = $ttlEnv;
+        $ttl = (int) ($ttlEnv ?: 3600);
+
+        return self::$ttl = $ttl > 0 ? $ttl : 3600;
     }
 }

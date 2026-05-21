@@ -24,6 +24,7 @@ RUN apt-get update \
 # Copiando os arquivos da aplicacao (build context: raiz do repositorio)
 COPY api/composer.json /var/www/html/composer.json
 COPY api/ /var/www/html/
+COPY api/Docker/php-fpm.prod.conf /usr/local/etc/php-fpm.d/zz-bifrost-prod.conf
 
 # Instala dependencias PHP (inclui autoload do Composer para integracoes opcionais)
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader

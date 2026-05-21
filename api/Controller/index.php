@@ -3,6 +3,7 @@
 namespace Bifrost\Controller;
 
 use Bifrost\Class\HttpResponse;
+use Bifrost\Class\TextResponse;
 use Bifrost\Interface\Controller;
 use Bifrost\Interface\Responseable;
 
@@ -24,5 +25,10 @@ class Index implements Controller
                 'checked_at' => gmdate('c'),
             ]
         );
+    }
+
+    public function ping(): Responseable
+    {
+        return new TextResponse('pong');
     }
 }
