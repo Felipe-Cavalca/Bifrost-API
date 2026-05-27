@@ -1,412 +1,177 @@
-# Bifrost API
+# Bifrost Framework
 
-Bifrost-API e um micro-framework em PHP 8.1+ focado no nucleo HTTP da aplicacao: roteamento, atributos, respostas tipadas, cache, fila, integracao com banco via PDO e utilitarios de validacao.
+O Bifrost-API fornece o runtime PHP utilizado pelo repositorio agregador
+[`Felipe-Cavalca/Bifrost`](https://github.com/Felipe-Cavalca/Bifrost) e uma
+nova distribuicao Composer modular para novas aplicacoes.
 
-O codigo principal fica em `api/` e a suite de testes fica em `api/tests/`.
+O runtime existente em `api/` permanece compativel com o fluxo de mesclagem
+do Bifrost. Os pacotes em `packages/` sao aditivos e nao removem namespaces,
+entrypoints ou integracoes publicas atuais.
 
-## Indice
+## Pacotes
 
-1. [Visao geral](#visao-geral)
-2. [Estrutura do projeto](#estrutura-do-projeto)
-3. [Requisitos](#requisitos)
-4. [Execucao local](#execucao-local)
-5. [Qualidade do framework](#qualidade-do-framework)
-6. [Variaveis de ambiente](#variaveis-de-ambiente)
-7. [Como funciona o request](#como-funciona-o-request)
-8. [Atributos disponiveis](#atributos-disponiveis)
-9. [Banco, cache, fila e S3](#banco-cache-fila-e-s3)
-10. [Testes](#testes)
-11. [CI em Pull Request](#ci-em-pull-request)
-12. [Contribuicao](#contribuicao)
-13. [Licenca](#licenca)
+| Pacote | Finalidade |
+| --- | --- |
+| `bifrost/framework` | Kernel HTTP, request/response, rotas, middleware, container e contratos |
+| `bifrost/cache-apcu` | Cache APCu opcional |
+| `bifrost/cache-redis` | Cache Redis opcional |
+| `bifrost/queue-redis` | Fila Redis opcional |
+| `bifrost/database-pdo` | Fabrica PDO generica opcional |
+| `bifrost/database-mysql` | Banco MySQL opcional |
+| `bifrost/database-postgresql` | Banco PostgreSQL opcional |
+| `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
+| `bifrost/storage-local` | Storage local opcional |
+| `bifrost/storage-s3` | Storage S3 opcional |
+| `bifrost/skeleton` | Projeto inicial para novas APIs |
 
-## Visao geral
+## Compatibilidade Atual
 
-Recursos disponiveis hoje no projeto:
+O repositorio agregador Bifrost combina `Bifrost-API`, `Bifrost-Database` e
+outros modulos por merge de branches `latest-release`. Por isso:
 
-- Roteamento por `_controller` e `_action`, com suporte a mapeamento via enum de rotas.
-- Attributes para validacao e comportamento transversal, como `Method`, `Cache`, `RequiredParams` e `Transaction`.
-- Respostas HTTP tipadas via `Bifrost\Class\HttpResponse`.
-- Integracao com banco de dados por PDO para `sqlite`, `mysql` e `pgsql`.
-- Cache e fila baseados em Redis, com fallback seguro quando Redis nao estiver configurado.
-- Integracao opcional com S3 via AWS SDK for PHP.
-- Testes automatizados com PHPUnit.
+- `api/` continua sendo o runtime compativel existente;
+- o workflow e a imagem Docker existentes continuam atendendo esse runtime;
+- `packages/` evolui em paralelo ate uma migracao coordenada dos consumidores.
 
-## Estrutura do projeto
+Validacao do runtime compativel:
+
+```bash
+docker compose -f api/Docker/docker-compose.dev.yml run --rm api1 composer test
+```
+
+## Inicio Rapido
+
+Depois de publicados os pacotes Composer:
+
+```bash
+composer create-project bifrost/skeleton minha-api
+cd minha-api
+cp .env.example .env
+docker compose up --build
+curl http://localhost:8080/health
+```
+
+A aplicacao inicial instala somente `bifrost/framework`. Para acrescentar
+infraestrutura, instale apenas o adaptador necessario:
+
+```bash
+composer require bifrost/cache-redis bifrost/queue-redis
+composer require bifrost/cache-apcu
+composer require bifrost/database-mysql
+# ou
+composer require bifrost/database-postgresql
+```
+
+O arquivo `config/extensions.php` do skeleton registra fila instalada e
+adapters selecionados. Cache e selecionado por `CACHE_DRIVER=apcu|redis`;
+banco, por `DB_DRIVER=mysql|postgresql`.
+
+## Variantes Docker
+
+Sem fila, cache ou banco:
+
+```bash
+docker compose up --build
+```
+
+Com cache APCu:
+
+```bash
+composer require bifrost/cache-apcu
+docker compose -f docker-compose.yml -f compose/apcu.yml up --build
+```
+
+Com Redis para cache e/ou fila:
+
+```bash
+composer require bifrost/cache-redis bifrost/queue-redis
+docker compose -f docker-compose.yml -f compose/redis.yml up --build
+```
+
+Com MySQL:
+
+```bash
+composer require bifrost/database-mysql
+docker compose -f docker-compose.yml -f compose/mysql.yml up --build
+```
+
+Com PostgreSQL:
+
+```bash
+composer require bifrost/database-postgresql
+docker compose -f docker-compose.yml -f compose/postgresql.yml up --build
+```
+
+Cada complemento instala na imagem PHP somente a extensao exigida pelo
+pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
+
+## Estrutura
 
 ```text
 .
-├── .github/workflows/       # Workflows do GitHub Actions
-├── .env.example             # Exemplo de configuracao
-├── api/
-│   ├── Attributes/          # Attributes da framework
-│   ├── Class/               # Classes utilitarias, como HttpResponse
-│   ├── Controller/          # Controllers HTTP
-│   ├── Core/                # Kernel, request, settings, cache, queue
-│   ├── DataTypes/           # Tipos auxiliares validados
-│   ├── Docker/              # Dockerfiles e compose da API
-│   ├── Enum/                # Enums do projeto
-│   ├── Include/             # Traits e helpers
-│   ├── Integration/         # Integracoes externas
-│   ├── Interface/           # Contratos
-│   ├── Model/               # Reservado para modelos
-│   ├── Tasks/               # Reservado para tarefas assicronas
-│   ├── tests/               # Suite PHPUnit
-│   ├── composer.json
-│   ├── index.php
-│   ├── phpunit.xml
-│   └── Worker.php
-└── README.md
+|-- api/                      # Runtime compativel consumido pelo Bifrost
+|-- packages/
+|   |-- framework/
+|   |-- cache-apcu/
+|   |-- cache-redis/
+|   |-- queue-redis/
+|   |-- database-pdo/
+|   |-- database-mysql/
+|   |-- database-postgresql/
+|   |-- log-mongodb/
+|   |-- storage-local/
+|   `-- storage-s3/
+|-- skeleton/
+|   |-- app/
+|   |-- bootstrap/
+|   |-- compose/
+|   |-- config/
+|   |-- public/
+|   `-- routes/
+|-- docker/modular/
+|-- docs/
+`-- .github/workflows/
 ```
 
-## Requisitos
+Aplicacoes novas podem usar o skeleton modular. Aplicacoes integradas ao
+repositorio Bifrost continuam usando `api/` ate a migracao ser coordenada.
 
-Para rodar localmente sem Docker:
+Storage modular e opt-in: seus contratos nao substituem automaticamente o
+contrato existente em `api/`.
 
-- PHP 8.1 ou superior
-- Composer
-- Extensoes PHP exigidas pelo projeto:
-  - `curl`
-  - `json`
-- Para alguns cenarios:
-  - `pdo_sqlite`, `pdo_mysql` ou `pdo_pgsql`
-  - `redis`, se quiser cache e fila reais
-
-Para rodar com Docker:
-
-- Docker
-- Docker Compose
-
-## Execucao local
-
-### Com Docker
-
-1. Copie o arquivo de ambiente:
-
-```bash
-cp .env.example .env
-```
-
-2. Suba o ambiente de desenvolvimento:
-
-```bash
-docker compose -f api/Docker/docker-compose.dev.yml up -d --build
-```
-
-O Nginx sobe na porta `80` e encaminha as requisicoes para dois workers PHP-FPM: `api1` e `api2`.
-
-Em producao local, o compose builda a imagem `bifrost-api:prod-local` por padrao, usa `Dockerfile.prod` e sobe com configuracoes minimas de runtime. Logs estruturados e Redis de cache ficam desligados por padrao; sessao usa Redis local.
-
-```bash
-docker compose -f api/Docker/docker-compose.prod.yml up -d
-```
-
-Para usar outro nome/tag de imagem no build local, informe `BFR_API_IMAGE`.
-
-```bash
-BFR_API_IMAGE=bifrost-api:minha-tag \
-docker compose -f api/Docker/docker-compose.prod.yml up -d
-```
-
-No compose de producao, `GET /health`, `GET /index/health` e `GET /ping` passam pelo framework PHP. Para workloads de baixa latencia, como Rinha de Backend, prefira endpoints mapeados em `Bifrost\Enum\Routes`; esse caminho evita validacoes dinamicas de controller/action sem remover suporte a attributes, observabilidade e respostas HTTP quando usados.
-
-O compose prod local fica dentro de 1 CPU e 350 MB somados por padrao:
-
-- `nginx`: 0.08 CPU e 38 MB.
-- `api1`: 0.455 CPU e 140 MB.
-- `api2`: 0.455 CPU e 140 MB.
-- `redis`: 0.01 CPU e 32 MB.
-
-Para medir o menor overhead do framework, use `GET /ping` com `BFR_API_LOG_DRIVER=none`.
-
-### Sem Docker
-
-1. Instale as dependencias PHP:
-
-```bash
-cd api
-composer install
-```
-
-2. Ajuste as variaveis de ambiente no arquivo `.env` da raiz, se necessario.
-
-3. Execute com o servidor embutido do PHP para desenvolvimento simples:
-
-```bash
-cd api
-php -S 0.0.0.0:8000
-```
-
-Depois acesse:
-
-```bash
-curl "http://localhost:8000/index.php?_controller=index&_action=index"
-```
-
-Resposta atual do controller padrao:
-
-```json
-{
-  "status": 200,
-  "message": "Operation completed successfully",
-  "data": null,
-  "errors": null
-}
-```
-
-Se estiver usando o Nginx do projeto, o acesso tipico fica em:
-
-```bash
-curl "http://localhost/api/index/index"
-```
-
-## Qualidade do framework
-
-O Bifrost-API e um micro-framework. Os checks devem proteger contrato publico, compatibilidade e integracoes opcionais sem transformar cada PR em uma migracao ampla de estilo.
-
-Execute a verificacao padrao dentro de `api/`:
-
-```bash
-composer check
-```
-
-Esse comando valida Composer, formatacao minima, sintaxe PHP, PHPStan e PHPUnit. No GitHub, o workflow de PR publica um unico comentario consolidado: se tudo passar, a mensagem e curta; se houver falha, a mensagem lista apenas os checks com problema.
-
-## Variaveis de ambiente
-
-O projeto le as configuracoes principalmente via `api/Core/Settings.php`, pelas integracoes em `api/Integration/` e pelo compose de producao em `api/Docker/docker-compose.prod.yml`.
-
-O arquivo [`.env.example`](/workspaces/Bifrost-API/.env.example) documenta cada configuracao, valores esperados, defaults recomendados e variaveis sensiveis.
-
-Principais grupos:
-
-| Grupo | Variaveis |
-|------|-----------|
-| Runtime | `BFR_API_DEBUG_SHOW_ERRORS`, `BFR_API_IMAGE`, `BFR_API_HTTP_PORT` |
-| Logs | `BFR_API_LOG_DRIVER`, `BFR_API_LOG_FILE`, `BFR_API_LOG_COLLECTION`, `BFR_API_MONGO_*` |
-| Sessao | `BFR_API_SESSION_HANDLER`, `BFR_API_SESSION_PATH`, `BFR_API_SESSION_TTL`, `BFR_API_SESSION_COOKIE_TTL` |
-| Cache | `BFR_API_CACHE_DRIVER`, `BFR_API_CACHE_APCU_ENABLED`, `BFR_API_CACHE_APCU_PREFIX`, `BFR_API_CACHE_APCU_TTL`, `BFR_API_CACHE_REDIS_HOST`, `BFR_API_CACHE_REDIS_PORT`, `BFR_API_CACHE_QUERY_TTL` |
-| Fila | `BFR_API_QUEUE_NAME`, `BFR_API_QUEUE_REDIS_HOST`, `BFR_API_QUEUE_REDIS_PORT` |
-| Banco | `BFR_API_DB_DRIVER`, `BFR_API_DB_HOST`, `BFR_API_DB_PORT`, `BFR_API_DB_NAME`, `BFR_API_DB_USER`, `BFR_API_DB_PASSWORD` |
-| Storage | `BFR_API_STORAGE_DRIVER`, `BFR_API_STORAGE_LOCAL_PATH`, `BFR_API_S3_BUCKET`, `BFR_API_S3_REGION`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET`, `BFR_API_S3_ENDPOINT`, `BFR_API_S3_PATH_STYLE` |
-
-Variaveis sensiveis, como `BFR_API_DB_PASSWORD`, `BFR_API_S3_KEY`, `BFR_API_S3_SECRET` e `BFR_API_MONGO_PASSWORD`, nao devem ser commitadas com valores reais.
-
-Para gravar logs estruturados no MongoDB, configure `BFR_API_LOG_DRIVER=mongo`, `BFR_API_MONGO_DATABASE` e `BFR_API_MONGO_URI` ou `BFR_API_MONGO_HOST`/`BFR_API_MONGO_PORT`. A collection padrao e `logs`, ajustavel por `BFR_API_LOG_COLLECTION`.
-
-## Como funciona o request
-
-O ponto de entrada HTTP e [`api/index.php`](/workspaces/Bifrost-API/api/index.php), que instancia `Bifrost\Core\Request`.
-
-O fluxo atual e:
-
-1. `Get` le `_controller` e `_action`.
-2. `Request` resolve o controller e a action.
-3. Os attributes do metodo sao instanciados.
-4. Attributes `before()` podem bloquear a execucao e devolver uma resposta imediatamente.
-5. A action do controller e executada.
-6. Attributes `after()` recebem a resposta final.
-
-Controller padrao atual:
-
-- Arquivo: [`api/Controller/index.php`](/workspaces/Bifrost-API/api/Controller/index.php)
-- Classe: `Bifrost\Controller\Index`
-- Action padrao: `index()`
-
-## Atributos disponiveis
-
-Attributes implementados hoje:
-
-| Attribute | Finalidade |
-|-----------|------------|
-| `Method` | Restringe os metodos HTTP permitidos e responde a `OPTIONS` |
-| `Cache` | Usa GET, POST e sessao para gerar chave de cache |
-| `Details` | Expoe metadados do endpoint |
-| `RequiredParams` | Exige parametros GET e valida tipos |
-| `OptionalParams` | Valida parametros GET opcionais |
-| `RequiredFields` | Exige campos do corpo e valida tipos |
-| `OptionalFields` | Valida campos opcionais do corpo |
-| `Response` | Documenta o shape esperado da resposta |
-| `Transaction` | Abre transacao antes da action e faz commit ou rollback depois |
-
-Os metadados podem ser lidos em runtime com:
-
-```php
-Request::getOptionsAttributes('index', 'index');
-```
-
-## Banco, cache, fila e S3
-
-### Banco
-
-O projeto usa [`Bifrost\Core\Database`](/workspaces/Bifrost-API/api/Core/Database.php), que herda de [`PdoDatabase`](/workspaces/Bifrost-API/api/Integration/Database/PdoDatabase.php).
-
-Capacidades atuais:
-
-- `select`
-- `insert`
-- `update`
-- `delete`
-- `exists`
-- `query`
-- introspeccao de tabelas e colunas
-
-Drivers suportados:
-
-- SQLite
-- MySQL
-- PostgreSQL
-
-### Cache
-
-[`Bifrost\Core\Cache`](/workspaces/Bifrost-API/api/Core/Cache.php) usa Redis quando configurado.
-
-Se Redis nao estiver configurado:
-
-- `set`, `exists` e `del` retornam fallback seguro
-- a leitura com valor padrao continua funcionando
-
-### Fila
-
-[`Bifrost\Core\Queue`](/workspaces/Bifrost-API/api/Core/Queue.php) usa Redis quando disponivel.
-
-Se Redis nao estiver configurado:
-
-- `addToFront`
-- `addToEnd`
-- `addScheduledTask`
-
-executam a `Task` imediatamente no processo atual.
-
-O worker da fila fica em [`api/Worker.php`](/workspaces/Bifrost-API/api/Worker.php).
-
-### Storage
-
-O storage pode ser resolvido por [`StorageFactory`](/workspaces/Bifrost-API/api/Integration/Storage/StorageFactory.php), usando `BFR_API_STORAGE_DRIVER=local|s3`.
-
-O driver `local` grava em [`LocalStorage`](/workspaces/Bifrost-API/api/Integration/Storage/LocalStorage.php). Configure `BFR_API_STORAGE_LOCAL_PATH` para apontar para um diretorio gravavel; em Docker, esse caminho pode ser um volume montado, por exemplo `/var/www/html/storage`.
-
-A integracao S3 e opcional e fica em [`api/Integration/Storage/S3Storage.php`](/workspaces/Bifrost-API/api/Integration/Storage/S3Storage.php). O namespace antigo `Bifrost\Integration\S3Storage` continua disponivel por compatibilidade.
-
-As operacoes recebem `Bifrost\DataTypes\StorageKey` para a chave do arquivo. URLs assinadas usam `Bifrost\DataTypes\DateTime` para representar a expiracao. `body` e `options` continuam genericos porque variam conforme o driver.
-
-Shapes de retorno esperados:
-
-| Metodo | Campos minimos |
-| --- | --- |
-| `put` | `Key`, `ContentLength` |
-| `get` | `Key`, `Body`, `ContentLength` |
-| `delete` | `Key`, `Deleted` |
-| `createPresignedUrl` | string com URL assinada ou caminho local equivalente |
-
-Esses retornos permanecem como arrays por compatibilidade. Caso o contrato passe a retornar objetos dedicados no futuro, a mudanca deve ser tratada como `upgrade`.
-
-Para usa-la, instale o SDK oficial:
-
-```bash
-cd api
-composer require aws/aws-sdk-php
-```
-
-Exemplo:
-
-```php
-use Bifrost\Integration\Storage\StorageFactory;
-use Bifrost\DataTypes\StorageKey;
-
-$storage = StorageFactory::fromSettings();
-$storage->put(key: new StorageKey(key: 'files/report.txt'), body: 'conteudo', options: [
-    'ContentType' => 'text/plain',
-]);
-```
-
-Teste S3 local temporario:
-
-```powershell
-docker rm -f bifrost-seaweedfs-test 2>$null
-docker run -d --name bifrost-seaweedfs-test --network bifrost-api_bifrost-back-network -e AWS_ACCESS_KEY_ID=admin -e AWS_SECRET_ACCESS_KEY=key chrislusf/seaweedfs:4.19 server -dir=/data -s3 -s3.port=8333 -ip.bind=0.0.0.0
-New-Item -ItemType Directory -Force api\tmp | Out-Null
-@'
-<?php
-
-declare(strict_types=1);
-
-require __DIR__ . '/../tests/bootstrap.php';
-
-putenv('BFR_API_STORAGE_DRIVER=s3');
-putenv('BFR_API_S3_BUCKET=bifrost-test');
-putenv('BFR_API_S3_REGION=us-east-1');
-putenv('BFR_API_S3_KEY=admin');
-putenv('BFR_API_S3_SECRET=key');
-putenv('BFR_API_S3_ENDPOINT=http://bifrost-seaweedfs-test:8333');
-putenv('BFR_API_S3_PATH_STYLE=true');
-'@ | Set-Content api\tmp\s3-phpunit-bootstrap.php
-docker compose -f api\Docker\docker-compose.dev.yml run --rm -e BFR_API_STORAGE_DRIVER=s3 -e BFR_API_S3_BUCKET=bifrost-test -e BFR_API_S3_REGION=us-east-1 -e BFR_API_S3_KEY=admin -e BFR_API_S3_SECRET=key -e BFR_API_S3_ENDPOINT=http://bifrost-seaweedfs-test:8333 -e BFR_API_S3_PATH_STYLE=true api1 ./vendor/bin/phpunit --bootstrap tmp/s3-phpunit-bootstrap.php --display-skipped
-Remove-Item api\tmp\s3-phpunit-bootstrap.php
-docker rm -f bifrost-seaweedfs-test
-```
-
-O bootstrap temporario usado nesse fluxo deve ficar fora de commit. Ele deve carregar `tests/bootstrap.php` e reconfigurar apenas as variaveis `BFR_API_S3_*` para a execucao local.
-
-## Testes
-
-Os testes automatizados ficam em `api/tests`.
-
-Execucao local:
-
-```bash
-cd api
-./vendor/bin/phpunit -c phpunit.xml
-```
-
-Resultado validado atualmente:
+## Lifecycle HTTP
 
 ```text
-OK (55 tests, 187 assertions)
+public/index.php
+  -> Request::fromGlobals()
+  -> Application
+  -> HttpKernel
+  -> middleware
+  -> Router
+  -> controller/callable
+  -> Response
+  -> ResponseEmitter
 ```
 
-A suite cobre o codigo PHP atual do projeto, incluindo:
+## Desenvolvimento
 
-- attributes
-- core
-- enums
-- datatypes
-- controller padrao
-- integracoes
-- contratos
-- entrypoints
+O ecossistema completo e testado em containers:
 
-## CI em Pull Request
+```bash
+docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests
+```
 
-O repositorio agora possui um workflow dedicado em [`.github/workflows/php-tests-pr.yml`](/workspaces/Bifrost-API/.github/workflows/php-tests-pr.yml).
+O Dockerfile distribuido com o skeleton resolve pacotes pelo repositorio
+Composer publicado. Durante desenvolvimento deste monorepo, use a verificacao
+modular acima, que injeta dependencias locais por `path`.
 
-Quando um Pull Request e:
+## Documentacao
 
-- aberto
-- reaberto
-- atualizado
-- marcado como `ready for review`
-
-o GitHub Actions:
-
-1. prepara PHP 8.3
-2. instala dependencias, se necessario
-3. executa a suite PHPUnit em `api/`
-4. publica o status nos `Checks` do PR
-5. adiciona ou atualiza um comentario no PR com `passed` ou `failed`
-
-## Contribuicao
-
-Fluxo sugerido:
-
-1. Crie uma branch a partir de `main`.
-2. Faça as alteracoes necessarias.
-3. Rode os testes locais.
-4. Abra o Pull Request.
-5. Verifique os `Checks` do GitHub Actions.
-
-Se a contribuicao vier de um fork, os checks continuam rodando. O comentario automatico no PR pode depender das permissoes disponiveis no repositorio.
+- [Arquitetura](docs/architecture.md)
+- [Convencoes](docs/conventions.md)
+- [Distribuicao modular](docs/modular-distribution.md)
+- [Publicacao e versionamento](docs/releasing.md)
 
 ## Licenca
 
-Distribuido sob a licenca MIT. Consulte [LICENSE](/workspaces/Bifrost-API/LICENSE).
+Distribuido sob a licenca MIT. Consulte [LICENSE](LICENSE).
