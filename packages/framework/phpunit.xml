@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         colors="true"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="Bifrost Framework">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
