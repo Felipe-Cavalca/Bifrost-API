@@ -28,6 +28,13 @@ final class Router
         return array_keys($this->routes[self::normalizePath($path)] ?? []);
     }
 
+    public function firstRouteForPath(string $path): ?Route
+    {
+        $routes = $this->routes[self::normalizePath($path)] ?? [];
+
+        return $routes === [] ? null : reset($routes);
+    }
+
     private static function normalizePath(string $path): string
     {
         $path = '/' . ltrim($path, '/');

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Bifrost\Framework\Tests;
 
 use Bifrost\Framework\Application;
+use Bifrost\Framework\Attributes\Method;
+use Bifrost\Framework\Attributes\RequiredFields;
+use Bifrost\Framework\Attributes\RequiredParams;
 use Bifrost\Framework\Contracts\Extension;
 use Bifrost\Framework\Http\Request;
 use Bifrost\Framework\Http\Response;
@@ -73,5 +76,60 @@ final class ApplicationTest extends TestCase
         self::assertSame(500, $response->status());
         self::assertStringNotContainsString('secret', $response->body());
         self::assertJsonStringEqualsJsonString('{"message":"Internal Server Error"}', $response->body());
+    }
+
+    public function testValidatesControllerAttributesBeforeAction(): void
+    {
+        $application = Application::create();
+        $application->post('/users', [AttributeControllerStub::class, 'store']);
+
+        $response = $application->handle(new Request(
+            method: 'POST',
+            path: '/users',
+            query: ['page' => '1'],
+            body: ['name' => 'Bifrost']
+        ));
+
+        self::assertSame(400, $response->status());
+        self::assertStringContainsString('email', $response->body());
+    }
+
+    public function testAllowsRequestWhenControllerAttributesPass(): void
+    {
+        $application = Application::create();
+        $application->post('/users', [AttributeControllerStub::class, 'store']);
+
+        $response = $application->handle(new Request(
+            method: 'POST',
+            path: '/users',
+            query: ['page' => '1'],
+            body: ['name' => 'Bifrost', 'email' => 'team@bifrost.dev']
+        ));
+
+        self::assertSame(201, $response->status());
+        self::assertJsonStringEqualsJsonString('{"created":true}', $response->body());
+    }
+
+    public function testReturnsControllerAttributeMetadataOnOptionsRequest(): void
+    {
+        $application = Application::create();
+        $application->post('/users', [AttributeControllerStub::class, 'store']);
+
+        $response = $application->handle(new Request(method: 'OPTIONS', path: '/users'));
+
+        self::assertSame(200, $response->status());
+        self::assertStringContainsString('attributes', $response->body());
+        self::assertStringContainsString('email', $response->body());
+    }
+}
+
+final class AttributeControllerStub
+{
+    #[Method('POST')]
+    #[RequiredParams(['page' => 'int-string'])]
+    #[RequiredFields(['name' => 'string', 'email' => 'email'])]
+    public function store(Request $request): Response
+    {
+        return Response::json(['created' => true], status: 201);
     }
 }

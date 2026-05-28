@@ -51,6 +51,16 @@ final class HttpKernel
         $route = $this->router->match($request);
         if ($route === null) {
             $allowedMethods = $this->router->allowedMethods($request->path());
+            if ($request->method() === 'OPTIONS' && $allowedMethods !== []) {
+                $routeForOptions = $this->router->firstRouteForPath($request->path());
+
+                return Response::json(payload: [
+                    'attributes' => $routeForOptions === null
+                        ? []
+                        : $this->controllerResolver->options($routeForOptions->handler()),
+                ]);
+            }
+
             if ($allowedMethods !== []) {
                 return Response::json(
                     payload: ['message' => 'Method Not Allowed'],
