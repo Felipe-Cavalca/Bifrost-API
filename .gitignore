@@ -1,6 +1,34 @@
-tmp/*
-/api/tmp/*
-!/api/tmp/.gitkeep
-!/api/tmp/xdebug/.gitkeep
-/api/vendor
+# Ambiente
 .env
+.env.*
+!.env.example
+
+# Dependencias Composer
+**/vendor/
+
+# Caches e artefatos de ferramentas
+.phpunit.cache/
+**/.phpunit.cache/
+.phpstan.cache/
+**/.phpstan.cache/
+.php-cs-fixer.cache
+**/.php-cs-fixer.cache
+
+# Runtime local
+tmp/*
+api/tmp/*
+!api/tmp/.gitkeep
+!api/tmp/xdebug/.gitkeep
+storage/*
+api/storage/*
+
+# Logs e dumps
+*.log
+*.cache
+*.prof
+*.trace
+cachegrind.out.*
+
+# IDE/local
+.DS_Store
+Thumbs.db
