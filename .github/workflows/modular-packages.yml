@@ -65,7 +65,7 @@ jobs:
           MYSQL_HOST: 127.0.0.1
           POSTGRES_HOST: 127.0.0.1
         run: |
-          for package in datatypes cache-redis cache-apcu queue-redis database-pdo log-mongodb storage-local storage-s3; do
+          for package in datatypes cache-redis cache-apcu queue-redis queue-worker database-pdo log-mongodb storage-local storage-s3; do
             cd "$GITHUB_WORKSPACE/packages/$package"
             composer config minimum-stability dev
             composer config repositories.framework path ../framework

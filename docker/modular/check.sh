@@ -6,7 +6,7 @@ composer validate --strict --no-check-publish packages/framework/composer.json
 composer install --working-dir=packages/framework --no-interaction --no-progress --prefer-dist
 composer check --working-dir=packages/framework
 
-for package in datatypes cache-redis cache-apcu queue-redis database-pdo log-mongodb storage-local storage-s3; do
+for package in datatypes cache-redis cache-apcu queue-redis queue-worker database-pdo log-mongodb storage-local storage-s3; do
     (
         cd "packages/$package"
         composer validate --strict --no-check-publish composer.json
