@@ -6,13 +6,19 @@ namespace Bifrost\Framework\Http;
 
 final class Request
 {
+    private readonly array $headers;
+    private readonly string $requestId;
+
     public function __construct(
         private readonly string $method,
         private readonly string $path,
         private readonly array $query = [],
         private readonly array $body = [],
-        private readonly array $headers = []
+        array $headers = [],
+        ?string $requestId = null
     ) {
+        $this->headers = self::normalizeHeaders($headers);
+        $this->requestId = self::resolveRequestId($this->headers, $requestId);
     }
 
     public static function fromGlobals(): self
@@ -60,6 +66,11 @@ final class Request
         return $this->headers[strtolower($name)] ?? $default;
     }
 
+    public function requestId(): string
+    {
+        return $this->requestId;
+    }
+
     private static function headersFromServer(array $server): array
     {
         $headers = [];
@@ -73,5 +84,29 @@ final class Request
         }
 
         return $headers;
+    }
+
+    private static function normalizeHeaders(array $headers): array
+    {
+        $normalized = [];
+        foreach ($headers as $name => $value) {
+            if (!is_string($name) || !is_string($value)) {
+                continue;
+            }
+
+            $normalized[strtolower($name)] = $value;
+        }
+
+        return $normalized;
+    }
+
+    private static function resolveRequestId(array $headers, ?string $requestId): string
+    {
+        $requestId = trim((string) ($requestId ?? $headers['x-request-id'] ?? ''));
+        if ($requestId !== '') {
+            return $requestId;
+        }
+
+        return bin2hex(random_bytes(16));
     }
 }
