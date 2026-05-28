@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bifrost Framework</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="badge">Bifrost novo</span>
+        <h1>Framework Composer para criar APIs do zero.</h1>
+        <p>
+          Esta documentacao mostra como iniciar um backend em <code>api/</code>,
+          escolher modulos opcionais e usar attributes, DataTypes, rotas,
+          controllers e Docker.
+        </p>
+      </div>
+      <div class="panel terminal">
+        <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <pre>mkdir api
+cd api
+composer create-project bifrost/skeleton .
+cp .env.example .env
+docker compose up --build</pre>
+      </div>
+    </section>
+
+    <section class="grid">
+      <a class="card" href="01-criando-projeto.html"><h2>Criar Projeto</h2><p>Do zero ate o primeiro health check.</p></a>
+      <a class="card" href="02-arquitetura.html"><h2>Arquitetura</h2><p>Como framework, app e extensoes se encaixam.</p></a>
+      <a class="card" href="03-lifecycle.html"><h2>Lifecycle</h2><p>O caminho completo da request.</p></a>
+      <a class="card" href="04-modulos.html"><h2>Modulos</h2><p>Cache, fila, banco, storage e logs sob demanda.</p></a>
+      <a class="card" href="05-attributes-datatypes.html"><h2>Attributes e DataTypes</h2><p>Contratos HTTP e tipagem forte.</p></a>
+      <a class="card" href="06-deploy.html"><h2>Docker e Deploy</h2><p>Ambiente base e perfis opcionais.</p></a>
+    </section>
+  </main>
+</body>
+</html>
