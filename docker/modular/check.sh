@@ -17,7 +17,7 @@ for package in datatypes cache-redis cache-apcu queue-redis queue-worker databas
     )
 done
 
-for package in database-mysql database-postgresql; do
+for package in database-mysql database-postgresql database-sqlite; do
     (
         cd "packages/$package"
         composer validate --strict --no-check-publish composer.json

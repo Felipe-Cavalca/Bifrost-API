@@ -50,7 +50,7 @@ jobs:
           php-version: '8.3'
           tools: composer:2
           coverage: none
-          extensions: json, redis, apcu, mongodb, pdo, pdo_mysql, pdo_pgsql
+          extensions: json, redis, apcu, mongodb, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite
 
       - name: Install framework dependencies
         run: composer install --working-dir=packages/framework --no-interaction --no-progress --prefer-dist
@@ -73,7 +73,7 @@ jobs:
             composer validate --strict --no-check-publish
             composer test
           done
-          for package in database-mysql database-postgresql; do
+          for package in database-mysql database-postgresql database-sqlite; do
             cd "$GITHUB_WORKSPACE/packages/$package"
             composer config minimum-stability dev
             composer config repositories.framework path ../framework
