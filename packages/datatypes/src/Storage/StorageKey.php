@@ -8,4 +8,19 @@ use Bifrost\DataTypes\Filesystem\FilePath;
 
 final readonly class StorageKey extends FilePath
 {
+    protected static function normalize(mixed $value): string
+    {
+        return str_replace('\\', '/', trim((string) $value));
+    }
+
+    public static function isValid(mixed $value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        $normalized = self::normalize($value);
+
+        return !str_starts_with($normalized, '/') && parent::isValid($normalized);
+    }
 }
