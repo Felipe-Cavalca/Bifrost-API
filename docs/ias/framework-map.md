@@ -7,6 +7,7 @@
 - `HttpKernel`: lifecycle HTTP.
 - `Request`: metodo, path, query, body, headers e request-id.
 - `Response`: JSON/texto/status/headers e helpers HTTP comuns.
+- `HttpStatusCode`: enum de status HTTP comuns e classificacao por familia.
 - `Router` e `Route`: roteamento HTTP.
 - `ControllerResolver`: invoca controllers e valida attributes.
 - `HttpException`: excecao HTTP padronizada para respostas JSON com status, erros e headers.
@@ -20,6 +21,8 @@
 ## Attributes
 
 - `Method`
+- `Cache`
+- `Transaction`
 - `RequiredFields`
 - `OptionalFields`
 - `RequiredParams`
@@ -31,9 +34,20 @@
 
 - `Extension`
 - `CacheStore`
+- `LogWriter`
 - `Queue`
 - `DatabaseConnectionFactory`
 - `Storage`
 - `DataType`
 - `HttpAttribute`
 - `RequestValidatorAttribute`
+- `BeforeRequestAttribute`
+- `AfterResponseAttribute`
+- `TransactionManager`
+- `LogWriter`
+
+## Extensoes de Infraestrutura
+
+- `bifrost/redis` fornece `RedisConnectionFactory` e `RedisConnectionManager`.
+- Extensoes Redis devem usar `RedisConnectionFactory` em vez de abrir conexoes diretamente.
+- Conexoes Redis equivalentes sao reutilizadas pelo `RedisConnectionManager`.
