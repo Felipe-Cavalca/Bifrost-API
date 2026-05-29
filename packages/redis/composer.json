@@ -1,17 +1,16 @@
 {
-  "name": "bifrost/cache-redis",
-  "description": "Adapter Redis opcional para cache no Bifrost Framework",
+  "name": "bifrost/redis",
+  "description": "Cliente Redis reutilizavel para extensoes opcionais do Bifrost Framework",
   "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=8.1",
     "bifrost/framework": "^1.0",
-    "bifrost/redis": "^1.0",
     "ext-redis": "*"
   },
   "autoload": {
     "psr-4": {
-      "Bifrost\\Extension\\CacheRedis\\": "src/"
+      "Bifrost\\Extension\\Redis\\": "src/"
     }
   },
   "require-dev": {

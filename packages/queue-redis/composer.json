@@ -6,6 +6,7 @@
   "require": {
     "php": ">=8.1",
     "bifrost/framework": "^1.0",
+    "bifrost/redis": "^1.0",
     "ext-redis": "*"
   },
   "autoload": {
