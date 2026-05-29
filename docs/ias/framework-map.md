@@ -51,3 +51,5 @@
 - `bifrost/redis` fornece `RedisConnectionFactory` e `RedisConnectionManager`.
 - Extensoes Redis devem usar `RedisConnectionFactory` em vez de abrir conexoes diretamente.
 - Conexoes Redis equivalentes sao reutilizadas pelo `RedisConnectionManager`.
+- `bifrost/storage-s3` fornece `S3ClientFactory` e `S3ClientManager`.
+- Extensoes S3 devem usar `S3ClientFactory` em vez de criar `S3Client` diretamente.

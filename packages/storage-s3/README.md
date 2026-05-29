@@ -17,6 +17,11 @@ $storage = $application->container()->get(Storage::class);
 $url = $storage->temporaryUrl('reports/example.txt');
 ```
 
+O pacote registra `S3ClientFactory` internamente e reutiliza clientes com a
+mesma configuracao via `S3ClientManager`. Para trocar a criacao do cliente,
+registre uma factory propria antes da extensao ou informe `clientFactory` no
+construtor.
+
 Este pacote e aditivo. Ele nao substitui `Bifrost\Interface\Storage`,
 `Bifrost\Integration\Storage\S3Storage` ou o alias legado
 `Bifrost\Integration\S3Storage` do modulo `bifrost/api`.

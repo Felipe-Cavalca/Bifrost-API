@@ -5,25 +5,38 @@ declare(strict_types=1);
 namespace Bifrost\Extension\StorageS3;
 
 use Aws\S3\S3Client;
+use Bifrost\Extension\StorageS3\Contracts\S3ClientFactory;
 use Bifrost\Framework\Application;
+use Bifrost\Framework\Container;
 use Bifrost\Framework\Contracts\Extension;
 use Bifrost\Framework\Contracts\Storage;
 use InvalidArgumentException;
 
 final class S3StorageExtension implements Extension
 {
+    private readonly S3ClientConfig $clientConfig;
+
     public function __construct(
         private readonly array $config,
-        private readonly ?S3Client $client = null
+        private readonly ?S3Client $client = null,
+        private readonly ?S3ClientFactory $clientFactory = null
     ) {
+        $this->clientConfig = S3ClientConfig::fromStorageConfig($config);
     }
 
     public function register(Application $application): void
     {
+        $clientFactory = $this->clientFactory;
+        if ($clientFactory === null && $this->client !== null) {
+            $clientFactory = new FixedS3ClientFactory($this->client);
+        }
+
+        S3ServiceRegistrar::register($application, $clientFactory);
+
         $application->container()->bind(
             Storage::class,
-            fn (): S3Storage => new S3Storage(
-                client: $this->client ?? new S3Client($this->clientConfig()),
+            fn (Container $container): S3Storage => new S3Storage(
+                client: $container->get(S3ClientFactory::class)->client($this->clientConfig),
                 bucket: $this->bucket()
             )
         );
@@ -38,15 +51,5 @@ final class S3StorageExtension implements Extension
         }
 
         return $bucket;
-    }
-
-    private function clientConfig(): array
-    {
-        $config = $this->config;
-        unset($config['bucket']);
-        $config['version'] ??= 'latest';
-        $config['region'] ??= 'us-east-1';
-
-        return $config;
     }
 }
