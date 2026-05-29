@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Bifrost\Extension\DatabasePdo;
 
 use Bifrost\Framework\Application;
+use Bifrost\Framework\Container;
 use Bifrost\Framework\Contracts\DatabaseConnectionFactory;
 use Bifrost\Framework\Contracts\Extension;
-use Bifrost\Framework\Container;
+use Bifrost\Framework\Contracts\TransactionManager;
 
 final class PdoExtension implements Extension
 {
@@ -29,6 +30,11 @@ final class PdoExtension implements Extension
             static fn (Container $container): PdoDatabase => new PdoDatabase(
                 connection: $container->get(DatabaseConnectionFactory::class)->connection()
             )
+        );
+
+        $application->container()->bind(
+            TransactionManager::class,
+            static fn (Container $container): TransactionManager => $container->get(PdoDatabase::class)
         );
     }
 }

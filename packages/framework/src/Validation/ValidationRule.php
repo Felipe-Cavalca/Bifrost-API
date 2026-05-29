@@ -6,8 +6,21 @@ namespace Bifrost\Framework\Validation;
 
 use Bifrost\Framework\Contracts\DataType;
 
+/**
+ * Valida valores usados pelos attributes de request.
+ *
+ * Aceita regras nomeadas, DataTypes ou callables.
+ */
 final class ValidationRule
 {
+    /**
+     * Verifica se um valor atende a uma regra.
+     *
+     * Regras nomeadas suportadas: int, int-string, string, float, numeric, bool,
+     * array, object, null, email, url, base64, json e uuid.
+     *
+     * @param mixed $rule Nome da regra, classe DataType, instancia DataType ou callable.
+     */
     public static function validate(mixed $value, mixed $rule): bool
     {
         if (is_string($rule) && enum_exists($rule) === false && class_exists($rule) === false) {
@@ -29,6 +42,9 @@ final class ValidationRule
         return false;
     }
 
+    /**
+     * Descreve uma regra em formato legivel para metadados de endpoint.
+     */
     public static function describe(mixed $rule): string
     {
         if (is_string($rule)) {

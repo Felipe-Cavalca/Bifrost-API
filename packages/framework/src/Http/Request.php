@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace Bifrost\Framework\Http;
 
+/**
+ * Representa a request HTTP normalizada pelo Bifrost.
+ *
+ * Fornece acesso ao metodo, path, query string, corpo da request, headers e request-id.
+ * Controllers recebem esta classe como entrada principal.
+ */
 final class Request
 {
     private readonly array $headers;
     private readonly string $requestId;
 
+    /**
+     * @param string $method Metodo HTTP recebido.
+     * @param string $path Path da request, com ou sem barra inicial.
+     * @param array<string, mixed> $query Parametros de query string.
+     * @param array<string, mixed> $body Corpo decodificado da request.
+     * @param array<string, string> $headers Headers HTTP.
+     * @param string|null $requestId Identificador da request. Se omitido, usa X-Request-Id ou gera um novo.
+     */
     public function __construct(
         private readonly string $method,
         private readonly string $path,
@@ -21,6 +35,9 @@ final class Request
         $this->requestId = self::resolveRequestId($this->headers, $requestId);
     }
 
+    /**
+     * Cria uma request a partir das variaveis globais do PHP.
+     */
     public static function fromGlobals(): self
     {
         $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
@@ -39,11 +56,17 @@ final class Request
         );
     }
 
+    /**
+     * Retorna o metodo HTTP em maiusculas.
+     */
     public function method(): string
     {
         return strtoupper($this->method);
     }
 
+    /**
+     * Retorna o path normalizado, sempre com barra inicial e sem barra final.
+     */
     public function path(): string
     {
         $path = '/' . ltrim($this->path, '/');
@@ -51,21 +74,44 @@ final class Request
         return $path !== '/' ? rtrim($path, '/') : $path;
     }
 
+    /**
+     * Le parametros da query string.
+     *
+     * @param string|null $key Nome do parametro. Quando null, retorna todos os parametros.
+     * @param mixed $default Valor usado quando o parametro nao existe.
+     * @return mixed Valor do parametro, todos os parametros ou o default.
+     */
     public function query(?string $key = null, mixed $default = null): mixed
     {
         return $key === null ? $this->query : ($this->query[$key] ?? $default);
     }
 
+    /**
+     * Le valores do corpo da request.
+     *
+     * @param string|null $key Nome do campo. Quando null, retorna todo o corpo.
+     * @param mixed $default Valor usado quando o campo nao existe.
+     * @return mixed Valor do campo, corpo completo ou o default.
+     */
     public function input(?string $key = null, mixed $default = null): mixed
     {
         return $key === null ? $this->body : ($this->body[$key] ?? $default);
     }
 
+    /**
+     * Le um header HTTP por nome, sem diferenciar maiusculas/minusculas.
+     *
+     * @param string $name Nome do header, como Authorization ou X-Request-Id.
+     * @param string|null $default Valor usado quando o header nao existe.
+     */
     public function header(string $name, ?string $default = null): ?string
     {
         return $this->headers[strtolower($name)] ?? $default;
     }
 
+    /**
+     * Retorna o identificador da request para rastreamento.
+     */
     public function requestId(): string
     {
         return $this->requestId;
