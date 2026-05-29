@@ -6,6 +6,9 @@ use Bifrost\Extension\CacheApcu\ApcuCacheExtension;
 use Bifrost\Extension\CacheRedis\RedisCacheExtension;
 use Bifrost\Extension\DatabaseMySql\MySqlExtension;
 use Bifrost\Extension\DatabasePostgreSql\PostgreSqlExtension;
+use Bifrost\Extension\LogFile\FileLogExtension;
+use Bifrost\Extension\LogMongoDb\MongoLogExtension;
+use Bifrost\Extension\LogStdout\StdoutLogExtension;
 use Bifrost\Extension\QueueRedis\RedisQueueExtension;
 use Bifrost\Framework\Contracts\Extension;
 
@@ -80,6 +83,47 @@ if ($databaseDriver === 'postgresql' && !class_exists(PostgreSqlExtension::class
 
 if ($databaseDriver === 'postgresql') {
     $extensions[] = new PostgreSqlExtension($databaseConfig);
+}
+
+$logDriver = getenv('LOG_DRIVER') ?: '';
+if ($logDriver !== '' && !in_array($logDriver, ['stdout', 'file', 'mongodb'], true)) {
+    throw new RuntimeException('LOG_DRIVER deve ser stdout, file ou mongodb.');
+}
+
+if ($logDriver === 'stdout' && !class_exists(StdoutLogExtension::class)) {
+    throw new RuntimeException('Instale bifrost/log-stdout para usar LOG_DRIVER=stdout.');
+}
+
+if ($logDriver === 'stdout') {
+    $extensions[] = new StdoutLogExtension([
+        'stream' => getenv('LOG_STREAM') ?: 'stdout',
+    ]);
+}
+
+if ($logDriver === 'file' && !class_exists(FileLogExtension::class)) {
+    throw new RuntimeException('Instale bifrost/log-file para usar LOG_DRIVER=file.');
+}
+
+if ($logDriver === 'file') {
+    $extensions[] = new FileLogExtension([
+        'path' => getenv('LOG_FILE') ?: dirname(__DIR__) . '/storage/logs/app.log',
+    ]);
+}
+
+if ($logDriver === 'mongodb' && !class_exists(MongoLogExtension::class)) {
+    throw new RuntimeException('Instale bifrost/log-mongodb para usar LOG_DRIVER=mongodb.');
+}
+
+if ($logDriver === 'mongodb') {
+    $extensions[] = new MongoLogExtension([
+        'uri' => getenv('MONGO_LOG_URI') ?: null,
+        'host' => getenv('MONGO_LOG_HOST') ?: 'mongo',
+        'port' => getenv('MONGO_LOG_PORT') ?: '27017',
+        'database' => getenv('MONGO_LOG_DATABASE') ?: 'bifrost_logs',
+        'collection' => getenv('MONGO_LOG_COLLECTION') ?: 'logs',
+        'username' => getenv('MONGO_LOG_USERNAME') ?: null,
+        'password' => getenv('MONGO_LOG_PASSWORD') ?: null,
+    ]);
 }
 
 return $extensions;

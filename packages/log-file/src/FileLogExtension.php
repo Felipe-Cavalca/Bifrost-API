@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Bifrost\Extension\LogMongoDb;
+namespace Bifrost\Extension\LogFile;
 
-use Bifrost\Extension\LogMongoDb\Contracts\LogWriter;
+use Bifrost\Extension\LogFile\Contracts\LogWriter;
 use Bifrost\Framework\Application;
 use Bifrost\Framework\Contracts\Extension;
 use Bifrost\Framework\Contracts\LogWriter as FrameworkLogWriter;
 use Bifrost\Framework\Logging\Logger;
 use Closure;
 
-final class MongoLogExtension implements Extension
+final class FileLogExtension implements Extension
 {
-    private readonly MongoLogConfig $config;
+    private readonly FileLogConfig $config;
 
-    /** @var Closure(MongoLogConfig): LogWriter|null */
+    /** @var Closure(FileLogConfig): LogWriter|null */
     private readonly ?Closure $writerFactory;
 
     public function __construct(array $config, ?callable $writerFactory = null)
     {
-        $this->config = MongoLogConfig::fromArray($config);
+        $this->config = FileLogConfig::fromArray($config);
         $this->writerFactory = $writerFactory === null
             ? null
             : Closure::fromCallable($writerFactory);
@@ -48,6 +48,6 @@ final class MongoLogExtension implements Extension
             return ($this->writerFactory)($this->config);
         }
 
-        return MongoLogWriter::connect($this->config);
+        return new FileLogWriter($this->config);
     }
 }
