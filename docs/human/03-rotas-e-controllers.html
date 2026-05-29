@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker e deploy - Bifrost Framework</title>
+    <title>Rotas e controllers - Bifrost Framework</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -21,32 +21,42 @@
         </aside>
         <main class="content">
             <article class="article">
-                <span class="eyebrow">Entrega</span>
-                <h1>Docker e deploy</h1>
-                <p class="lead">Em produção, trate o app como uma aplicação Composer comum: instale dependências, configure variáveis de ambiente e exponha o diretório público.</p>
+                <span class="eyebrow">Usando o framework</span>
+                <h1>Rotas e controllers</h1>
+                <p class="lead">Rotas conectam uma URL a uma ação. Controllers executam essa ação e retornam um objeto <code>Response</code>.</p>
 
-                <h2>Instalação de produção</h2>
-                <pre><code class="language-bash">composer install --no-dev --optimize-autoloader</code></pre>
+                <h2>Controller simples</h2>
+                <p>Um controller deve ser pequeno. Extraia regra de negócio para services quando a lógica crescer.</p>
+                <pre><code class="language-php">final class HealthController
+{
+    public static function show(Request $request): Response
+    {
+        return Response::json(['status' =&gt; 'ok']);
+    }
+}</code></pre>
 
-                <h2>Logs</h2>
-                <p>Para containers, prefira logs em stdout/stderr. Isso facilita coleta por Docker, Kubernetes ou ferramentas da plataforma.</p>
-                <pre><code class="language-bash">composer require bifrost/log-stdout</code></pre>
+                <h2>Validação de campos</h2>
+                <p>Use attributes para declarar quais campos ou parâmetros são esperados pela rota.</p>
+                <pre><code class="language-php">#[RequiredFields(['email', 'name'])]
+final class CreateUserController
+{
+    public static function handle(Request $request): Response
+    {
+        return Response::json(['created' =&gt; true], 201);
+    }
+}</code></pre>
 
-                <h2>Arquivos</h2>
-                <p>Escolha o storage conforme o ambiente. Local funciona bem para desenvolvimento; S3 ou compatível é mais adequado quando a aplicação roda distribuída.</p>
-
-                <h2>Checklist</h2>
+                <h2>Boas práticas</h2>
                 <ul>
-                    <li>Instalar dependências sem <code>--dev</code>.</li>
-                    <li>Configurar secrets fora do repositório.</li>
-                    <li>Validar healthcheck.</li>
-                    <li>Escolher módulos de infraestrutura adequados ao ambiente.</li>
-                    <li>Confirmar que logs e request-id estão chegando na ferramenta de observabilidade.</li>
+                    <li>Use nomes claros, como <code>CreateUserController</code> ou <code>ListOrdersController</code>.</li>
+                    <li>Converta dados brutos da request antes de chamar regras de negócio.</li>
+                    <li>Retorne sempre <code>Response</code>, evitando saída direta com <code>echo</code>.</li>
+                    <li>Não coloque acesso direto a serviços externos dentro da regra de domínio.</li>
                 </ul>
 
                 <div class="next">
-                    <a href="modulos/filas.html">Filas</a>
-                    <span></span>
+                    <a href="02-primeiros-passos.html">Primeiros passos</a>
+                    <a href="04-request-response.html">Request e response</a>
                 </div>
             </article>
         </main>

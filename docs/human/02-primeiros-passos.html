@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker e deploy - Bifrost Framework</title>
+    <title>Primeiros passos - Bifrost Framework</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -21,32 +21,46 @@
         </aside>
         <main class="content">
             <article class="article">
-                <span class="eyebrow">Entrega</span>
-                <h1>Docker e deploy</h1>
-                <p class="lead">Em produção, trate o app como uma aplicação Composer comum: instale dependências, configure variáveis de ambiente e exponha o diretório público.</p>
+                <span class="eyebrow">Comece aqui</span>
+                <h1>Primeiros passos</h1>
+                <p class="lead">Depois de criar o projeto, o fluxo normal é instalar dependências, rodar a API e criar a primeira rota.</p>
 
-                <h2>Instalação de produção</h2>
-                <pre><code class="language-bash">composer install --no-dev --optimize-autoloader</code></pre>
+                <h2>1. Entre na aplicação</h2>
+                <p>O skeleton cria a aplicação dentro de <code>api/</code>. Esse é o diretório onde você executa Composer e comandos da API.</p>
+                <pre><code class="language-bash">cd minha-api/api
+composer install</code></pre>
 
-                <h2>Logs</h2>
-                <p>Para containers, prefira logs em stdout/stderr. Isso facilita coleta por Docker, Kubernetes ou ferramentas da plataforma.</p>
-                <pre><code class="language-bash">composer require bifrost/log-stdout</code></pre>
+                <h2>2. Suba o servidor local</h2>
+                <p>Para um teste simples, o servidor embutido do PHP já permite validar uma rota HTTP.</p>
+                <pre><code class="language-bash">php -S 0.0.0.0:8000 -t public</code></pre>
 
-                <h2>Arquivos</h2>
-                <p>Escolha o storage conforme o ambiente. Local funciona bem para desenvolvimento; S3 ou compatível é mais adequado quando a aplicação roda distribuída.</p>
+                <h2>3. Crie um controller</h2>
+                <p>Controllers recebem a request e devolvem uma response. Mantenha cada controller focado em uma intenção clara.</p>
+                <pre><code class="language-php">&lt;?php
 
-                <h2>Checklist</h2>
-                <ul>
-                    <li>Instalar dependências sem <code>--dev</code>.</li>
-                    <li>Configurar secrets fora do repositório.</li>
-                    <li>Validar healthcheck.</li>
-                    <li>Escolher módulos de infraestrutura adequados ao ambiente.</li>
-                    <li>Confirmar que logs e request-id estão chegando na ferramenta de observabilidade.</li>
-                </ul>
+namespace App\Controllers;
+
+use Bifrost\Framework\Http\Request;
+use Bifrost\Framework\Http\Response;
+
+final class HelloController
+{
+    public static function show(Request $request): Response
+    {
+        return Response::json(['message' =&gt; 'Olá, Bifrost']);
+    }
+}</code></pre>
+
+                <h2>4. Registre a rota</h2>
+                <p>O arquivo exato depende do skeleton, mas a ideia é mapear método e caminho para o controller.</p>
+                <pre><code class="language-php">$router-&gt;get('/hello', [HelloController::class, 'show']);</code></pre>
+
+                <h2>5. Teste a resposta</h2>
+                <pre><code class="language-bash">curl http://localhost:8000/hello</code></pre>
 
                 <div class="next">
-                    <a href="modulos/filas.html">Filas</a>
-                    <span></span>
+                    <a href="01-instalacao.html">Instalação</a>
+                    <a href="03-rotas-e-controllers.html">Rotas e controllers</a>
                 </div>
             </article>
         </main>

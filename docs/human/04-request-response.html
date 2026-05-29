@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker e deploy - Bifrost Framework</title>
+    <title>Request e response - Bifrost Framework</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -21,32 +21,33 @@
         </aside>
         <main class="content">
             <article class="article">
-                <span class="eyebrow">Entrega</span>
-                <h1>Docker e deploy</h1>
-                <p class="lead">Em produção, trate o app como uma aplicação Composer comum: instale dependências, configure variáveis de ambiente e exponha o diretório público.</p>
+                <span class="eyebrow">Usando o framework</span>
+                <h1>Request e response</h1>
+                <p class="lead">A request concentra os dados de entrada. A response concentra o que será enviado ao cliente.</p>
 
-                <h2>Instalação de produção</h2>
-                <pre><code class="language-bash">composer install --no-dev --optimize-autoloader</code></pre>
+                <h2>Lendo dados da request</h2>
+                <p>Use a request para acessar body, query string, headers, método e caminho. O controller decide como transformar esses dados em tipos do domínio.</p>
+                <pre><code class="language-php">$email = $request-&gt;body('email');
+$page = $request-&gt;query('page', 1);
+$requestId = $request-&gt;header('X-Request-Id');</code></pre>
 
-                <h2>Logs</h2>
-                <p>Para containers, prefira logs em stdout/stderr. Isso facilita coleta por Docker, Kubernetes ou ferramentas da plataforma.</p>
-                <pre><code class="language-bash">composer require bifrost/log-stdout</code></pre>
+                <h2>Retornando JSON</h2>
+                <p>APIs normalmente retornam JSON. O helper de response evita repetir headers e serialização.</p>
+                <pre><code class="language-php">return Response::json([
+    'id' =&gt; $userId,
+    'status' =&gt; 'created',
+], 201);</code></pre>
 
-                <h2>Arquivos</h2>
-                <p>Escolha o storage conforme o ambiente. Local funciona bem para desenvolvimento; S3 ou compatível é mais adequado quando a aplicação roda distribuída.</p>
+                <h2>Erros previsíveis</h2>
+                <p>Quando precisar interromper a request com um status HTTP, use exceções HTTP do framework para manter o formato de erro consistente.</p>
+                <pre><code class="language-php">throw new HttpException(404, 'Registro não encontrado.');</code></pre>
 
-                <h2>Checklist</h2>
-                <ul>
-                    <li>Instalar dependências sem <code>--dev</code>.</li>
-                    <li>Configurar secrets fora do repositório.</li>
-                    <li>Validar healthcheck.</li>
-                    <li>Escolher módulos de infraestrutura adequados ao ambiente.</li>
-                    <li>Confirmar que logs e request-id estão chegando na ferramenta de observabilidade.</li>
-                </ul>
+                <h2>Request ID</h2>
+                <p>O framework propaga <code>X-Request-Id</code>. Esse identificador ajuda a cruzar logs e respostas sem expor dados sensíveis.</p>
 
                 <div class="next">
-                    <a href="modulos/filas.html">Filas</a>
-                    <span></span>
+                    <a href="03-rotas-e-controllers.html">Rotas e controllers</a>
+                    <a href="05-datatypes.html">DataTypes</a>
                 </div>
             </article>
         </main>

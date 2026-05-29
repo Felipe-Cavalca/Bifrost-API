@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Storage - Bifrost Framework</title><link rel="stylesheet" href="../assets/styles.css"></head>
+<body>
+    <div class="mobile-bar"><strong>Bifrost</strong><button class="menu-button" data-menu-toggle>Menu</button></div>
+    <div class="layout">
+        <aside class="sidebar">
+            <a class="brand" href="../index.html"><span class="brand-mark">B</span><span><span class="brand-name">Bifrost</span><span class="brand-subtitle">Framework Composer</span></span></a>
+            <button class="theme-button" data-theme-toggle>Tema escuro</button>
+            <nav>
+                <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="../index.html" class="nav-link">Visão geral</a><a href="../01-instalacao.html" class="nav-link">Instalação</a><a href="../02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
+                <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="../03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="../04-request-response.html" class="nav-link">Request e response</a><a href="../05-datatypes.html" class="nav-link">DataTypes</a></section>
+                <section class="nav-section"><p class="nav-title">Módulos</p><a href="index.html" class="nav-link">Todos os módulos</a><a href="cache.html" class="nav-link">Cache</a><a href="redis.html" class="nav-link">Redis</a><a href="database.html" class="nav-link">Banco de dados</a><a href="storage.html" class="nav-link">Storage</a><a href="logs.html" class="nav-link">Logs</a><a href="filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Entrega</p><a href="../06-deploy.html" class="nav-link">Docker e deploy</a></section>
+            </nav>
+        </aside>
+        <main class="content"><article class="article">
+            <span class="eyebrow">Módulos</span>
+            <h1>Storage</h1>
+            <p class="lead">Storage é a camada para gravar, ler e remover arquivos sem acoplar sua aplicação ao disco local ou S3 diretamente.</p>
+            <h2>Escolha do driver</h2>
+            <table><thead><tr><th>Pacote</th><th>Uso indicado</th></tr></thead><tbody><tr><td><code>bifrost/storage-local</code></td><td>Desenvolvimento local, testes e arquivos persistidos no disco da aplicação.</td></tr><tr><td><code>bifrost/storage-s3</code></td><td>Produção distribuída, buckets S3 ou serviços compatíveis.</td></tr></tbody></table>
+            <h2>Instalar</h2>
+            <pre><code class="language-bash">composer require bifrost/storage-s3</code></pre>
+            <p>Clientes S3 equivalentes devem ser reutilizados pelo módulo, evitando abrir clientes duplicados para a mesma configuração.</p>
+            <div class="next"><a href="database.html">Banco de dados</a><a href="logs.html">Logs</a></div>
+        </article></main>
+    </div>
+    <script src="../assets/app.js"></script>
+</body>
+</html>

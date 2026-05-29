@@ -1,59 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bifrost Framework</title>
-  <link rel="stylesheet" href="assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bifrost Framework - Documentação</title>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <main>
-    <header class="topbar">
-      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
-      <nav class="nav">
-        <a href="01-criando-projeto.html">Inicio</a>
-        <a href="02-arquitetura.html">Arquitetura</a>
-        <a href="03-lifecycle.html">Lifecycle</a>
-        <a href="04-modulos.html">Modulos</a>
-        <a href="05-attributes-datatypes.html">Attributes</a>
-        <a href="06-deploy.html">Deploy</a>
-      </nav>
-    </header>
+    <div class="mobile-bar"><strong>Bifrost</strong><button class="menu-button" data-menu-toggle>Menu</button></div>
+    <div class="layout">
+        <aside class="sidebar">
+            <a class="brand" href="index.html"><span class="brand-mark">B</span><span><span class="brand-name">Bifrost</span><span class="brand-subtitle">Framework Composer</span></span></a>
+            <button class="theme-button" data-theme-toggle>Tema escuro</button>
+            <nav>
+                <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="index.html" class="nav-link">Visão geral</a><a href="01-instalacao.html" class="nav-link">Instalação</a><a href="02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
+                <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="04-request-response.html" class="nav-link">Request e response</a><a href="05-datatypes.html" class="nav-link">DataTypes</a></section>
+                <section class="nav-section"><p class="nav-title">Módulos</p><a href="modulos/index.html" class="nav-link">Todos os módulos</a><a href="modulos/cache.html" class="nav-link">Cache</a><a href="modulos/redis.html" class="nav-link">Redis</a><a href="modulos/database.html" class="nav-link">Banco de dados</a><a href="modulos/storage.html" class="nav-link">Storage</a><a href="modulos/logs.html" class="nav-link">Logs</a><a href="modulos/filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Entrega</p><a href="06-deploy.html" class="nav-link">Docker e deploy</a></section>
+            </nav>
+        </aside>
+        <main class="content">
+            <article class="article">
+                <span class="eyebrow">Documentação para uso</span>
+                <h1>Bifrost Framework</h1>
+                <p class="lead">Bifrost é um framework PHP para criar APIs com um núcleo pequeno e módulos opcionais. Você começa com o skeleton, cria suas rotas e instala somente as integrações que o projeto realmente usa.</p>
 
-    <section class="hero">
-      <div>
-        <span class="eyebrow">Framework Composer para APIs</span>
-        <h1>Construa backends pequenos, modulares e previsiveis.</h1>
-        <p class="lead">
-          O Bifrost separa o core HTTP das integracoes opcionais. Projetos novos
-          comecam pelo skeleton e adicionam cache, fila, banco, storage e logs
-          somente quando precisam.
-        </p>
-        <div class="actions">
-          <a class="button" href="01-criando-projeto.html">Criar projeto</a>
-          <a class="button secondary" href="04-modulos.html">Ver modulos</a>
-        </div>
-      </div>
-      <div class="panel terminal">
-        <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
-        <pre>mkdir api
-cd api
-composer create-project bifrost/skeleton .
-cp .env.example .env
-docker compose up --build
-curl http://localhost:8080/health</pre>
-      </div>
-    </section>
+                <div class="callout">
+                    <p>Esta documentação é para quem vai usar o framework em uma aplicação. Ela não cobre manutenção interna do monorepo nem desenvolvimento dos pacotes.</p>
+                </div>
 
-    <section class="grid">
-      <a class="card" href="01-criando-projeto.html"><h2>Criar Projeto</h2><p>Instalacao do skeleton, estrutura inicial e primeiro health check.</p></a>
-      <a class="card" href="02-arquitetura.html"><h2>Arquitetura</h2><p>Core HTTP, container, extensoes e separacao por pacotes Composer.</p></a>
-      <a class="card" href="03-lifecycle.html"><h2>Lifecycle</h2><p>O caminho da request ate a response, incluindo middleware e controllers.</p></a>
-      <a class="card" href="04-modulos.html"><h2>Modulos</h2><p>Cache, fila, banco, Redis, storage e logs como dependencias opcionais.</p></a>
-      <a class="card" href="05-attributes-datatypes.html"><h2>Attributes e DataTypes</h2><p>Contratos HTTP declarativos e valores tipados reutilizaveis.</p></a>
-      <a class="card" href="06-deploy.html"><h2>Docker e Deploy</h2><p>Compose base, overlays e checks modulares.</p></a>
-    </section>
-  </main>
-  <script src="assets/app.js"></script>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Comece pelo skeleton</h3>
+                        <p>O pacote <code>bifrost/skeleton</code> cria a base do projeto para uma API nova.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Adicione módulos</h3>
+                        <p>Cache, Redis, banco, logs, filas e storage são instalados conforme a necessidade.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Modele valores</h3>
+                        <p>DataTypes ajudam a transformar regras de campos em tipos explícitos e reutilizáveis.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Consulte a referência</h3>
+                        <p>A referência lista funções públicas, parâmetros, retornos e links entre tipos.</p>
+                        <a href="referencia/index.html">Abrir referência</a>
+                    </div>
+                </div>
+
+                <h2>Fluxo recomendado</h2>
+                <div class="flow">
+                    <div class="flow-item"><strong>Instale</strong><span>Crie o projeto com Composer.</span></div>
+                    <div class="flow-item"><strong>Rode</strong><span>Suba a API localmente e teste uma rota.</span></div>
+                    <div class="flow-item"><strong>Construa</strong><span>Crie controllers, responses e DataTypes.</span></div>
+                    <div class="flow-item"><strong>Expanda</strong><span>Instale módulos opcionais quando precisar.</span></div>
+                </div>
+
+                <h2>O que você precisa saber primeiro</h2>
+                <p>Se você está testando o Bifrost pela primeira vez, siga a ordem do menu: instalação, primeiros passos, rotas e controllers, request/response e DataTypes. Depois leia os módulos conforme a infraestrutura do seu app.</p>
+
+                <div class="next">
+                    <span></span>
+                    <a href="01-instalacao.html">Instalação</a>
+                </div>
+            </article>
+        </main>
+    </div>
+    <script src="assets/app.js"></script>
 </body>
 </html>

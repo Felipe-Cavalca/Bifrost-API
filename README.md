@@ -15,7 +15,10 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | `bifrost/database-pdo` | Fabrica PDO generica opcional |
 | `bifrost/database-mysql` | Banco MySQL opcional |
 | `bifrost/database-postgresql` | Banco PostgreSQL opcional |
-| `bifrost/datatypes` | DataTypes reutilizaveis para validação e tipagem forte |
+| `bifrost/datatype-core` | Base comum para DataTypes |
+| `bifrost/datatype-email` | DataType Email opcional |
+| `bifrost/datatype-cpf` | DataType CPF opcional |
+| `bifrost/datatypes` | Agregador opcional com todos os DataTypes |
 | `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
 | `bifrost/storage-local` | Storage local opcional |
 | `bifrost/storage-s3` | Storage S3 opcional |
@@ -40,6 +43,8 @@ infraestrutura, instale apenas o adaptador necessario:
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
 composer require bifrost/cache-apcu
+composer require bifrost/datatype-email
+# ou, se quiser todos os DataTypes
 composer require bifrost/datatypes
 composer require bifrost/database-mysql
 # ou
@@ -102,6 +107,8 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |   |-- database-pdo/
 |   |-- database-mysql/
 |   |-- database-postgresql/
+|   |-- datatype-core/
+|   |-- datatype-email/
 |   |-- datatypes/
 |   |-- log-mongodb/
 |   |-- storage-local/

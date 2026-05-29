@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataTypes - Bifrost Framework</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="mobile-bar"><strong>Bifrost</strong><button class="menu-button" data-menu-toggle>Menu</button></div>
+    <div class="layout">
+        <aside class="sidebar">
+            <a class="brand" href="index.html"><span class="brand-mark">B</span><span><span class="brand-name">Bifrost</span><span class="brand-subtitle">Framework Composer</span></span></a>
+            <button class="theme-button" data-theme-toggle>Tema escuro</button>
+            <nav>
+                <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="index.html" class="nav-link">Visão geral</a><a href="01-instalacao.html" class="nav-link">Instalação</a><a href="02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
+                <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="04-request-response.html" class="nav-link">Request e response</a><a href="05-datatypes.html" class="nav-link">DataTypes</a></section>
+                <section class="nav-section"><p class="nav-title">Módulos</p><a href="modulos/index.html" class="nav-link">Todos os módulos</a><a href="modulos/cache.html" class="nav-link">Cache</a><a href="modulos/redis.html" class="nav-link">Redis</a><a href="modulos/database.html" class="nav-link">Banco de dados</a><a href="modulos/storage.html" class="nav-link">Storage</a><a href="modulos/logs.html" class="nav-link">Logs</a><a href="modulos/filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Entrega</p><a href="06-deploy.html" class="nav-link">Docker e deploy</a></section>
+            </nav>
+        </aside>
+        <main class="content">
+            <article class="article">
+                <span class="eyebrow">Usando o framework</span>
+                <h1>DataTypes</h1>
+                <p class="lead">DataTypes agora são modulares. Você instala apenas o tipo que sua aplicação usa, sem trazer todos os outros para o projeto.</p>
+
+                <h2>Instalação recomendada</h2>
+                <p>Instale o pacote específico do tipo. O Composer traz o pacote base automaticamente quando necessário.</p>
+                <pre><code class="language-bash">composer require bifrost/datatype-email</code></pre>
+
+                <p>Se quiser todos os tipos mantidos pelo Bifrost, use o pacote agregador:</p>
+                <pre><code class="language-bash">composer require bifrost/datatypes</code></pre>
+
+                <h2>Pacote base</h2>
+                <p><code>bifrost/datatype-core</code> contém a base comum, incluindo <code>AbstractDataType</code>. Normalmente você não precisa instalar esse pacote manualmente, porque os DataTypes específicos já dependem dele.</p>
+
+                <h2>Tipos disponíveis</h2>
+                <div class="grid two">
+                    <div class="card"><h3>Email</h3><p>Valida e normaliza e-mails.</p><a href="datatypes/email.html">Ler Email</a></div>
+                    <div class="card"><h3>Url</h3><p>Valida URLs completas.</p><a href="datatypes/url.html">Ler Url</a></div>
+                    <div class="card"><h3>Base64</h3><p>Valida strings Base64.</p><a href="datatypes/base64.html">Ler Base64</a></div>
+                    <div class="card"><h3>Json</h3><p>Valida conteúdo JSON em string.</p><a href="datatypes/json.html">Ler Json</a></div>
+                    <div class="card"><h3>Uuid</h3><p>Valida e gera UUID v4.</p><a href="datatypes/uuid.html">Ler Uuid</a></div>
+                    <div class="card"><h3>DateTime</h3><p>Normaliza datas e horas.</p><a href="datatypes/date-time.html">Ler DateTime</a></div>
+                    <div class="card"><h3>CPF</h3><p>Valida CPF brasileiro.</p><a href="datatypes/cpf.html">Ler CPF</a></div>
+                    <div class="card"><h3>CNPJ</h3><p>Valida CNPJ brasileiro.</p><a href="datatypes/cnpj.html">Ler CNPJ</a></div>
+                    <div class="card"><h3>FileName</h3><p>Valida nomes de arquivo.</p><a href="datatypes/file-name.html">Ler FileName</a></div>
+                    <div class="card"><h3>FolderName</h3><p>Valida nomes de pasta.</p><a href="datatypes/folder-name.html">Ler FolderName</a></div>
+                    <div class="card"><h3>FilePath</h3><p>Valida caminhos relativos de arquivo.</p><a href="datatypes/file-path.html">Ler FilePath</a></div>
+                    <div class="card"><h3>FolderPath</h3><p>Valida caminhos de pasta.</p><a href="datatypes/folder-path.html">Ler FolderPath</a></div>
+                    <div class="card"><h3>StorageKey</h3><p>Valida chaves relativas de storage.</p><a href="datatypes/storage-key.html">Ler StorageKey</a></div>
+                </div>
+
+                <h2>Persistência</h2>
+                <p>DataTypes baseados em <code>AbstractDataType</code> implementam <code>Insertable</code>. Isso permite salvar o valor no banco sem perder tipagem na aplicação.</p>
+                <pre><code class="language-php">$database-&gt;insert('users', [
+    'email' =&gt; Email::from('dev@example.com'),
+]);</code></pre>
+
+                <div class="next">
+                    <a href="04-request-response.html">Request e response</a>
+                    <a href="datatypes/email.html">Email</a>
+                </div>
+            </article>
+        </main>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>

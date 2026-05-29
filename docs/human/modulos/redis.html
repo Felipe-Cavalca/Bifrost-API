@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Redis - Bifrost Framework</title><link rel="stylesheet" href="../assets/styles.css"></head>
+<body>
+    <div class="mobile-bar"><strong>Bifrost</strong><button class="menu-button" data-menu-toggle>Menu</button></div>
+    <div class="layout">
+        <aside class="sidebar">
+            <a class="brand" href="../index.html"><span class="brand-mark">B</span><span><span class="brand-name">Bifrost</span><span class="brand-subtitle">Framework Composer</span></span></a>
+            <button class="theme-button" data-theme-toggle>Tema escuro</button>
+            <nav>
+                <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="../index.html" class="nav-link">Visão geral</a><a href="../01-instalacao.html" class="nav-link">Instalação</a><a href="../02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
+                <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="../03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="../04-request-response.html" class="nav-link">Request e response</a><a href="../05-datatypes.html" class="nav-link">DataTypes</a></section>
+                <section class="nav-section"><p class="nav-title">Módulos</p><a href="index.html" class="nav-link">Todos os módulos</a><a href="cache.html" class="nav-link">Cache</a><a href="redis.html" class="nav-link">Redis</a><a href="database.html" class="nav-link">Banco de dados</a><a href="storage.html" class="nav-link">Storage</a><a href="logs.html" class="nav-link">Logs</a><a href="filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Entrega</p><a href="../06-deploy.html" class="nav-link">Docker e deploy</a></section>
+            </nav>
+        </aside>
+        <main class="content"><article class="article">
+            <span class="eyebrow">Módulos</span>
+            <h1>Redis</h1>
+            <p class="lead">O pacote Redis existe para centralizar conexão e configuração usadas por outros módulos, como cache e filas.</p>
+            <h2>Quando instalar diretamente</h2>
+            <p>Normalmente você instala <code>bifrost/cache-redis</code> ou <code>bifrost/queue-redis</code>, e o Composer traz o Redis base quando necessário. Instale <code>bifrost/redis</code> diretamente se sua aplicação for usar a conexão Redis em código próprio.</p>
+            <pre><code class="language-bash">composer require bifrost/redis</code></pre>
+            <h2>Reutilização</h2>
+            <p>Configurações equivalentes devem compartilhar a mesma conexão. Isso evita que cache e fila abram conexões duplicadas para o mesmo Redis.</p>
+            <div class="callout"><p>Se no futuro você usar cluster, sentinel ou outro cliente, a troca deve acontecer no pacote Redis, sem espalhar detalhes nos módulos consumidores.</p></div>
+            <div class="next"><a href="cache.html">Cache</a><a href="database.html">Banco de dados</a></div>
+        </article></main>
+    </div>
+    <script src="../assets/app.js"></script>
+</body>
+</html>
