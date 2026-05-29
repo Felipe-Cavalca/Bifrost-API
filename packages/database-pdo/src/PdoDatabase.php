@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\DatabasePdo;
 
+use Bifrost\Framework\Contracts\Insertable;
 use Bifrost\Framework\Contracts\TransactionManager;
 use InvalidArgumentException;
 use PDO;
@@ -76,7 +77,7 @@ final class PdoDatabase implements TransactionManager
     public function execute(string $sql, array $params = []): PDOStatement
     {
         $statement = $this->connection->prepare($sql);
-        $statement->execute($params);
+        $statement->execute($this->databaseValues($params));
 
         return $statement;
     }
@@ -161,6 +162,7 @@ final class PdoDatabase implements TransactionManager
             throw new InvalidArgumentException('Insert PDO deve receber ao menos um campo.');
         }
 
+        $data = $this->databaseValues($data);
         $columns = array_keys($data);
         $placeholders = array_map(static fn (string $column): string => ':' . $column, $columns);
         $sql = "INSERT INTO $table (" . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')';
@@ -199,7 +201,7 @@ final class PdoDatabase implements TransactionManager
 
             $placeholder = 'set_' . $column;
             $sets[] = "$column = :$placeholder";
-            $params[$placeholder] = $value;
+            $params[$placeholder] = $this->databaseValue($value);
         }
 
         $whereSql = $this->whereSql($where, $params);
@@ -276,7 +278,7 @@ final class PdoDatabase implements TransactionManager
                 foreach (array_values($value) as $index => $item) {
                     $placeholder = 'where_' . $column . '_' . $index;
                     $placeholders[] = ":$placeholder";
-                    $params[$placeholder] = $item;
+                    $params[$placeholder] = $this->databaseValue($item);
                 }
 
                 $parts[] = "$column IN (" . implode(', ', $placeholders) . ')';
@@ -285,9 +287,27 @@ final class PdoDatabase implements TransactionManager
 
             $placeholder = 'where_' . $column;
             $parts[] = "$column = :$placeholder";
-            $params[$placeholder] = $value;
+            $params[$placeholder] = $this->databaseValue($value);
         }
 
         return implode(' AND ', $parts);
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function databaseValues(array $values): array
+    {
+        foreach ($values as $key => $value) {
+            $values[$key] = $this->databaseValue($value);
+        }
+
+        return $values;
+    }
+
+    private function databaseValue(mixed $value): mixed
+    {
+        return $value instanceof Insertable ? $value->value() : $value;
     }
 }

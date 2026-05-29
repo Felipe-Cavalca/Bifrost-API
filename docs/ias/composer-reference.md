@@ -51,6 +51,8 @@ Attributes de lifecycle implementam `BeforeRequestAttribute` ou
 ## DataTypes
 
 DataTypes implementam `Bifrost\Framework\Contracts\DataType`.
+DataTypes reutilizaveis tambem implementam `Insertable`, entao podem ser
+passados para o banco e convertidos para `value()` antes de executar SQL.
 
 Use quando o valor possui regra propria ou aparece em mais de um fluxo.
 Exemplos: `Email`, `Uuid`, `Cpf`, `Cnpj`, `Url`, `Json`, `Base64`,
