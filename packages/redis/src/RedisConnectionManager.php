@@ -15,11 +15,17 @@ final class RedisConnectionManager implements RedisConnectionFactory
     /** @var array<string, Redis> */
     private array $connections = [];
 
+    /**
+     * @param RedisConnectionFactory $factory Factory concreta usada ao abrir conexoes novas.
+     */
     public function __construct(
         private readonly RedisConnectionFactory $factory = new NativeRedisConnectionFactory()
     ) {
     }
 
+    /**
+     * Retorna uma conexao Redis reutilizada para a configuracao informada.
+     */
     public function connect(RedisConfig $config): Redis
     {
         $key = $config->fingerprint();

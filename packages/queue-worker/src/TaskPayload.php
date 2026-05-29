@@ -9,6 +9,12 @@ use JsonSerializable;
 
 final class TaskPayload implements JsonSerializable
 {
+    /**
+     * @param string $task Nome pesquisavel da tarefa.
+     * @param array<string, mixed> $data Dados serializaveis da tarefa.
+     * @param int $attempts Quantidade de tentativas ja registradas.
+     * @param int $maxAttempts Limite maximo de tentativas.
+     */
     public function __construct(
         private readonly string $task,
         private readonly array $data = [],
@@ -30,6 +36,11 @@ final class TaskPayload implements JsonSerializable
         self::assertSerializableArray($this->data);
     }
 
+    /**
+     * Cria um payload validado a partir dos dados vindos da fila.
+     *
+     * @param array<string, mixed> $payload
+     */
     public static function fromArray(array $payload): self
     {
         $task = $payload['task'] ?? null;
@@ -50,26 +61,43 @@ final class TaskPayload implements JsonSerializable
         );
     }
 
+    /**
+     * Retorna o nome da tarefa.
+     */
     public function task(): string
     {
         return $this->task;
     }
 
+    /**
+     * Retorna os dados serializaveis da tarefa.
+     *
+     * @return array<string, mixed>
+     */
     public function data(): array
     {
         return $this->data;
     }
 
+    /**
+     * Retorna a quantidade de tentativas ja feitas.
+     */
     public function attempts(): int
     {
         return $this->attempts;
     }
 
+    /**
+     * Retorna o limite maximo de tentativas.
+     */
     public function maxAttempts(): int
     {
         return $this->maxAttempts;
     }
 
+    /**
+     * Retorna uma nova instancia com uma falha registrada.
+     */
     public function withRecordedFailure(): self
     {
         return new self(
@@ -80,11 +108,19 @@ final class TaskPayload implements JsonSerializable
         );
     }
 
+    /**
+     * Indica se a tarefa ainda pode ser reenfileirada.
+     */
     public function canRetry(): bool
     {
         return $this->attempts < $this->maxAttempts;
     }
 
+    /**
+     * Serializa o payload para gravacao na fila.
+     *
+     * @return array{task: string, data: array<string, mixed>, attempts: int, max_attempts: int}
+     */
     public function toArray(): array
     {
         return [
@@ -95,6 +131,9 @@ final class TaskPayload implements JsonSerializable
         ];
     }
 
+    /**
+     * @return array{task: string, data: array<string, mixed>, attempts: int, max_attempts: int}
+     */
     public function jsonSerialize(): array
     {
         return $this->toArray();

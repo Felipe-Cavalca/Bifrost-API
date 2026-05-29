@@ -9,12 +9,19 @@ use Redis;
 
 final class RedisCache implements CacheStore
 {
+    /**
+     * @param Redis $redis Conexao Redis reutilizavel.
+     * @param string $prefix Prefixo aplicado nas chaves.
+     */
     public function __construct(
         private readonly Redis $redis,
         private readonly string $prefix = ''
     ) {
     }
 
+    /**
+     * Recupera um valor serializado do Redis.
+     */
     public function get(string $key): mixed
     {
         $value = $this->redis->get($this->cacheKey($key));
@@ -26,6 +33,9 @@ final class RedisCache implements CacheStore
         return unserialize($value, ['allowed_classes' => true]);
     }
 
+    /**
+     * Armazena um valor serializado no Redis.
+     */
     public function set(string $key, mixed $value, ?int $ttlSeconds = null): void
     {
         $key = $this->cacheKey($key);
@@ -44,6 +54,9 @@ final class RedisCache implements CacheStore
         $this->redis->setex($key, $ttlSeconds, $value);
     }
 
+    /**
+     * Remove uma chave do Redis.
+     */
     public function delete(string $key): void
     {
         $this->redis->del($this->cacheKey($key));

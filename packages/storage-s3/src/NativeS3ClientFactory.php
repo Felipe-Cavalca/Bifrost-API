@@ -12,6 +12,9 @@ use Bifrost\Extension\StorageS3\Contracts\S3ClientFactory;
  */
 final class NativeS3ClientFactory implements S3ClientFactory
 {
+    /**
+     * Cria um cliente S3 usando o AWS SDK oficial.
+     */
     public function client(S3ClientConfig $config): S3Client
     {
         return new S3Client($config->options());

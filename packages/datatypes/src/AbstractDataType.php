@@ -14,6 +14,9 @@ abstract readonly class AbstractDataType implements DataType, JsonSerializable
     {
     }
 
+    /**
+     * Cria e valida uma instancia do DataType.
+     */
     public static function from(mixed $value): static
     {
         if (!static::isValid($value)) {
@@ -23,16 +26,25 @@ abstract readonly class AbstractDataType implements DataType, JsonSerializable
         return new static(static::normalize($value));
     }
 
+    /**
+     * Retorna o valor normalizado.
+     */
     public function value(): mixed
     {
         return $this->value;
     }
 
+    /**
+     * Retorna o valor serializavel.
+     */
     public function jsonSerialize(): mixed
     {
         return $this->value();
     }
 
+    /**
+     * Retorna a representacao textual do valor.
+     */
     public function __toString(): string
     {
         return (string) $this->value();

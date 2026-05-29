@@ -8,6 +8,9 @@ use Bifrost\DataTypes\AbstractDataType;
 
 final readonly class FileName extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e um nome de arquivo valido.
+     */
     public static function isValid(mixed $value): bool
     {
         if (!is_string($value) || $value === '' || strlen($value) > 255) {

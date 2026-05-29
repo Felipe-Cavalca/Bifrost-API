@@ -18,6 +18,10 @@ final class StdoutLogExtension implements Extension
     /** @var Closure(StdoutLogConfig): LogWriter|null */
     private readonly ?Closure $writerFactory;
 
+    /**
+     * @param array{stream?: string} $config Configuracao do stream stdout/stderr.
+     * @param callable|null $writerFactory Factory opcional para testes ou integracao customizada.
+     */
     public function __construct(array $config = [], ?callable $writerFactory = null)
     {
         $this->config = StdoutLogConfig::fromArray($config);
@@ -26,6 +30,9 @@ final class StdoutLogExtension implements Extension
             : Closure::fromCallable($writerFactory);
     }
 
+    /**
+     * Registra o writer stdout/stderr e o logger estruturado.
+     */
     public function register(Application $application): void
     {
         $application->container()->bind(

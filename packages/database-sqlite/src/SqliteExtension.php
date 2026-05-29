@@ -14,10 +14,16 @@ use InvalidArgumentException;
 
 final class SqliteExtension implements Extension
 {
+    /**
+     * @param array<string, mixed> $config Configuracao SQLite unica ou mapa de conexoes.
+     */
     public function __construct(private readonly array $config)
     {
     }
 
+    /**
+     * Registra a factory PDO configurada para SQLite.
+     */
     public function register(Application $application): void
     {
         $factory = new PdoConnectionFactory(config: $this->pdoConfig());

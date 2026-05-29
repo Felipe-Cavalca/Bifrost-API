@@ -12,6 +12,11 @@ final class StdoutLogConfig
     {
     }
 
+    /**
+     * Cria a configuracao a partir de array.
+     *
+     * @param array{stream?: string} $config
+     */
     public static function fromArray(array $config = []): self
     {
         $stream = $config['stream'] ?? 'stdout';
@@ -22,6 +27,9 @@ final class StdoutLogConfig
         return new self($stream);
     }
 
+    /**
+     * Retorna o stream de saida usado pelo writer.
+     */
     public function stream(): string
     {
         return $this->stream;

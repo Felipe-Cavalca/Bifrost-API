@@ -13,6 +13,9 @@ use RuntimeException;
  */
 final class NativeRedisConnectionFactory implements RedisConnectionFactory
 {
+    /**
+     * Abre uma conexao Redis usando ext-redis.
+     */
     public function connect(RedisConfig $config): Redis
     {
         $redis = new Redis();

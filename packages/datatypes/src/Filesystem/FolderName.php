@@ -8,6 +8,9 @@ use Bifrost\DataTypes\AbstractDataType;
 
 final readonly class FolderName extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e um nome de pasta valido.
+     */
     public static function isValid(mixed $value): bool
     {
         return is_string($value)

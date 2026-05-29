@@ -15,11 +15,17 @@ final class S3ClientManager implements S3ClientFactory
     /** @var array<string, S3Client> */
     private array $clients = [];
 
+    /**
+     * @param S3ClientFactory $factory Factory concreta usada ao criar clientes novos.
+     */
     public function __construct(
         private readonly S3ClientFactory $factory = new NativeS3ClientFactory()
     ) {
     }
 
+    /**
+     * Retorna um cliente S3 reutilizado para a configuracao informada.
+     */
     public function client(S3ClientConfig $config): S3Client
     {
         $key = $config->fingerprint();

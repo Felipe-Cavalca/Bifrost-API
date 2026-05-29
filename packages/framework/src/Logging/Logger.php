@@ -22,6 +22,11 @@ final class Logger
     /** @var Closure(): string */
     private readonly Closure $requestIdResolver;
 
+    /**
+     * @param LogWriter $writer Destino estruturado do log.
+     * @param callable|null $timestampResolver Resolver opcional de timestamp, usado em testes.
+     * @param callable|null $requestIdResolver Resolver opcional de request-id, usado em testes.
+     */
     public function __construct(
         private readonly LogWriter $writer,
         ?callable $timestampResolver = null,

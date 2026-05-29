@@ -18,6 +18,10 @@ final class MongoLogExtension implements Extension
     /** @var Closure(MongoLogConfig): LogWriter|null */
     private readonly ?Closure $writerFactory;
 
+    /**
+     * @param array<string, mixed> $config Configuracao MongoDB.
+     * @param callable|null $writerFactory Factory opcional para testes ou integracao customizada.
+     */
     public function __construct(array $config, ?callable $writerFactory = null)
     {
         $this->config = MongoLogConfig::fromArray($config);
@@ -26,6 +30,9 @@ final class MongoLogExtension implements Extension
             : Closure::fromCallable($writerFactory);
     }
 
+    /**
+     * Registra o writer MongoDB e o logger estruturado.
+     */
     public function register(Application $application): void
     {
         $application->container()->bind(

@@ -6,6 +6,9 @@ namespace Bifrost\DataTypes;
 
 final readonly class Uuid extends AbstractDataType
 {
+    /**
+     * Gera um UUID v4 valido.
+     */
     public static function generate(): self
     {
         $bytes = random_bytes(16);
@@ -23,6 +26,9 @@ final readonly class Uuid extends AbstractDataType
         ));
     }
 
+    /**
+     * Verifica se o valor e um UUID valido.
+     */
     public static function isValid(mixed $value): bool
     {
         return is_string($value)

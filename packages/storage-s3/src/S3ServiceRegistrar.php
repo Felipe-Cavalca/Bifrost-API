@@ -12,6 +12,9 @@ use Bifrost\Framework\Application;
  */
 final class S3ServiceRegistrar
 {
+    /**
+     * Registra a factory S3 compartilhada se ainda nao houver uma no container.
+     */
     public static function register(Application $application, ?S3ClientFactory $factory = null): void
     {
         if ($application->container()->has(S3ClientFactory::class)) {

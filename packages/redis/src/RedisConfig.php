@@ -9,6 +9,13 @@ namespace Bifrost\Extension\Redis;
  */
 final class RedisConfig
 {
+    /**
+     * @param string $host Host Redis.
+     * @param int $port Porta Redis.
+     * @param float $timeout Timeout de conexao em segundos.
+     * @param string|null $password Senha Redis opcional.
+     * @param int|null $database Banco Redis opcional.
+     */
     public function __construct(
         public readonly string $host = '127.0.0.1',
         public readonly int $port = 6379,

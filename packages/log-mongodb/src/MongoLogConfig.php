@@ -15,6 +15,11 @@ final class MongoLogConfig
     ) {
     }
 
+    /**
+     * Cria a configuracao a partir de array.
+     *
+     * @param array<string, mixed> $config
+     */
     public static function fromArray(array $config): self
     {
         $database = self::optionalString($config['database'] ?? null);
@@ -31,21 +36,33 @@ final class MongoLogConfig
         );
     }
 
+    /**
+     * Retorna a URI de conexao MongoDB.
+     */
     public function uri(): string
     {
         return $this->uri;
     }
 
+    /**
+     * Retorna o banco onde os logs serao gravados.
+     */
     public function database(): string
     {
         return $this->database;
     }
 
+    /**
+     * Retorna a collection onde os logs serao gravados.
+     */
     public function collection(): string
     {
         return $this->collection;
     }
 
+    /**
+     * Retorna namespace MongoDB no formato database.collection.
+     */
     public function collectionNamespace(): string
     {
         return "{$this->database}.{$this->collection}";

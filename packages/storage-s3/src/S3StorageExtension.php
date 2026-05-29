@@ -16,6 +16,11 @@ final class S3StorageExtension implements Extension
 {
     private readonly S3ClientConfig $clientConfig;
 
+    /**
+     * @param array<string, mixed> $config Configuracao do bucket e do cliente S3.
+     * @param S3Client|null $client Cliente pronto, mantido para compatibilidade.
+     * @param S3ClientFactory|null $clientFactory Factory customizada para criar clientes S3.
+     */
     public function __construct(
         private readonly array $config,
         private readonly ?S3Client $client = null,
@@ -24,6 +29,9 @@ final class S3StorageExtension implements Extension
         $this->clientConfig = S3ClientConfig::fromStorageConfig($config);
     }
 
+    /**
+     * Registra Storage e a factory compartilhada de cliente S3.
+     */
     public function register(Application $application): void
     {
         $clientFactory = $this->clientFactory;
