@@ -8,19 +8,34 @@
 </head>
 <body>
   <main>
-    <a href="index.html">← voltar</a>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
     <section class="section panel">
+      <span class="eyebrow">Instale sob demanda</span>
       <h1>Modulos opcionais</h1>
-      <p>Instale somente o que o projeto precisa.</p>
-      <div class="grid">
-        <div class="card"><h2>Core</h2><p><code>bifrost/framework</code></p></div>
-        <div class="card"><h2>DataTypes</h2><p><code>bifrost/datatypes</code></p></div>
-        <div class="card"><h2>Cache</h2><p><code>cache-apcu</code> ou <code>cache-redis</code></p></div>
-        <div class="card"><h2>Fila</h2><p><code>queue-redis</code> ou processamento sync.</p></div>
-        <div class="card"><h2>Banco</h2><p><code>database-mysql</code> ou <code>database-postgresql</code></p></div>
-        <div class="card"><h2>Storage</h2><p><code>storage-local</code> ou <code>storage-s3</code></p></div>
-      </div>
+      <p class="lead">O core nao carrega fornecedores externos. Cada integracao vive em um pacote Composer proprio.</p>
+      <table class="table">
+        <thead><tr><th>Area</th><th>Pacotes</th><th>Observacao</th></tr></thead>
+        <tbody>
+          <tr><td>Cache</td><td><code>bifrost/cache-apcu</code>, <code>bifrost/cache-redis</code></td><td>Redis usa <code>bifrost/redis</code> automaticamente.</td></tr>
+          <tr><td>Fila</td><td><code>bifrost/queue-redis</code>, <code>bifrost/queue-worker</code></td><td>O worker processa <code>TaskPayload</code> por handlers registrados.</td></tr>
+          <tr><td>Banco</td><td><code>bifrost/database-pdo</code>, MySQL, PostgreSQL, SQLite</td><td>Conexoes PDO sao reutilizadas pela factory.</td></tr>
+          <tr><td>Storage</td><td><code>bifrost/storage-local</code>, <code>bifrost/storage-s3</code></td><td>S3 usa <code>S3ClientFactory</code> e manager compartilhado.</td></tr>
+          <tr><td>Logs</td><td><code>bifrost/log-stdout</code>, <code>bifrost/log-file</code>, <code>bifrost/log-mongodb</code></td><td>Todos expõem o mesmo logger estruturado.</td></tr>
+        </tbody>
+      </table>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>

@@ -8,19 +8,35 @@
 </head>
 <body>
   <main>
-    <a href="index.html">← voltar</a>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
     <section class="section panel">
+      <span class="eyebrow">Request para response</span>
       <h1>Lifecycle HTTP</h1>
-      <p>Da entrada da request ate a resposta final.</p>
-      <div class="flow">
-        <div class="step" style="--i:0"><b>public/index.php</b><span>Entrypoint unico.</span></div>
-        <div class="step" style="--i:1"><b>bootstrap/app.php</b><span>Monta a aplicacao.</span></div>
-        <div class="step" style="--i:2"><b>extensions</b><span>Registra pacotes.</span></div>
-        <div class="step" style="--i:3"><b>attributes</b><span>Valida metodo e dados.</span></div>
-        <div class="step" style="--i:4"><b>controller</b><span>Executa regra do app.</span></div>
-        <div class="step" style="--i:5"><b>response</b><span>Emite HTTP.</span></div>
+      <p class="lead">A request entra pelo front controller, passa pelo kernel, middlewares, rota e controller, e sempre volta como <code>Response</code>.</p>
+      <div class="panel terminal">
+        <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <pre>public/index.php
+  -> Request::fromGlobals()
+  -> Application
+  -> HttpKernel
+  -> middleware
+  -> Router
+  -> ControllerResolver
+  -> ResponseEmitter</pre>
       </div>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>

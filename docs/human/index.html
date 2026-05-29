@@ -8,15 +8,31 @@
 </head>
 <body>
   <main>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
     <section class="hero">
       <div>
-        <span class="badge">Bifrost novo</span>
-        <h1>Framework Composer para criar APIs do zero.</h1>
-        <p>
-          Esta documentacao mostra como iniciar um backend em <code>api/</code>,
-          escolher modulos opcionais e usar attributes, DataTypes, rotas,
-          controllers e Docker.
+        <span class="eyebrow">Framework Composer para APIs</span>
+        <h1>Construa backends pequenos, modulares e previsiveis.</h1>
+        <p class="lead">
+          O Bifrost separa o core HTTP das integracoes opcionais. Projetos novos
+          comecam pelo skeleton e adicionam cache, fila, banco, storage e logs
+          somente quando precisam.
         </p>
+        <div class="actions">
+          <a class="button" href="01-criando-projeto.html">Criar projeto</a>
+          <a class="button secondary" href="04-modulos.html">Ver modulos</a>
+        </div>
       </div>
       <div class="panel terminal">
         <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
@@ -24,18 +40,20 @@
 cd api
 composer create-project bifrost/skeleton .
 cp .env.example .env
-docker compose up --build</pre>
+docker compose up --build
+curl http://localhost:8080/health</pre>
       </div>
     </section>
 
     <section class="grid">
-      <a class="card" href="01-criando-projeto.html"><h2>Criar Projeto</h2><p>Do zero ate o primeiro health check.</p></a>
-      <a class="card" href="02-arquitetura.html"><h2>Arquitetura</h2><p>Como framework, app e extensoes se encaixam.</p></a>
-      <a class="card" href="03-lifecycle.html"><h2>Lifecycle</h2><p>O caminho completo da request.</p></a>
-      <a class="card" href="04-modulos.html"><h2>Modulos</h2><p>Cache, fila, banco, storage e logs sob demanda.</p></a>
-      <a class="card" href="05-attributes-datatypes.html"><h2>Attributes e DataTypes</h2><p>Contratos HTTP e tipagem forte.</p></a>
-      <a class="card" href="06-deploy.html"><h2>Docker e Deploy</h2><p>Ambiente base e perfis opcionais.</p></a>
+      <a class="card" href="01-criando-projeto.html"><h2>Criar Projeto</h2><p>Instalacao do skeleton, estrutura inicial e primeiro health check.</p></a>
+      <a class="card" href="02-arquitetura.html"><h2>Arquitetura</h2><p>Core HTTP, container, extensoes e separacao por pacotes Composer.</p></a>
+      <a class="card" href="03-lifecycle.html"><h2>Lifecycle</h2><p>O caminho da request ate a response, incluindo middleware e controllers.</p></a>
+      <a class="card" href="04-modulos.html"><h2>Modulos</h2><p>Cache, fila, banco, Redis, storage e logs como dependencias opcionais.</p></a>
+      <a class="card" href="05-attributes-datatypes.html"><h2>Attributes e DataTypes</h2><p>Contratos HTTP declarativos e valores tipados reutilizaveis.</p></a>
+      <a class="card" href="06-deploy.html"><h2>Docker e Deploy</h2><p>Compose base, overlays e checks modulares.</p></a>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>

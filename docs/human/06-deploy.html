@@ -8,19 +8,30 @@
 </head>
 <body>
   <main>
-    <a href="index.html">← voltar</a>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
     <section class="section panel">
-      <h1>Docker e Deploy</h1>
-      <p>O skeleton deve iniciar simples e receber overlays quando precisar de infraestrutura.</p>
-      <div class="flow">
-        <div class="step" style="--i:0"><b>base</b><span>PHP + servidor HTTP.</span></div>
-        <div class="step" style="--i:1"><b>redis</b><span>Cache e fila.</span></div>
-        <div class="step" style="--i:2"><b>mysql</b><span>Banco opcional.</span></div>
-        <div class="step" style="--i:3"><b>postgres</b><span>Banco opcional.</span></div>
-        <div class="step" style="--i:4"><b>s3</b><span>Storage externo.</span></div>
-        <div class="step" style="--i:5"><b>logs</b><span>Observabilidade.</span></div>
+      <span class="eyebrow">Ambiente previsivel</span>
+      <h1>Docker e deploy</h1>
+      <p class="lead">O skeleton sobe sem infraestrutura externa. Overlays adicionam Redis, banco ou extensoes PHP conforme os pacotes instalados.</p>
+      <div class="panel terminal">
+        <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <pre>docker compose up --build
+docker compose -f docker-compose.yml -f compose/redis.yml up --build
+docker compose -f docker-compose.yml -f compose/postgresql.yml up --build</pre>
       </div>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>
