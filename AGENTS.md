@@ -16,13 +16,13 @@
 - O alvo novo e distribuicao por Composer, com `packages/` e `skeleton/`.
 - A documentacao deve falar apenas da versao nova.
 - Projeto novo cria backend dentro de `api/` usando `bifrost/skeleton`.
-- Implementacoes novas vivem em `packages/` e `skeleton/`.
 
 ## Areas do repositorio
 
 - `packages/framework/`: nucleo Composer do framework.
 - `packages/*/`: extensoes Composer opcionais.
-- `packages/datatypes/`: DataTypes reutilizaveis para tipagem forte e validacao.
+- `packages/datatype-*/`: DataTypes modulares para tipagem forte e validacao.
+- `packages/datatypes/`: pacote agregador dos DataTypes.
 - `skeleton/`: projeto base publicado como `bifrost/skeleton`.
 - `docs/human/`: documentacao visual para humanos.
 - `docs/ias/`: documentacao objetiva para agentes e IAs.
@@ -53,7 +53,8 @@
 - Crie DataType quando o valor tiver validacao propria, aparecer em mais de um fluxo ou representar conceito do dominio.
 - Nao crie DataType apenas para embrulhar primitivo sem regra.
 - Controllers podem receber dados brutos da request, mas devem converte-los antes de chamar classes de negocio.
-- DataTypes genericos ficam em `packages/datatypes/`.
+- DataTypes genericos ficam em pacotes `packages/datatype-*/`, um pacote por tipo ou grupo pequeno.
+- `packages/datatypes/` deve apenas agregar os DataTypes publicados.
 - DataTypes especificos de infraestrutura ou fornecedor devem ficar no pacote da extensao correspondente.
 
 ## Dependencias
@@ -83,11 +84,24 @@
 
 ## Documentacao
 
+- Toda mudanca em API publica, comportamento documentavel, modulo Composer, DataType, contrato, atributo, fluxo HTTP, instalacao, configuracao, ambiente, observabilidade ou extensao deve atualizar a documentacao correspondente no mesmo trabalho.
 - Mudancas de padrao do projeto devem atualizar `docs/ias/coding-rules.md`.
 - Mudancas de arquitetura, core, observabilidade, ambiente ou contratos publicos devem atualizar `docs/ias/framework-map.md`.
 - Mudancas de distribuicao Composer devem atualizar `docs/ias/packages.md`.
-- Guias para humanos ficam em `docs/human/`.
+- Mudancas que afetam como usuarios usam o framework devem atualizar os guias humanos em `docs/human/`.
+- Mudancas em classes, metodos, parametros, retornos ou PHPDoc de API publica devem regenerar a referencia humana com `tools/generate-human-reference.php`.
 - Guias para IAs/agentes ficam em `docs/ias/`.
+- Se uma mudanca nao exigir documentacao, registre objetivamente o motivo no resumo final.
+
+## Memoria local para agentes
+
+- Use o SQLite em `tmp/agent-memory/bifrost-agent-memory.sqlite` como memoria local auxiliar do projeto.
+- Antes de iniciar uma tarefa, consulte a memoria quando o pedido depender de decisoes anteriores, preferencias do usuario, pendencias ou contexto arquitetural.
+- Ao finalizar uma tarefa relevante, registre um resumo curto na memoria com decisoes, preferencias novas, pendencias e verificacoes executadas.
+- A memoria e apenas apoio: o codigo e a documentacao do repositorio continuam sendo a fonte final da verdade.
+- Nao grave segredos, tokens, credenciais, valores de `.env`, dados pessoais sensiveis ou logs extensos na memoria.
+- Registros devem ser objetivos, em portugues do Brasil, com referencias a arquivos quando util.
+- Se a memoria conflitar com o codigo atual, siga o codigo e atualize a memoria com a decisao corrigida.
 
 ## Escopo
 
