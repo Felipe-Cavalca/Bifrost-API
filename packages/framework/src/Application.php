@@ -6,6 +6,7 @@ namespace Bifrost\Framework;
 
 use Bifrost\Framework\Contracts\Extension;
 use Bifrost\Framework\Http\HttpKernel;
+use Bifrost\Framework\Http\HttpMethod;
 use Bifrost\Framework\Http\Request;
 use Bifrost\Framework\Http\Response;
 use Bifrost\Framework\Http\ResponseEmitter;
@@ -79,9 +80,11 @@ final class Application
     /**
      * Registra uma rota HTTP.
      *
+     * @param string|HttpMethod $method Metodo HTTP aceito pela rota.
+     * @param string $path Path da rota, com ou sem barra inicial.
      * @param mixed $handler Callable ou par [Controller::class, 'metodo'].
      */
-    public function route(string $method, string $path, mixed $handler): self
+    public function route(string|HttpMethod $method, string $path, mixed $handler): self
     {
         $this->router->add(method: $method, path: $path, handler: $handler);
 
@@ -95,7 +98,7 @@ final class Application
      */
     public function get(string $path, mixed $handler): self
     {
-        return $this->route(method: 'GET', path: $path, handler: $handler);
+        return $this->route(method: HttpMethod::Get, path: $path, handler: $handler);
     }
 
     /**
@@ -105,7 +108,7 @@ final class Application
      */
     public function post(string $path, mixed $handler): self
     {
-        return $this->route(method: 'POST', path: $path, handler: $handler);
+        return $this->route(method: HttpMethod::Post, path: $path, handler: $handler);
     }
 
     /**
@@ -115,7 +118,7 @@ final class Application
      */
     public function put(string $path, mixed $handler): self
     {
-        return $this->route(method: 'PUT', path: $path, handler: $handler);
+        return $this->route(method: HttpMethod::Put, path: $path, handler: $handler);
     }
 
     /**
@@ -125,7 +128,7 @@ final class Application
      */
     public function patch(string $path, mixed $handler): self
     {
-        return $this->route(method: 'PATCH', path: $path, handler: $handler);
+        return $this->route(method: HttpMethod::Patch, path: $path, handler: $handler);
     }
 
     /**
@@ -135,7 +138,7 @@ final class Application
      */
     public function delete(string $path, mixed $handler): self
     {
-        return $this->route(method: 'DELETE', path: $path, handler: $handler);
+        return $this->route(method: HttpMethod::Delete, path: $path, handler: $handler);
     }
 
     /**

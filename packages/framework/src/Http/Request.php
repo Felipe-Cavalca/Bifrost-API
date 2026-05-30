@@ -12,11 +12,12 @@ namespace Bifrost\Framework\Http;
  */
 final class Request
 {
+    private readonly HttpMethod $method;
     private readonly array $headers;
     private readonly string $requestId;
 
     /**
-     * @param string $method Metodo HTTP recebido.
+     * @param string|HttpMethod $method Metodo HTTP recebido.
      * @param string $path Path da request, com ou sem barra inicial.
      * @param array<string, mixed> $query Parametros de query string.
      * @param array<string, mixed> $body Corpo decodificado da request.
@@ -24,13 +25,14 @@ final class Request
      * @param string|null $requestId Identificador da request. Se omitido, usa X-Request-Id ou gera um novo.
      */
     public function __construct(
-        private readonly string $method,
+        string|HttpMethod $method,
         private readonly string $path,
         private readonly array $query = [],
         private readonly array $body = [],
         array $headers = [],
         ?string $requestId = null
     ) {
+        $this->method = HttpMethod::fromValue($method);
         $this->headers = self::normalizeHeaders($headers);
         $this->requestId = self::resolveRequestId($this->headers, $requestId);
     }
@@ -61,7 +63,15 @@ final class Request
      */
     public function method(): string
     {
-        return strtoupper($this->method);
+        return $this->method->value;
+    }
+
+    /**
+     * Retorna o metodo HTTP como enum.
+     */
+    public function httpMethod(): HttpMethod
+    {
+        return $this->method;
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Bifrost\Framework\Attributes;
 
 use Attribute;
 use Bifrost\Framework\Contracts\RequestValidatorAttribute;
+use Bifrost\Framework\Http\HttpMethod;
 use Bifrost\Framework\Http\Request;
 use Bifrost\Framework\Http\Response;
 
@@ -20,15 +21,18 @@ use Bifrost\Framework\Http\Response;
  */
 final class Method implements RequestValidatorAttribute
 {
-    /** @var list<string> */
+    /** @var list<HttpMethod> */
     private array $methods;
 
     /**
-     * @param string ...$methods Metodos HTTP aceitos, como GET, POST, PUT, PATCH ou DELETE.
+     * @param string|HttpMethod ...$methods Metodos HTTP aceitos, como GET, POST, PUT, PATCH ou DELETE.
      */
-    public function __construct(string ...$methods)
+    public function __construct(string|HttpMethod ...$methods)
     {
-        $this->methods = array_map('strtoupper', $methods);
+        $this->methods = array_map(
+            static fn (string|HttpMethod $method): HttpMethod => HttpMethod::fromValue($method),
+            $methods
+        );
     }
 
     /**
@@ -38,14 +42,16 @@ final class Method implements RequestValidatorAttribute
      */
     public function validate(Request $request): ?Response
     {
-        if (in_array($request->method(), $this->methods, true)) {
+        if (in_array($request->httpMethod(), $this->methods, true)) {
             return null;
         }
+
+        $allowedMethods = array_map(static fn (HttpMethod $method): string => $method->value, $this->methods);
 
         return Response::json(
             payload: ['message' => sprintf('Method %s is not allowed for this endpoint.', $request->method())],
             status: 405,
-            headers: ['Allow' => implode(', ', $this->methods)]
+            headers: ['Allow' => implode(', ', $allowedMethods)]
         );
     }
 
@@ -54,6 +60,6 @@ final class Method implements RequestValidatorAttribute
      */
     public function options(): array
     {
-        return ['methods' => $this->methods];
+        return ['methods' => array_map(static fn (HttpMethod $method): string => $method->value, $this->methods)];
     }
 }
