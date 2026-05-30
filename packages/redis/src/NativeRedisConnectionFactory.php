@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\Redis;
 
+use Bifrost\Extension\Redis\Contracts\RedisClient;
 use Bifrost\Extension\Redis\Contracts\RedisConnectionFactory;
 use Redis;
 use RuntimeException;
@@ -14,9 +15,9 @@ use RuntimeException;
 final class NativeRedisConnectionFactory implements RedisConnectionFactory
 {
     /**
-     * Abre uma conexao Redis usando ext-redis.
+     * Abre uma conexao Redis usando ext-redis e retorna o adapter Bifrost.
      */
-    public function connect(RedisConfig $config): Redis
+    public function connect(RedisConfig $config): RedisClient
     {
         $redis = new Redis();
         $connected = $redis->connect($config->host, $config->port, $config->timeout);
@@ -33,6 +34,6 @@ final class NativeRedisConnectionFactory implements RedisConnectionFactory
             $redis->select($config->database);
         }
 
-        return $redis;
+        return new NativeRedisClient($redis);
     }
 }

@@ -7,6 +7,7 @@
 - `HttpKernel`: lifecycle HTTP.
 - `Request`: metodo, path, query, body, headers e request-id.
 - `Response`: JSON/texto/status/headers e helpers HTTP comuns.
+- `HttpMethod`: enum de metodos HTTP suportados.
 - `HttpStatusCode`: enum de status HTTP comuns e classificacao por familia.
 - `Router` e `Route`: roteamento HTTP.
 - `ControllerResolver`: invoca controllers e valida attributes.
@@ -49,8 +50,10 @@
 
 ## Extensoes de Infraestrutura
 
-- `bifrost/redis` fornece `RedisConnectionFactory` e `RedisConnectionManager`.
-- Extensoes Redis devem usar `RedisConnectionFactory` em vez de abrir conexoes diretamente.
-- Conexoes Redis equivalentes sao reutilizadas pelo `RedisConnectionManager`.
+- `bifrost/redis` fornece `RedisClient`, `RedisConnectionFactory` e `RedisConnectionManager`.
+- Extensoes Redis devem depender de `RedisClient`, nunca da classe nativa `Redis`.
+- A classe nativa `Redis` fica encapsulada em `NativeRedisClient`/`NativeRedisConnectionFactory`.
+- Clientes Redis equivalentes sao reutilizados pelo `RedisConnectionManager`.
+- Implementacoes futuras de cluster, roteamento de leitura/escrita ou balanceamento devem implementar `RedisClient`.
 - `bifrost/storage-s3` fornece `S3ClientFactory` e `S3ClientManager`.
 - Extensoes S3 devem usar `S3ClientFactory` em vez de criar `S3Client` diretamente.

@@ -70,13 +70,17 @@ Exemplos: `Email`, `Uuid`, `Cpf`, `Cnpj`, `Url`, `Json`, `Base64`,
 `bifrost/redis` fornece:
 
 - `RedisConfig`
+- `RedisClient`
 - `RedisConnectionFactory`
+- `NativeRedisClient`
 - `NativeRedisConnectionFactory`
 - `RedisConnectionManager`
 - `RedisExtension`
 
-Extensoes Redis devem pedir `RedisConnectionFactory` ao container. O manager
-reutiliza a mesma conexao para configuracoes iguais.
+Extensoes Redis devem receber `RedisClient` pela factory compartilhada e nao
+usar a classe nativa `Redis` diretamente. O manager reutiliza o mesmo cliente
+para configuracoes iguais. Implementacoes futuras de cluster, leitura/escrita
+separadas ou balanceamento devem trocar a implementacao de `RedisClient`.
 
 ## Fila e Worker
 

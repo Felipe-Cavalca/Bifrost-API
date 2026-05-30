@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\Redis;
 
+use Bifrost\Extension\Redis\Contracts\RedisClient;
 use Bifrost\Extension\Redis\Contracts\RedisConnectionFactory;
-use Redis;
 
 /**
- * Reutiliza conexoes Redis por configuracao.
+ * Reutiliza clientes Redis por configuracao.
  */
 final class RedisConnectionManager implements RedisConnectionFactory
 {
-    /** @var array<string, Redis> */
+    /** @var array<string, RedisClient> */
     private array $connections = [];
 
     /**
@@ -24,9 +24,9 @@ final class RedisConnectionManager implements RedisConnectionFactory
     }
 
     /**
-     * Retorna uma conexao Redis reutilizada para a configuracao informada.
+     * Retorna um cliente Redis reutilizado para a configuracao informada.
      */
-    public function connect(RedisConfig $config): Redis
+    public function connect(RedisConfig $config): RedisClient
     {
         $key = $config->fingerprint();
 

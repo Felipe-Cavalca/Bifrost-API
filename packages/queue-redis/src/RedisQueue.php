@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\QueueRedis;
 
+use Bifrost\Extension\Redis\Contracts\RedisClient;
 use Bifrost\Framework\Contracts\Queue;
-use Redis;
 use UnexpectedValueException;
 
 final class RedisQueue implements Queue
 {
     /**
-     * @param Redis $redis Conexao Redis reutilizavel.
+     * @param RedisClient $redis Cliente Redis reutilizavel.
      * @param string $prefix Prefixo aplicado nas filas.
      */
     public function __construct(
-        private readonly Redis $redis,
+        private readonly RedisClient $redis,
         private readonly string $prefix = ''
     ) {
     }

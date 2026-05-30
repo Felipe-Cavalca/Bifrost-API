@@ -20,7 +20,7 @@
 | `bifrost/datatype-storage-key` | DataType StorageKey |
 | `bifrost/datatypes` | Agregador com todos os DataTypes |
 | `bifrost/cache-apcu` | Cache local APCu |
-| `bifrost/redis` | Conexao Redis reutilizavel para extensoes |
+| `bifrost/redis` | Cliente Redis encapsulado e reutilizavel para extensoes |
 | `bifrost/cache-redis` | Cache Redis |
 | `bifrost/queue-redis` | Fila Redis |
 | `bifrost/database-pdo` | Base PDO |
