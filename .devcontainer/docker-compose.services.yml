@@ -1,4 +1,4 @@
-name: bifrost-modular-test
+name: bifrost-devcontainer
 
 services:
   redis:
@@ -29,18 +29,6 @@ services:
       timeout: 5s
       retries: 20
 
-  tests:
-    build:
-      context: ../..
-      dockerfile: docker/modular/Dockerfile.test
-    environment:
-      REDIS_HOST: redis
-      MYSQL_HOST: mysql
-      POSTGRES_HOST: postgres
-    depends_on:
-      mysql:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
+networks:
+  default:
+    name: bifrost-devcontainer

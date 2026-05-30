@@ -126,7 +126,7 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |   |   |-- config/
 |   |   `-- routes/
 |   `-- public/
-|-- docker/modular/
+|-- .devcontainer/
 |-- docs/
 `-- .github/workflows/
 ```
@@ -150,15 +150,19 @@ public/index.php
 
 ## Desenvolvimento
 
-O ecossistema completo e testado em containers:
+O ecossistema completo e testado diretamente dentro do Dev Container:
 
 ```bash
-docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests
+sh .devcontainer/check.sh
 ```
 
 O Dockerfile distribuido com o skeleton resolve pacotes pelo repositorio
 Composer publicado. Durante desenvolvimento deste monorepo, use a verificacao
 modular acima, que injeta dependencias locais por `path`.
+
+Uma maquina de desenvolvimento precisa apenas de Docker, Visual Studio Code e
+a extensao Dev Containers. O ambiente em `.devcontainer/` instala PHP,
+Composer e extensoes, alem de subir Redis, MySQL e PostgreSQL.
 
 ## Documentacao
 

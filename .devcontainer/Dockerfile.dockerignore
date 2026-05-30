@@ -1,7 +1,6 @@
 .git
 .github
 .vscode
-.devcontainer
 
 **/vendor
 **/.phpunit.cache
@@ -9,9 +8,7 @@
 **/.php-cs-fixer.cache
 
 tmp
-api/tmp
 storage
-api/storage
 
 *.log
 .env

@@ -8,10 +8,10 @@ Antes de finalizar:
 - DataTypes alterado: teste de `packages/datatypes`
 - extensao alterada: teste do pacote especifico
 - skeleton alterado: teste de `skeleton`
-- mudanca central: `docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests`
+- mudanca central: `sh .devcontainer/check.sh` dentro do Dev Container
 
 Depois de rodar Docker:
 
 ```bash
-docker compose -f docker/modular/docker-compose.test.yml down --volumes
+docker compose -f .devcontainer/docker-compose.services.yml down --volumes
 ```

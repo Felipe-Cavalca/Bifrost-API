@@ -32,7 +32,9 @@
 - Use Docker, Docker Compose ou Dev Container para comandos do projeto sempre que possivel.
 - Nao instale dependencias na maquina local; instale apenas dentro de container.
 - Dentro de containers do projeto, instalacoes e comandos necessarios para a tarefa estao liberados.
-- O ambiente modular oficial e `docker/modular/docker-compose.test.yml`.
+- O ambiente modular oficial e o Dev Container em `.devcontainer/`.
+- Execute a suite completa diretamente dentro do Dev Container com
+  `sh .devcontainer/check.sh`.
 - O Docker em `api/Docker/` e referencia antiga; nao use como modelo do Composer novo.
 
 ## Codigo orientado a agentes
@@ -77,7 +79,7 @@
 
 ## Verificacoes
 
-- Monorepo modular: `docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests`.
+- Monorepo modular: `sh .devcontainer/check.sh` dentro do Dev Container.
 - Pacote especifico: rode `composer check` ou `composer test` dentro do pacote alterado.
 - Mudancas em core, contratos, lifecycle HTTP, attributes ou DataTypes exigem testes no pacote afetado.
 - Rode checks de `api/` apenas quando alterar `api/`.
