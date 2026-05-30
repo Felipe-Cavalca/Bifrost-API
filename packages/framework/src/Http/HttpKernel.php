@@ -88,16 +88,9 @@ final class HttpKernel
             return Response::notFound();
         }
 
-        $result = $this->controllerResolver->invoke($route->handler(), $request);
-        if ($result instanceof Response) {
-            return $result;
-        }
-
-        if (is_array($result)) {
-            return Response::json(payload: $result);
-        }
-
-        return Response::text((string) $result);
+        return Response::fromResult(
+            $this->controllerResolver->invoke($route->handler(), $request)
+        );
     }
 
     /**

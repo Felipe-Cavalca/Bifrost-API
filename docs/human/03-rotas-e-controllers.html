@@ -24,7 +24,7 @@
             <article class="article">
                 <span class="eyebrow">Usando o framework</span>
                 <h1>Rotas e controllers</h1>
-                <p class="lead">Rotas conectam uma URL a uma ação. Controllers executam essa ação e retornam um objeto <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a>.</p>
+                <p class="lead">Rotas conectam uma URL a uma ação. Controllers executam essa ação e retornam um objeto <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a> ou um objeto de domínio que implemente <a href="referencia/bifrost-framework-contracts-responseable.html"><code>Responseable</code></a>.</p>
 
                 <h2>Controller simples</h2>
                 <p>Um controller recebe <a href="referencia/bifrost-framework-http-request.html"><code>Request</code></a> quando precisa ler dados da chamada e retorna <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a> para enviar o resultado.</p>
@@ -55,7 +55,7 @@ final class CreateUserController
                 <ul>
                     <li>Use nomes claros, como <code>CreateUserController</code> ou <code>ListOrdersController</code>.</li>
                     <li>Converta dados brutos da request antes de chamar regras de negócio.</li>
-                    <li>Retorne sempre <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a>, evitando saída direta com <code>echo</code>.</li>
+                    <li>Retorne <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a> ou <a href="referencia/bifrost-framework-contracts-responseable.html"><code>Responseable</code></a>, evitando saída direta com <code>echo</code>.</li>
                     <li>Consulte a <a href="referencia/index.html">referência pública</a> quando quiser ver parâmetros e retornos.</li>
                 </ul>
 

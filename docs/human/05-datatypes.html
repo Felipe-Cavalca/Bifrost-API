@@ -58,6 +58,10 @@
     'email' =&gt; Email::from('dev@example.com'),
 ]);</code></pre>
 
+                <h2>Retorno HTTP</h2>
+                <p>DataTypes baseados em <code>AbstractDataType</code> também implementam <a href="referencia/bifrost-framework-contracts-responseable.html"><code>Responseable</code></a>. Quando fizer sentido retornar somente esse valor, o controller pode devolver o DataType diretamente.</p>
+                <pre><code class="language-php">return Uuid::from('11a9d0a2-6901-4abc-85f9-6c5f985c5981');</code></pre>
+
                 <div class="next">
                     <a href="04-request-response.html">Request e response</a>
                     <a href="datatypes/email.html">Email</a>

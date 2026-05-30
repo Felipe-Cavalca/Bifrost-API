@@ -11,7 +11,7 @@
 ## Controllers
 
 - Recebem `Request`.
-- Retornam `Response`, array ou string.
+- Retornam `Response`, `Responseable`, array ou string.
 - Devem converter dados brutos em DTOs/DataTypes antes de chamar regra de negocio.
 
 ## DataTypes
@@ -19,7 +19,8 @@
 - Implementam `Bifrost\Framework\Contracts\DataType`.
 - Devem validar entrada.
 - Devem expor `value()`.
-- Devem ser serializaveis quando fizer sentido.
+- Devem implementar `Responseable` quando puderem ser retornados diretamente
+  por controllers.
 
 ## Attributes
 

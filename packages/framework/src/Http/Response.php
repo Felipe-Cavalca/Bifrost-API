@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bifrost\Framework\Http;
 
+use Bifrost\Framework\Contracts\Responseable;
 use JsonException;
 
 /**
@@ -29,12 +30,12 @@ final class Response
     /**
      * Cria uma resposta JSON.
      *
-     * @param array<string, mixed> $payload Payload serializado para JSON.
+     * @param mixed $payload Payload serializado para JSON.
      * @param int $status Codigo HTTP da resposta.
      * @param array<string, string> $headers Headers adicionais.
      * @throws JsonException
      */
-    public static function json(array $payload, int $status = 200, array $headers = []): self
+    public static function json(mixed $payload, int $status = 200, array $headers = []): self
     {
         $headers['Content-Type'] = 'application/json; charset=utf-8';
 
@@ -43,6 +44,33 @@ final class Response
             status: $status,
             headers: $headers
         );
+    }
+
+    /**
+     * Converte o retorno de um controller em resposta HTTP.
+     *
+     * Objetos arbitrarios nao sao serializados automaticamente. Implemente
+     * Responseable para declarar explicitamente quais dados podem ser expostos.
+     *
+     * @param mixed $result Resultado retornado pelo controller.
+     * @return self Resposta HTTP pronta para emissao.
+     * @throws JsonException
+     */
+    public static function fromResult(mixed $result): self
+    {
+        if ($result instanceof self) {
+            return $result;
+        }
+
+        if ($result instanceof Responseable) {
+            return self::json(payload: $result->jsonSerialize());
+        }
+
+        if (is_array($result)) {
+            return self::json(payload: $result);
+        }
+
+        return self::text((string) $result);
     }
 
     /**

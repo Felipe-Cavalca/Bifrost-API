@@ -40,6 +40,24 @@ $requestId = $request-&gt;header('X-Request-Id');</code></pre>
     'status' =&gt; 'created',
 ], 201);</code></pre>
 
+                <h2>Retornando objetos diretamente</h2>
+                <p>Objetos de domínio, como um usuário ou arquivo, podem implementar <a href="referencia/bifrost-framework-contracts-responseable.html"><code>Responseable</code></a>. O controller pode retornar o objeto diretamente e o framework converte o resultado em JSON. Exponha somente campos seguros em <code>jsonSerialize()</code>.</p>
+                <pre><code class="language-php">final readonly class User implements Responseable
+{
+    public function __construct(
+        private Uuid $id,
+        private Email $email,
+    ) {
+    }
+
+    public function jsonSerialize(): array
+    {
+        return ['id' =&gt; $this-&gt;id, 'email' =&gt; $this-&gt;email];
+    }
+}
+
+return $user;</code></pre>
+
                 <h2>Erros previsíveis</h2>
                 <p>Quando precisar interromper a request com um status HTTP, use <a href="referencia/bifrost-framework-exceptions-httpexception.html"><code>HttpException</code></a> para manter o formato de erro consistente.</p>
                 <pre><code class="language-php">throw new HttpException(404, 'Registro não encontrado.');</code></pre>

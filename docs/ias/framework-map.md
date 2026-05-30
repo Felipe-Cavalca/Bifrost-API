@@ -6,7 +6,8 @@
 - `Container`: registro e resolucao de dependencias.
 - `HttpKernel`: lifecycle HTTP.
 - `Request`: metodo, path, query, body, headers e request-id.
-- `Response`: JSON/texto/status/headers e helpers HTTP comuns.
+- `Response`: JSON/texto/status/headers, helpers HTTP comuns e conversao do
+  retorno de controllers.
 - `HttpMethod`: enum de metodos HTTP suportados.
 - `HttpStatusCode`: enum de status HTTP comuns e classificacao por familia.
 - `Router` e `Route`: roteamento HTTP.
@@ -47,6 +48,7 @@
 - `TransactionManager`
 - `LogWriter`
 - `Insertable`
+- `Responseable`
 
 ## Extensoes de Infraestrutura
 
