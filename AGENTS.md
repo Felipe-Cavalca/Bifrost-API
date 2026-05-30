@@ -24,7 +24,7 @@
 - `packages/datatype-*/`: DataTypes modulares para tipagem forte e validacao.
 - `packages/datatypes/`: pacote agregador dos DataTypes.
 - `skeleton/`: projeto base publicado como `bifrost/skeleton`.
-- `docs/human/`: documentacao visual para humanos.
+- `docs/html/`: documentacao visual para humanos e publicacao no GitHub Pages.
 - `docs/ias/`: documentacao objetiva para agentes e IAs.
 
 ## Ambiente
@@ -90,8 +90,8 @@
 - Mudancas de padrao do projeto devem atualizar `docs/ias/coding-rules.md`.
 - Mudancas de arquitetura, core, observabilidade, ambiente ou contratos publicos devem atualizar `docs/ias/framework-map.md`.
 - Mudancas de distribuicao Composer devem atualizar `docs/ias/packages.md`.
-- Mudancas que afetam como usuarios usam o framework devem atualizar os guias humanos em `docs/human/`.
-- Mudancas em classes, metodos, parametros, retornos ou PHPDoc de API publica devem regenerar a referencia humana com `tools/generate-human-reference.php`.
+- Mudancas que afetam como usuarios usam o framework devem atualizar os guias humanos em `docs/html/`.
+- Mudancas em classes, metodos, parametros, retornos ou PHPDoc de API publica devem regenerar a referencia humana com `php docs/generate-reference.php`.
 - Guias para IAs/agentes ficam em `docs/ias/`.
 - Se uma mudanca nao exigir documentacao, registre objetivamente o motivo no resumo final.
 

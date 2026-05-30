@@ -1,0 +1,44 @@
+name: Publicar documentacao no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/html/**'
+      - '.github/workflows/publish-docs-pages.yml'
+  repository_dispatch:
+    types: [tag-created]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.tag || github.sha }}
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar documentacao estatica
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/html
+
+      - name: Publicar documentacao
+        id: deployment
+        uses: actions/deploy-pages@v4

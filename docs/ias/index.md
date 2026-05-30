@@ -15,7 +15,7 @@ O foco e criar e manter projetos novos usando Composer, `bifrost/framework`,
 - Core fica em `packages/framework`.
 - DataTypes ficam em `packages/datatypes`.
 - Infra opcional fica em extensoes Composer.
-- Sempre atualize `docs/human` e `docs/ias` quando mudar comportamento publico.
+- Sempre atualize `docs/html` e `docs/ias` quando mudar comportamento publico.
 
 ## Mapa
 

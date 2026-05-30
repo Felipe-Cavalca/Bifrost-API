@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $packagesDir = $root . '/packages';
-$outputDir = $root . '/docs/human/referencia';
+$outputDir = $root . '/docs/html/referencia';
 
 ensureDirectory($outputDir);
 

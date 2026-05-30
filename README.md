@@ -166,8 +166,12 @@ Composer e extensoes, alem de subir Redis, MySQL e PostgreSQL.
 
 ## Documentacao
 
-- [Documentacao humana](docs/human/index.html)
+- [Documentacao humana](docs/html/index.html)
 - [Documentacao para IAs](docs/ias/index.md)
+
+A documentacao humana em `docs/html/` e publicada no GitHub Pages quando a
+branch `main` recebe alteracoes ou quando o workflow de release dispara
+`tag-created`.
 
 ## Licenca
 

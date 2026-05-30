@@ -14,7 +14,7 @@ Escopo:
 Regras:
 - PSR-4
 - testes para comportamento novo
-- docs/human e docs/ias quando mudar uso publico
+- docs/html e docs/ias quando mudar uso publico
 - nao commit sem autorizacao
 
 Verificacoes:

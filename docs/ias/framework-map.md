@@ -68,3 +68,10 @@
 - Redis, MySQL e PostgreSQL sobem por `.devcontainer/docker-compose.services.yml`.
 - A suite modular completa roda dentro do Dev Container com
   `sh .devcontainer/check.sh`.
+
+## Documentacao Publicada
+
+- A documentacao visual fica em `docs/html/`.
+- `php docs/generate-reference.php` regenera a referencia de API publica.
+- `.github/workflows/publish-docs-pages.yml` publica `docs/html/` no GitHub
+  Pages em mudancas da `main` e no evento `tag-created`.
