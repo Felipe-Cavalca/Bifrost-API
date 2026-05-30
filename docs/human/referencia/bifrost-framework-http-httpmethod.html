@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Queue - Referência Bifrost</title>
+    <title>HttpMethod - Referência Bifrost</title>
     <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
                 <section class="nav-section"><p class="nav-title">Entrega</p><a href="../06-deploy.html" class="nav-link">Docker e deploy</a></section>
             </nav>
         </aside>
-        <main class="content"><article class="article"><span class="eyebrow">interface</span><h1>Queue</h1><p class="lead"><code>Bifrost\Framework\Contracts\Queue</code></p><p>Contrato para adaptadores de fila.</p><div class="callout"><p>Fonte: <code>packages/framework/src/Contracts/Queue.php:10</code></p></div><h2>Métodos públicos</h2><section class="method"><h3 id="push">push()</h3><p>Publica uma mensagem em uma fila.</p><pre><code class="language-php">public function push(string $queue, array $payload): void</code></pre><p class="source-ref">Fonte: <code>packages/framework/src/Contracts/Queue.php:17</code></p><table><thead><tr><th>Item</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>$queue</code></td><td>string</td><td></td></tr><tr><td><code>$payload</code></td><td>array&lt;string,mixed&gt;</td><td>Dados serializaveis da mensagem.</td></tr><tr><td><strong>retorno</strong></td><td>void</td><td></td></tr></tbody></table></section><section class="method"><h3 id="pop">pop()</h3><p>Consome uma mensagem da fila.</p><pre><code class="language-php">public function pop(string $queue): ?array</code></pre><p class="source-ref">Fonte: <code>packages/framework/src/Contracts/Queue.php:24</code></p><table><thead><tr><th>Item</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>$queue</code></td><td>string</td><td></td></tr><tr><td><strong>retorno</strong></td><td>array&lt;string,mixed&gt;|null</td><td>Payload da mensagem ou null quando nao houver item.</td></tr></tbody></table></section><div class="next"><a href="index.html">Referência</a><span></span></div></article></main>
+        <main class="content"><article class="article"><span class="eyebrow">enum</span><h1>HttpMethod</h1><p class="lead"><code>Bifrost\Framework\Http\HttpMethod</code></p><p>Metodos HTTP aceitos pelo roteador e pela request.</p><div class="callout"><p>Fonte: <code>packages/framework/src/Http/HttpMethod.php:12</code></p></div><h2>Métodos públicos</h2><section class="method"><h3 id="fromValue">fromValue()</h3><p>Normaliza uma string ou enum para HttpMethod.</p><pre><code class="language-php">public static function fromValue(string|self $method): self</code></pre><p class="source-ref">Fonte: <code>packages/framework/src/Http/HttpMethod.php:28</code></p><table><thead><tr><th>Item</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>$method</code></td><td>string|self</td><td>Metodo HTTP como string ou enum.</td></tr><tr><td><strong>retorno</strong></td><td>self</td><td>Metodo HTTP normalizado.</td></tr></tbody></table></section><div class="next"><a href="index.html">Referência</a><span></span></div></article></main>
     </div>
     <script src="../assets/app.js"></script>
 </body>

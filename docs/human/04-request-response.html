@@ -16,6 +16,7 @@
                 <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="index.html" class="nav-link">Visão geral</a><a href="01-instalacao.html" class="nav-link">Instalação</a><a href="02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
                 <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="04-request-response.html" class="nav-link">Request e response</a><a href="05-datatypes.html" class="nav-link">DataTypes</a></section>
                 <section class="nav-section"><p class="nav-title">Módulos</p><a href="modulos/index.html" class="nav-link">Todos os módulos</a><a href="modulos/cache.html" class="nav-link">Cache</a><a href="modulos/redis.html" class="nav-link">Redis</a><a href="modulos/database.html" class="nav-link">Banco de dados</a><a href="modulos/storage.html" class="nav-link">Storage</a><a href="modulos/logs.html" class="nav-link">Logs</a><a href="modulos/filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Referência</p><a href="referencia/index.html" class="nav-link">API pública</a></section>
                 <section class="nav-section"><p class="nav-title">Entrega</p><a href="06-deploy.html" class="nav-link">Docker e deploy</a></section>
             </nav>
         </aside>
@@ -23,23 +24,24 @@
             <article class="article">
                 <span class="eyebrow">Usando o framework</span>
                 <h1>Request e response</h1>
-                <p class="lead">A request concentra os dados de entrada. A response concentra o que será enviado ao cliente.</p>
+                <p class="lead">A <a href="referencia/bifrost-framework-http-request.html"><code>Request</code></a> concentra os dados de entrada. A <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a> concentra o que será enviado ao cliente.</p>
 
                 <h2>Lendo dados da request</h2>
-                <p>Use a request para acessar body, query string, headers, método e caminho. O controller decide como transformar esses dados em tipos do domínio.</p>
-                <pre><code class="language-php">$email = $request-&gt;body('email');
+                <p>Use métodos de <a href="referencia/bifrost-framework-http-request.html"><code>Request</code></a> para acessar body, query string, headers, método e caminho.</p>
+                <pre><code class="language-php">$email = $request-&gt;input('email');
 $page = $request-&gt;query('page', 1);
 $requestId = $request-&gt;header('X-Request-Id');</code></pre>
+                <p>Referências: <a href="referencia/bifrost-framework-http-request.html#input"><code>Request::input()</code></a>, <a href="referencia/bifrost-framework-http-request.html#query"><code>Request::query()</code></a> e <a href="referencia/bifrost-framework-http-request.html#header"><code>Request::header()</code></a>.</p>
 
                 <h2>Retornando JSON</h2>
-                <p>APIs normalmente retornam JSON. O helper de response evita repetir headers e serialização.</p>
+                <p>APIs normalmente retornam JSON. Use <a href="referencia/bifrost-framework-http-response.html#json"><code>Response::json()</code></a> para evitar repetir headers e serialização.</p>
                 <pre><code class="language-php">return Response::json([
     'id' =&gt; $userId,
     'status' =&gt; 'created',
 ], 201);</code></pre>
 
                 <h2>Erros previsíveis</h2>
-                <p>Quando precisar interromper a request com um status HTTP, use exceções HTTP do framework para manter o formato de erro consistente.</p>
+                <p>Quando precisar interromper a request com um status HTTP, use <a href="referencia/bifrost-framework-exceptions-httpexception.html"><code>HttpException</code></a> para manter o formato de erro consistente.</p>
                 <pre><code class="language-php">throw new HttpException(404, 'Registro não encontrado.');</code></pre>
 
                 <h2>Request ID</h2>
