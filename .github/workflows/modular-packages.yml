@@ -6,7 +6,7 @@ on:
       - 'packages/**'
       - 'skeleton/**'
       - 'docs/**'
-      - 'docs/modular-distribution.md'
+      - '.devcontainer/check.sh'
       - '.github/workflows/modular-packages.yml'
 
 jobs:
@@ -52,42 +52,9 @@ jobs:
           coverage: none
           extensions: json, redis, apcu, mongodb, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite
 
-      - name: Install framework dependencies
-        run: composer install --working-dir=packages/framework --no-interaction --no-progress --prefer-dist
-
-      - name: Test framework
-        run: composer check
-        working-directory: packages/framework
-
-      - name: Test optional packages
+      - name: Validar monorepo Composer
         env:
           REDIS_HOST: 127.0.0.1
           MYSQL_HOST: 127.0.0.1
           POSTGRES_HOST: 127.0.0.1
-        run: |
-          for package in datatypes cache-redis cache-apcu queue-redis queue-worker database-pdo log-mongodb storage-local storage-s3; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework path ../framework
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-          for package in database-mysql database-postgresql database-sqlite; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework path ../framework
-            composer config repositories.database-pdo path ../database-pdo
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-
-      - name: Install skeleton dependencies
-        run: |
-          cd skeleton
-          composer config minimum-stability dev
-          composer config repositories.framework path ../packages/framework
-          composer update --no-interaction --no-progress --prefer-dist
-          composer validate --strict --no-check-publish
-          composer test
+        run: sh .devcontainer/check.sh
