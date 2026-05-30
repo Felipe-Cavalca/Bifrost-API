@@ -16,4 +16,4 @@ api/storage
 *.log
 .env
 .env.*
-!.env.example
+!skeleton/.env.example

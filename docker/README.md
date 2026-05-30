@@ -14,6 +14,7 @@ Os arquivos ficam em `docker/modular/`:
 | --- | --- |
 | `docker-compose.test.yml` | Sobe Redis, MySQL, PostgreSQL e o container de testes. |
 | `Dockerfile.test` | Cria a imagem PHP 8.3 com Composer e extensoes exigidas pela suite. |
+| `Dockerfile.test.dockerignore` | Reduz o contexto enviado ao build modular. |
 | `check.sh` | Valida os pacotes Composer, instala dependencias locais e executa os testes. |
 
 O container `tests` executa o `check.sh`. Os demais containers existem para os

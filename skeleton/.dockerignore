@@ -1,0 +1,14 @@
+.git
+
+vendor
+.phpunit.cache
+.phpstan.cache
+.php-cs-fixer.cache
+
+storage
+tmp
+
+*.log
+.env
+.env.*
+!.env.example
