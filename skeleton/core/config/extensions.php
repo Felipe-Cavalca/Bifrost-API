@@ -15,6 +15,8 @@ use Bifrost\Framework\Contracts\Extension;
 /** @var list<Extension> $extensions */
 $extensions = [];
 
+// Pacotes opcionais nao fazem parte do framework base. Instale apenas o pacote
+// usado pelo projeto e selecione o driver correspondente no ambiente.
 $cacheDriver = getenv('CACHE_DRIVER') ?: '';
 if ($cacheDriver !== '' && !in_array($cacheDriver, ['apcu', 'redis'], true)) {
     throw new RuntimeException('CACHE_DRIVER deve ser apcu ou redis.');
@@ -106,7 +108,7 @@ if ($logDriver === 'file' && !class_exists(FileLogExtension::class)) {
 
 if ($logDriver === 'file') {
     $extensions[] = new FileLogExtension([
-        'path' => getenv('LOG_FILE') ?: dirname(__DIR__) . '/storage/logs/app.log',
+        'path' => getenv('LOG_FILE') ?: dirname(__DIR__, 2) . '/storage/logs/app.log',
     ]);
 }
 

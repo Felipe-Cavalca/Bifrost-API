@@ -1,5 +1,6 @@
 services:
   api:
+    # Instala ext-redis e configura os pacotes opcionais que usam Redis.
     build:
       args:
         INSTALL_REDIS: 1
@@ -12,6 +13,7 @@ services:
         condition: service_healthy
 
   redis:
+    # Servico compartilhado por cache e filas quando ambos forem instalados.
     image: redis:7-alpine
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

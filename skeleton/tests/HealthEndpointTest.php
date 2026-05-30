@@ -9,7 +9,7 @@ final class HealthEndpointTest extends TestCase
 {
     public function testHealthEndpointRespondsWithoutOptionalExtensions(): void
     {
-        $application = require dirname(__DIR__) . '/bootstrap/app.php';
+        $application = require dirname(__DIR__) . '/core/bootstrap/app.php';
 
         $response = $application->handle(new Request(method: 'GET', path: '/health'));
 

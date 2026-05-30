@@ -19,7 +19,7 @@ final class ExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('CACHE_DRIVER deve ser apcu ou redis.');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRequiresInstalledPackageForConfiguredCache(): void
@@ -29,7 +29,7 @@ final class ExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Instale bifrost/cache-apcu');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRejectsUnsupportedDatabaseDriver(): void
@@ -39,7 +39,7 @@ final class ExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('DB_DRIVER deve ser mysql ou postgresql.');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRequiresInstalledPackageForConfiguredDatabase(): void
@@ -49,6 +49,6 @@ final class ExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Instale bifrost/database-mysql');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 }

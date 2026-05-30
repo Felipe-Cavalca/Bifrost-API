@@ -1,5 +1,6 @@
 services:
   api:
+    # Habilita cache local dentro do processo PHP.
     build:
       args:
         INSTALL_APCU: 1

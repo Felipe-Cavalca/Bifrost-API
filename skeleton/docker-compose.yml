@@ -1,5 +1,7 @@
 services:
   api:
+    # Servico minimo da API. Combine este arquivo com overlays em core/compose
+    # somente quando o projeto precisar de cache, Redis ou banco de dados.
     build:
       context: .
       dockerfile: Dockerfile

@@ -10,10 +10,12 @@ Orientar a criacao de um backend Bifrost do zero.
 meu-sistema/
 |-- api/
 |   |-- app/
-|   |-- bootstrap/
-|   |-- config/
+|   |-- core/
+|   |   |-- bootstrap/
+|   |   |-- compose/
+|   |   |-- config/
+|   |   `-- routes/
 |   |-- public/
-|   |-- routes/
 |   |-- tests/
 |   `-- composer.json
 |-- database/
@@ -35,5 +37,10 @@ docker compose up --build
 - Nao use `classmap`.
 - Namespace da aplicacao e `App\`.
 - Entrypoint HTTP e `public/index.php`.
-- Boot da aplicacao e `bootstrap/app.php`.
-- Rotas ficam em `routes/api.php`.
+- Boot da aplicacao e `core/bootstrap/app.php`.
+- Extensoes opcionais ficam em `core/config/extensions.php`.
+- Rotas ficam em `core/routes/api.php`.
+- Overlays Docker Compose ficam em `core/compose/`.
+- Codigo do app segue as pastas `Attributes`, `Contracts`, `DataTypes`,
+  `Enums`, `Http/Controller`, `Integrations`, `Repositories`, `Services`,
+  `Support` e `Worker`.

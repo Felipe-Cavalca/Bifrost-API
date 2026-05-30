@@ -1,5 +1,6 @@
 services:
   api:
+    # Instala PDO MySQL e aponta a aplicacao para o servico abaixo.
     build:
       args:
         INSTALL_MYSQL: 1
@@ -15,6 +16,7 @@ services:
         condition: service_healthy
 
   mysql:
+    # Credenciais locais de desenvolvimento. Use secrets fora deste ambiente.
     image: mysql:8.4
     environment:
       MYSQL_DATABASE: app

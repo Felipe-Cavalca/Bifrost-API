@@ -35,3 +35,17 @@
 ## Regra
 
 Instale apenas o pacote necessario para a feature usada pelo projeto.
+
+## Estrutura do skeleton
+
+O projeto criado por `bifrost/skeleton` separa:
+
+- `core/bootstrap/`, `core/config/`, `core/routes/` e `core/compose/` para
+  infraestrutura basica do projeto;
+- `public/` como unica pasta exposta pelo servidor HTTP;
+- `app/` para codigo do produto;
+- `tests/` para testes da aplicacao.
+
+Dentro de `app/`, use as convencoes `Attributes`, `Contracts`, `DataTypes`,
+`Enums`, `Http/Controller`, `Integrations`, `Repositories`, `Services`,
+`Support` e `Worker`.

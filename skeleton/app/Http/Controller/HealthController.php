@@ -14,6 +14,9 @@ final class HealthController
 {
     /**
      * Retorna status basico da aplicacao.
+     *
+     * Controllers recebem a Request e devolvem uma Response. Quando surgir
+     * regra de negocio, crie um service em app/Services e chame-o daqui.
      */
     public static function show(Request $request): Response
     {

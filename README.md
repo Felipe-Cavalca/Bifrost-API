@@ -51,7 +51,7 @@ composer require bifrost/database-mysql
 composer require bifrost/database-postgresql
 ```
 
-O arquivo `config/extensions.php` do skeleton registra fila instalada e
+O arquivo `core/config/extensions.php` do skeleton registra fila instalada e
 adapters selecionados. Cache e selecionado por `CACHE_DRIVER=apcu|redis`;
 banco, por `DB_DRIVER=mysql|postgresql`.
 
@@ -67,28 +67,28 @@ Com cache APCu:
 
 ```bash
 composer require bifrost/cache-apcu
-docker compose -f docker-compose.yml -f compose/apcu.yml up --build
+docker compose -f docker-compose.yml -f core/compose/apcu.yml up --build
 ```
 
 Com Redis para cache e/ou fila:
 
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
-docker compose -f docker-compose.yml -f compose/redis.yml up --build
+docker compose -f docker-compose.yml -f core/compose/redis.yml up --build
 ```
 
 Com MySQL:
 
 ```bash
 composer require bifrost/database-mysql
-docker compose -f docker-compose.yml -f compose/mysql.yml up --build
+docker compose -f docker-compose.yml -f core/compose/mysql.yml up --build
 ```
 
 Com PostgreSQL:
 
 ```bash
 composer require bifrost/database-postgresql
-docker compose -f docker-compose.yml -f compose/postgresql.yml up --build
+docker compose -f docker-compose.yml -f core/compose/postgresql.yml up --build
 ```
 
 Cada complemento instala na imagem PHP somente a extensao exigida pelo
