@@ -1,6 +1,3 @@
 {
-    "xdebugProfileViewer.pathMappings": {
-        "/var/www/html": "/workspaces/Bifrost-API"
-    },
     "xdebugProfileViewer.codeLens.enabled": true
 }
