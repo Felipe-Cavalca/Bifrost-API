@@ -12,13 +12,16 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | `bifrost/redis` | Conexao Redis reutilizavel para extensoes opcionais |
 | `bifrost/cache-redis` | Cache Redis opcional |
 | `bifrost/queue-redis` | Fila Redis opcional |
+| `bifrost/queue-worker` | Worker opcional para consumo de filas |
 | `bifrost/database-pdo` | Fabrica PDO generica opcional |
 | `bifrost/database-mysql` | Banco MySQL opcional |
 | `bifrost/database-postgresql` | Banco PostgreSQL opcional |
+| `bifrost/database-sqlite` | Banco SQLite opcional |
 | `bifrost/datatype-core` | Base comum para DataTypes |
-| `bifrost/datatype-email` | DataType Email opcional |
-| `bifrost/datatype-cpf` | DataType CPF opcional |
+| `bifrost/datatype-*` | DataTypes opcionais instalados individualmente |
 | `bifrost/datatypes` | Agregador opcional com todos os DataTypes |
+| `bifrost/log-stdout` | Logs em stdout/stderr |
+| `bifrost/log-file` | Logs em arquivo |
 | `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
 | `bifrost/storage-local` | Storage local opcional |
 | `bifrost/storage-s3` | Storage S3 opcional |
@@ -110,16 +113,19 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |   |-- datatype-core/
 |   |-- datatype-email/
 |   |-- datatypes/
+|   |-- log-stdout/
+|   |-- log-file/
 |   |-- log-mongodb/
 |   |-- storage-local/
 |   `-- storage-s3/
 |-- skeleton/
 |   |-- app/
-|   |-- bootstrap/
-|   |-- compose/
-|   |-- config/
-|   |-- public/
-|   `-- routes/
+|   |-- core/
+|   |   |-- bootstrap/
+|   |   |-- compose/
+|   |   |-- config/
+|   |   `-- routes/
+|   `-- public/
 |-- docker/modular/
 |-- docs/
 `-- .github/workflows/
