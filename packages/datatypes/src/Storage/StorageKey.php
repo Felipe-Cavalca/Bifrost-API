@@ -13,6 +13,9 @@ final readonly class StorageKey extends FilePath
         return str_replace('\\', '/', trim((string) $value));
     }
 
+    /**
+     * Verifica se o valor e uma chave relativa valida para storage.
+     */
     public static function isValid(mixed $value): bool
     {
         if (!is_string($value)) {

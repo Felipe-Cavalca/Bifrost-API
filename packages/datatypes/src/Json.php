@@ -6,6 +6,9 @@ namespace Bifrost\DataTypes;
 
 final readonly class Json extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e uma string JSON valida.
+     */
     public static function isValid(mixed $value): bool
     {
         if (!is_string($value) || trim($value) === '') {

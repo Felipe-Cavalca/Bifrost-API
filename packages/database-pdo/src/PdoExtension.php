@@ -12,10 +12,16 @@ use Bifrost\Framework\Contracts\TransactionManager;
 
 final class PdoExtension implements Extension
 {
+    /**
+     * @param array<string, mixed> $config Configuracao PDO unica ou mapa de conexoes.
+     */
     public function __construct(private readonly array $config)
     {
     }
 
+    /**
+     * Registra factory PDO, banco padrao e gerenciador de transacao.
+     */
     public function register(Application $application): void
     {
         $factory = new PdoConnectionFactory(config: $this->config);

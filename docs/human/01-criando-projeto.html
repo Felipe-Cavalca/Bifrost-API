@@ -8,25 +8,41 @@
 </head>
 <body>
   <main>
-    <a href="index.html">← voltar</a>
-    <section class="section panel">
-      <h1>Criar um projeto novo</h1>
-      <p>O sistema pode ter frontend, banco, app mobile e outros modulos. O backend PHP fica dentro da pasta <code>api/</code>.</p>
-      <div class="grid">
-        <div class="card"><h2>1. Pasta</h2><p>Crie <code>api/</code> na raiz do sistema.</p></div>
-        <div class="card"><h2>2. Skeleton</h2><p>Instale <code>bifrost/skeleton</code> dentro dela.</p></div>
-        <div class="card"><h2>3. Rodar</h2><p>Suba Docker e acesse <code>/health</code>.</p></div>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Comece pelo skeleton</span>
+        <h1>Criar um backend do zero.</h1>
+        <p class="lead">A aplicacao PHP fica em <code>api/</code>. O skeleton instala apenas o core, com rotas, controller de health check e Docker prontos.</p>
       </div>
-    </section>
-    <section class="section panel terminal">
-      <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
-      <pre>mkdir api
+      <div class="panel terminal">
+        <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <pre>mkdir api
 cd api
 composer create-project bifrost/skeleton .
 cp .env.example .env
 docker compose up --build
 curl http://localhost:8080/health</pre>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card"><h2>1. Pasta</h2><p>Crie <code>api/</code> dentro do sistema consumidor.</p></div>
+      <div class="card"><h2>2. Skeleton</h2><p>Instale <code>bifrost/skeleton</code> dentro de <code>api/</code>.</p></div>
+      <div class="card"><h2>3. Extensoes</h2><p>Adicione pacotes opcionais apenas quando precisar.</p></div>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>

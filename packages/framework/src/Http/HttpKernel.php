@@ -21,6 +21,11 @@ final class HttpKernel
     /** @var list<callable> */
     private array $middleware = [];
 
+    /**
+     * @param Router $router Roteador HTTP da aplicacao.
+     * @param ControllerResolver $controllerResolver Resolvedor de handlers e controllers.
+     * @param bool $debug Quando true, respostas 500 podem expor a mensagem da excecao.
+     */
     public function __construct(
         private readonly Router $router,
         private readonly ControllerResolver $controllerResolver,

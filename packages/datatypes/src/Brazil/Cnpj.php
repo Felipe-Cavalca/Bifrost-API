@@ -8,6 +8,9 @@ use Bifrost\DataTypes\AbstractDataType;
 
 final readonly class Cnpj extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e um CNPJ valido.
+     */
     public static function isValid(mixed $value): bool
     {
         $digits = self::digits($value);

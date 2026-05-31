@@ -13,6 +13,10 @@ use RuntimeException;
 
 final class S3Storage implements Storage
 {
+    /**
+     * @param S3Client $client Cliente S3 usado nas operacoes.
+     * @param string $bucket Bucket padrao do storage.
+     */
     public function __construct(
         private readonly S3Client $client,
         private readonly string $bucket
@@ -22,6 +26,14 @@ final class S3Storage implements Storage
         }
     }
 
+    /**
+     * Envia um objeto para o bucket S3.
+     *
+     * @param string $key Chave do objeto.
+     * @param string $body Conteudo do objeto.
+     * @param array<string, mixed> $options Opcoes adicionais aceitas pelo AWS SDK.
+     * @return array<string, mixed>
+     */
     public function put(string $key, string $body, array $options = []): array
     {
         return $this->run('putObject', array_merge(
@@ -30,6 +42,13 @@ final class S3Storage implements Storage
         ));
     }
 
+    /**
+     * Recupera um objeto do bucket S3.
+     *
+     * @param string $key Chave do objeto.
+     * @param array<string, mixed> $options Opcoes adicionais aceitas pelo AWS SDK.
+     * @return array<string, mixed>
+     */
     public function get(string $key, array $options = []): array
     {
         return $this->run('getObject', array_merge(
@@ -38,6 +57,13 @@ final class S3Storage implements Storage
         ));
     }
 
+    /**
+     * Remove um objeto do bucket S3.
+     *
+     * @param string $key Chave do objeto.
+     * @param array<string, mixed> $options Opcoes adicionais aceitas pelo AWS SDK.
+     * @return array<string, mixed>
+     */
     public function delete(string $key, array $options = []): array
     {
         return $this->run('deleteObject', array_merge(
@@ -46,6 +72,13 @@ final class S3Storage implements Storage
         ));
     }
 
+    /**
+     * Cria uma URL temporaria assinada para leitura do objeto.
+     *
+     * @param string $key Chave do objeto.
+     * @param DateTimeImmutable|null $expiresAt Data de expiracao. Padrao: 15 minutos.
+     * @param array<string, mixed> $options Opcoes adicionais aceitas pelo AWS SDK.
+     */
     public function temporaryUrl(
         string $key,
         ?DateTimeImmutable $expiresAt = null,
@@ -66,6 +99,9 @@ final class S3Storage implements Storage
         return (string) $request->getUri();
     }
 
+    /**
+     * Retorna o cliente S3 usado pela instancia.
+     */
     public function client(): S3Client
     {
         return $this->client;

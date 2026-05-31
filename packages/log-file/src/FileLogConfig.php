@@ -12,6 +12,11 @@ final class FileLogConfig
     {
     }
 
+    /**
+     * Cria a configuracao a partir de array.
+     *
+     * @param array{path?: string} $config
+     */
     public static function fromArray(array $config): self
     {
         $path = $config['path'] ?? null;
@@ -22,6 +27,9 @@ final class FileLogConfig
         return new self(trim($path));
     }
 
+    /**
+     * Retorna o caminho do arquivo de log.
+     */
     public function path(): string
     {
         return $this->path;

@@ -13,6 +13,10 @@ final class StdoutLogWriter implements LogWriter
     /** @var Closure(string): void */
     private readonly Closure $writeLine;
 
+    /**
+     * @param StdoutLogConfig $config Configuracao do stream.
+     * @param callable|null $writeLine Escritor de linha opcional para testes.
+     */
     public function __construct(StdoutLogConfig $config, ?callable $writeLine = null)
     {
         $this->writeLine = Closure::fromCallable(

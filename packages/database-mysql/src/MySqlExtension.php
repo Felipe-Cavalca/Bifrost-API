@@ -12,10 +12,16 @@ use InvalidArgumentException;
 
 final class MySqlExtension implements Extension
 {
+    /**
+     * @param array<string, mixed> $config Configuracao MySQL unica ou mapa de conexoes.
+     */
     public function __construct(private readonly array $config)
     {
     }
 
+    /**
+     * Registra a factory PDO configurada para MySQL.
+     */
     public function register(Application $application): void
     {
         $application->container()->bind(

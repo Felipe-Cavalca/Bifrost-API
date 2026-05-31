@@ -16,6 +16,10 @@ final class MongoLogWriter implements LogWriter
     /** @var Closure(string, array): void */
     private readonly Closure $insertDocument;
 
+    /**
+     * @param MongoLogConfig $config Configuracao do destino MongoDB.
+     * @param callable $insertDocument Funcao que insere o documento.
+     */
     public function __construct(
         private readonly MongoLogConfig $config,
         callable $insertDocument
@@ -23,6 +27,9 @@ final class MongoLogWriter implements LogWriter
         $this->insertDocument = Closure::fromCallable($insertDocument);
     }
 
+    /**
+     * Cria um writer conectado ao MongoDB.
+     */
     public static function connect(MongoLogConfig $config): self
     {
         if (!class_exists(Manager::class)) {
@@ -48,6 +55,11 @@ final class MongoLogWriter implements LogWriter
         );
     }
 
+    /**
+     * Grava uma entrada de log no MongoDB.
+     *
+     * @param array<string, mixed> $entry
+     */
     public function write(array $entry): void
     {
         ($this->insertDocument)($this->config->collectionNamespace(), $entry);

@@ -8,33 +8,29 @@
 </head>
 <body>
   <main>
-    <a href="index.html">← voltar</a>
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"></span>Bifrost</a>
+      <nav class="nav">
+        <a href="01-criando-projeto.html">Inicio</a>
+        <a href="02-arquitetura.html">Arquitetura</a>
+        <a href="03-lifecycle.html">Lifecycle</a>
+        <a href="04-modulos.html">Modulos</a>
+        <a href="05-attributes-datatypes.html">Attributes</a>
+        <a href="06-deploy.html">Deploy</a>
+      </nav>
+    </header>
+
     <section class="section panel">
-      <h1>Arquitetura</h1>
-      <p>O framework e pequeno. Funcionalidades opcionais entram por Composer.</p>
-      <svg width="100%" height="320" viewBox="0 0 920 320" role="img">
-        <rect x="40" y="115" width="140" height="90" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="72" y="154">Projeto</text><text x="70" y="178">meu-sistema</text>
-        <rect x="245" y="40" width="145" height="80" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="286" y="77">api/</text><text x="278" y="99">backend</text>
-        <rect x="245" y="200" width="145" height="80" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="283" y="237">app/</text><text x="267" y="259">frontend</text>
-        <rect x="470" y="40" width="160" height="80" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="506" y="77">framework</text>
-        <rect x="470" y="140" width="160" height="80" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="510" y="177">datatypes</text>
-        <rect x="470" y="240" width="160" height="60" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="510" y="275">extensions</text>
-        <rect x="720" y="115" width="150" height="90" rx="20" fill="#10243d" stroke="#274966"/>
-        <text x="761" y="154">Composer</text><text x="755" y="178">instala so uso</text>
-        <path d="M180 160 H245" stroke="#63e6be" stroke-width="4" stroke-linecap="round"/>
-        <path d="M390 80 H470" stroke="#63e6be" stroke-width="4" stroke-linecap="round"/>
-        <path d="M390 80 C430 80 430 180 470 180" stroke="#6ea8fe" stroke-width="4" fill="none"/>
-        <path d="M390 80 C430 80 430 270 470 270" stroke="#6ea8fe" stroke-width="4" fill="none"/>
-        <path d="M630 180 H720" stroke="#63e6be" stroke-width="4" stroke-linecap="round"/>
-        <circle class="pulse" cx="430" cy="80" r="9" fill="#63e6be"/>
-      </svg>
+      <span class="eyebrow">Core pequeno</span>
+      <h1>Arquitetura modular</h1>
+      <p class="lead">O Bifrost separa o que e HTTP do que e infraestrutura. O framework define contratos; extensoes opcionais implementam fornecedores.</p>
+      <div class="grid">
+        <div class="card"><h2>Core</h2><p><code>Application</code>, <code>Container</code>, <code>HttpKernel</code>, rotas, request, response e attributes.</p></div>
+        <div class="card"><h2>Skeleton</h2><p>Projeto inicial com <code>bootstrap/app.php</code>, <code>routes/api.php</code> e Docker.</p></div>
+        <div class="card"><h2>Extensoes</h2><p>Pacotes Composer registram cache, banco, fila, storage e logs no container.</p></div>
+      </div>
     </section>
   </main>
+  <script src="assets/app.js"></script>
 </body>
 </html>

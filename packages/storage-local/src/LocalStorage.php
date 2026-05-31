@@ -11,6 +11,9 @@ use RuntimeException;
 
 final class LocalStorage implements Storage
 {
+    /**
+     * @param string $rootPath Diretorio raiz onde os arquivos serao gravados.
+     */
     public function __construct(private readonly string $rootPath)
     {
         if (trim($this->rootPath) === '') {
@@ -18,6 +21,14 @@ final class LocalStorage implements Storage
         }
     }
 
+    /**
+     * Grava um conteudo no storage local.
+     *
+     * @param string $key Chave relativa do arquivo.
+     * @param string $body Conteudo a ser gravado.
+     * @param array<string, mixed> $options Opcoes reservadas para compatibilidade com Storage.
+     * @return array{Key: string, ContentLength: int}
+     */
     public function put(string $key, string $body, array $options = []): array
     {
         $key = $this->normalizedKey($key);
@@ -35,6 +46,13 @@ final class LocalStorage implements Storage
         return ['Key' => $key, 'ContentLength' => strlen($body)];
     }
 
+    /**
+     * Le um arquivo do storage local.
+     *
+     * @param string $key Chave relativa do arquivo.
+     * @param array<string, mixed> $options Opcoes reservadas para compatibilidade com Storage.
+     * @return array{Key: string, Body: string, ContentLength: int}
+     */
     public function get(string $key, array $options = []): array
     {
         $key = $this->normalizedKey($key);
@@ -52,6 +70,13 @@ final class LocalStorage implements Storage
         return ['Key' => $key, 'Body' => $body, 'ContentLength' => strlen($body)];
     }
 
+    /**
+     * Remove um arquivo do storage local.
+     *
+     * @param string $key Chave relativa do arquivo.
+     * @param array<string, mixed> $options Opcoes reservadas para compatibilidade com Storage.
+     * @return array{Key: string, Deleted: bool}
+     */
     public function delete(string $key, array $options = []): array
     {
         $key = $this->normalizedKey($key);
@@ -60,6 +85,13 @@ final class LocalStorage implements Storage
         return ['Key' => $key, 'Deleted' => !is_file($path) || unlink($path)];
     }
 
+    /**
+     * Retorna uma URL file:// para o arquivo local.
+     *
+     * @param string $key Chave relativa do arquivo.
+     * @param DateTimeImmutable|null $expiresAt Ignorado pelo storage local.
+     * @param array<string, mixed> $options Opcoes reservadas para compatibilidade com Storage.
+     */
     public function temporaryUrl(
         string $key,
         ?DateTimeImmutable $expiresAt = null,

@@ -52,6 +52,9 @@ Os complementos podem ser combinados, por exemplo Redis e PostgreSQL:
 docker compose -f docker-compose.yml -f compose/redis.yml -f compose/postgresql.yml up --build
 ```
 
+Os pacotes `cache-redis` e `queue-redis` usam `bifrost/redis` internamente para
+reutilizar a conexao Redis quando a configuracao for igual.
+
 Os overlays instalam na imagem PHP apenas a extensao requerida pelo perfil.
 Escolha `CACHE_DRIVER=apcu` ou `CACHE_DRIVER=redis`; nao registre ambos como
 provider do mesmo contrato.

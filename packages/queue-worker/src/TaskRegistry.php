@@ -11,6 +11,12 @@ final class TaskRegistry
     /** @var array<string, TaskHandler|callable> */
     private array $handlers = [];
 
+    /**
+     * Registra um handler para um nome de tarefa.
+     *
+     * @param string $task Nome pesquisavel da tarefa.
+     * @param TaskHandler|callable $handler Handler invocavel pelo worker.
+     */
     public function add(string $task, TaskHandler|callable $handler): self
     {
         if ($task === '') {
@@ -22,6 +28,9 @@ final class TaskRegistry
         return $this;
     }
 
+    /**
+     * Executa o handler registrado para o payload informado.
+     */
     public function handle(TaskPayload $payload): void
     {
         $handler = $this->handlers[$payload->task()] ?? null;

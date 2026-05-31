@@ -11,11 +11,17 @@ use InvalidArgumentException;
 
 final readonly class DateTime extends AbstractDataType
 {
+    /**
+     * Cria um DateTime com o instante atual.
+     */
     public static function now(): self
     {
         return self::from('now');
     }
 
+    /**
+     * Verifica se o valor pode ser convertido para data e hora.
+     */
     public static function isValid(mixed $value): bool
     {
         if ($value instanceof DateTimeInterface) {
@@ -35,6 +41,9 @@ final readonly class DateTime extends AbstractDataType
         return true;
     }
 
+    /**
+     * Garante que a data e hora representada esta no futuro.
+     */
     public function assertFuture(): void
     {
         if (new DateTimeImmutable((string) $this->value()) <= new DateTimeImmutable()) {

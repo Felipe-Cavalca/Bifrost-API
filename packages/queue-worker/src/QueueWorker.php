@@ -9,12 +9,21 @@ use Throwable;
 
 final class QueueWorker
 {
+    /**
+     * @param Queue $queue Fila usada para buscar e reenfileirar tarefas.
+     * @param TaskRegistry $tasks Registro de handlers disponiveis.
+     */
     public function __construct(
         private readonly Queue $queue,
         private readonly TaskRegistry $tasks
     ) {
     }
 
+    /**
+     * Processa uma unica mensagem da fila.
+     *
+     * @param string $queue Nome da fila consumida.
+     */
     public function workOnce(string $queue): WorkerResult
     {
         $payload = $this->queue->pop($queue);

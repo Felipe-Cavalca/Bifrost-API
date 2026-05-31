@@ -9,6 +9,7 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | --- | --- |
 | `bifrost/framework` | Kernel HTTP, request/response, rotas, middleware, container e contratos |
 | `bifrost/cache-apcu` | Cache APCu opcional |
+| `bifrost/redis` | Conexao Redis reutilizavel para extensoes opcionais |
 | `bifrost/cache-redis` | Cache Redis opcional |
 | `bifrost/queue-redis` | Fila Redis opcional |
 | `bifrost/database-pdo` | Fabrica PDO generica opcional |
@@ -95,6 +96,7 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |-- packages/
 |   |-- framework/
 |   |-- cache-apcu/
+|   |-- redis/
 |   |-- cache-redis/
 |   |-- queue-redis/
 |   |-- database-pdo/

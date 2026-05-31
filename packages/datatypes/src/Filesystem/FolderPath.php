@@ -8,6 +8,9 @@ use Bifrost\DataTypes\AbstractDataType;
 
 final readonly class FolderPath extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e um caminho de pasta valido.
+     */
     public static function isValid(mixed $value): bool
     {
         if (!is_string($value) || $value === '') {

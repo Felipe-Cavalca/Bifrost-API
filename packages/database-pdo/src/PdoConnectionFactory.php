@@ -13,10 +13,16 @@ final class PdoConnectionFactory implements DatabaseConnectionFactory
     /** @var array<string, PDO> */
     private array $connections = [];
 
+    /**
+     * @param array<string, mixed> $config Configuracao PDO unica ou mapa de conexoes.
+     */
     public function __construct(private readonly array $config)
     {
     }
 
+    /**
+     * Retorna uma conexao PDO reutilizada pelo nome informado.
+     */
     public function connection(?string $name = null): PDO
     {
         $connectionName = $name ?? 'default';

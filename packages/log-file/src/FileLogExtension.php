@@ -18,6 +18,10 @@ final class FileLogExtension implements Extension
     /** @var Closure(FileLogConfig): LogWriter|null */
     private readonly ?Closure $writerFactory;
 
+    /**
+     * @param array{path?: string} $config Configuracao do arquivo de log.
+     * @param callable|null $writerFactory Factory opcional para testes ou integracao customizada.
+     */
     public function __construct(array $config, ?callable $writerFactory = null)
     {
         $this->config = FileLogConfig::fromArray($config);
@@ -26,6 +30,9 @@ final class FileLogExtension implements Extension
             : Closure::fromCallable($writerFactory);
     }
 
+    /**
+     * Registra o writer em arquivo e o logger estruturado.
+     */
     public function register(Application $application): void
     {
         $application->container()->bind(

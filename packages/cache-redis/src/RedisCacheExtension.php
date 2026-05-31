@@ -4,50 +4,41 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\CacheRedis;
 
+use Bifrost\Extension\Redis\Contracts\RedisConnectionFactory;
+use Bifrost\Extension\Redis\RedisConfig;
+use Bifrost\Extension\Redis\RedisServiceRegistrar;
 use Bifrost\Framework\Application;
+use Bifrost\Framework\Container;
 use Bifrost\Framework\Contracts\CacheStore;
 use Bifrost\Framework\Contracts\Extension;
-use Redis;
-use RuntimeException;
 
 final class RedisCacheExtension implements Extension
 {
+    private readonly RedisConfig $redisConfig;
+    private readonly string $prefix;
+
+    /**
+     * @param array{host?: string, port?: int|string, timeout?: float|int|string, password?: string|null, database?: int|string|null, prefix?: string} $config
+     */
     public function __construct(private readonly array $config)
     {
+        $this->redisConfig = RedisConfig::fromArray($config);
+        $this->prefix = (string) ($config['prefix'] ?? '');
     }
 
+    /**
+     * Registra o cache Redis usando a factory Redis compartilhada.
+     */
     public function register(Application $application): void
     {
+        RedisServiceRegistrar::register($application);
+
         $application->container()->bind(
             CacheStore::class,
-            fn (): RedisCache => new RedisCache(
-                redis: $this->connect(),
-                prefix: (string) ($this->config['prefix'] ?? '')
+            fn (Container $container): RedisCache => new RedisCache(
+                redis: $container->get(RedisConnectionFactory::class)->connect($this->redisConfig),
+                prefix: $this->prefix
             )
         );
-    }
-
-    private function connect(): Redis
-    {
-        $redis = new Redis();
-        $connected = $redis->connect(
-            (string) ($this->config['host'] ?? '127.0.0.1'),
-            (int) ($this->config['port'] ?? 6379),
-            (float) ($this->config['timeout'] ?? 0.0)
-        );
-
-        if (!$connected) {
-            throw new RuntimeException('Nao foi possivel conectar ao Redis de cache.');
-        }
-
-        if (isset($this->config['password'])) {
-            $redis->auth((string) $this->config['password']);
-        }
-
-        if (isset($this->config['database'])) {
-            $redis->select((int) $this->config['database']);
-        }
-
-        return $redis;
     }
 }

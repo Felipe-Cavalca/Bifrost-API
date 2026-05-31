@@ -8,6 +8,9 @@ use Bifrost\DataTypes\AbstractDataType;
 
 final readonly class Cpf extends AbstractDataType
 {
+    /**
+     * Verifica se o valor e um CPF valido.
+     */
     public static function isValid(mixed $value): bool
     {
         $digits = self::digits($value);

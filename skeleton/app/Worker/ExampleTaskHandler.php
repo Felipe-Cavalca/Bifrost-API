@@ -9,6 +9,9 @@ use Bifrost\Extension\QueueWorker\TaskPayload;
 
 final class ExampleTaskHandler implements TaskHandler
 {
+    /**
+     * Processa uma tarefa de exemplo emitindo uma linha no stdout.
+     */
     public function handle(TaskPayload $payload): void
     {
         fwrite(STDOUT, sprintf("Tarefa %s processada.\n", $payload->task()));

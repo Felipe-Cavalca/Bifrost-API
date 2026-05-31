@@ -20,6 +20,7 @@ O foco e criar e manter projetos novos usando Composer, `bifrost/framework`,
 ## Mapa
 
 - `project-setup.md`: como um projeto novo nasce.
+- `composer-reference.md`: referencia operacional da distribuicao Composer.
 - `framework-map.md`: o que existe no framework.
 - `packages.md`: pacotes Composer disponiveis.
 - `extension-rules.md`: como criar extensoes.

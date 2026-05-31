@@ -6,12 +6,22 @@ namespace Bifrost\Extension\QueueWorker;
 
 final class QueueWorkerCommand
 {
+    /**
+     * @param QueueWorker $worker Worker responsavel pelo processamento.
+     * @param int $defaultSleepSeconds Pausa padrao quando a fila estiver vazia.
+     */
     public function __construct(
         private readonly QueueWorker $worker,
         private readonly int $defaultSleepSeconds = 1
     ) {
     }
 
+    /**
+     * Executa o loop de consumo da fila.
+     *
+     * @param list<string> $argv Argumentos de linha de comando.
+     * @return int Codigo de saida do processo.
+     */
     public function run(array $argv): int
     {
         $options = $this->options($argv);

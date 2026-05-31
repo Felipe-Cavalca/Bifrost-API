@@ -4,50 +4,41 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\QueueRedis;
 
+use Bifrost\Extension\Redis\Contracts\RedisConnectionFactory;
+use Bifrost\Extension\Redis\RedisConfig;
+use Bifrost\Extension\Redis\RedisServiceRegistrar;
 use Bifrost\Framework\Application;
+use Bifrost\Framework\Container;
 use Bifrost\Framework\Contracts\Extension;
 use Bifrost\Framework\Contracts\Queue;
-use Redis;
-use RuntimeException;
 
 final class RedisQueueExtension implements Extension
 {
+    private readonly RedisConfig $redisConfig;
+    private readonly string $prefix;
+
+    /**
+     * @param array{host?: string, port?: int|string, timeout?: float|int|string, password?: string|null, database?: int|string|null, prefix?: string} $config
+     */
     public function __construct(private readonly array $config)
     {
+        $this->redisConfig = RedisConfig::fromArray($config);
+        $this->prefix = (string) ($config['prefix'] ?? '');
     }
 
+    /**
+     * Registra a fila Redis usando a factory Redis compartilhada.
+     */
     public function register(Application $application): void
     {
+        RedisServiceRegistrar::register($application);
+
         $application->container()->bind(
             Queue::class,
-            fn (): RedisQueue => new RedisQueue(
-                redis: $this->connect(),
-                prefix: (string) ($this->config['prefix'] ?? '')
+            fn (Container $container): RedisQueue => new RedisQueue(
+                redis: $container->get(RedisConnectionFactory::class)->connect($this->redisConfig),
+                prefix: $this->prefix
             )
         );
-    }
-
-    private function connect(): Redis
-    {
-        $redis = new Redis();
-        $connected = $redis->connect(
-            (string) ($this->config['host'] ?? '127.0.0.1'),
-            (int) ($this->config['port'] ?? 6379),
-            (float) ($this->config['timeout'] ?? 0.0)
-        );
-
-        if (!$connected) {
-            throw new RuntimeException('Nao foi possivel conectar ao Redis de fila.');
-        }
-
-        if (isset($this->config['password'])) {
-            $redis->auth((string) $this->config['password']);
-        }
-
-        if (isset($this->config['database'])) {
-            $redis->select((int) $this->config['database']);
-        }
-
-        return $redis;
     }
 }
