@@ -29,8 +29,6 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 
 ## Inicio Rapido
 
-Depois de publicados os pacotes Composer:
-
 ```bash
 mkdir api
 cd api
@@ -41,18 +39,19 @@ curl http://localhost:8080/health
 ```
 
 A aplicacao inicial instala somente `bifrost/framework`. Para acrescentar
-infraestrutura, instale apenas o adaptador necessario:
+infraestrutura, instale apenas o adaptador necessario. Os pacotes nao formam
+uma lista obrigatoria:
 
-```bash
-composer require bifrost/cache-redis bifrost/queue-redis
-composer require bifrost/cache-apcu
-composer require bifrost/datatype-email
-# ou, se quiser todos os DataTypes
-composer require bifrost/datatypes
-composer require bifrost/database-mysql
-# ou
-composer require bifrost/database-postgresql
-```
+| Necessidade | Pacote |
+| --- | --- |
+| Cache local | `bifrost/cache-apcu` |
+| Cache compartilhado | `bifrost/cache-redis` |
+| Fila Redis | `bifrost/queue-redis` |
+| Worker para consumir filas | `bifrost/queue-worker` |
+| Banco MySQL | `bifrost/database-mysql` |
+| Banco PostgreSQL | `bifrost/database-postgresql` |
+| Um DataType especifico | `bifrost/datatype-email` |
+| Todos os DataTypes | `bifrost/datatypes` |
 
 O arquivo `core/config/extensions.php` do skeleton registra fila instalada e
 adapters selecionados. Cache e selecionado por `CACHE_DRIVER=apcu|redis`;
@@ -65,6 +64,10 @@ Sem fila, cache ou banco:
 ```bash
 docker compose up --build
 ```
+
+Os arquivos em `core/compose/` sao overlays opcionais. Para ativa-los, informe
+cada arquivo com `-f`; o Docker Compose combina as configuracoes na ordem
+recebida. Nao e necessario copiar e colar o conteudo no `docker-compose.yml`.
 
 Com cache APCu:
 
@@ -97,42 +100,12 @@ docker compose -f docker-compose.yml -f core/compose/postgresql.yml up --build
 Cada complemento instala na imagem PHP somente a extensao exigida pelo
 pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 
-## Estrutura
+## Estrutura da aplicacao
 
-```text
-.
-|-- packages/
-|   |-- framework/
-|   |-- cache-apcu/
-|   |-- redis/
-|   |-- cache-redis/
-|   |-- queue-redis/
-|   |-- database-pdo/
-|   |-- database-mysql/
-|   |-- database-postgresql/
-|   |-- datatype-core/
-|   |-- datatype-email/
-|   |-- datatypes/
-|   |-- log-stdout/
-|   |-- log-file/
-|   |-- log-mongodb/
-|   |-- storage-local/
-|   `-- storage-s3/
-|-- skeleton/
-|   |-- app/
-|   |-- core/
-|   |   |-- bootstrap/
-|   |   |-- compose/
-|   |   |-- config/
-|   |   `-- routes/
-|   `-- public/
-|-- .devcontainer/
-|-- docs/
-`-- .github/workflows/
-```
-
-Aplicacoes novas usam o skeleton modular dentro da pasta `api/` do sistema
-consumidor.
+O skeleton cria a estrutura inicial da API dentro da pasta escolhida. O codigo
+da aplicacao fica em `app/`, configuracoes de boot ficam em `core/`, e o
+servidor HTTP expoe somente `public/`. Actions seguem a convencao
+`/controller/action`; aliases opcionais ficam em `app/Http/HttpRoutes.php`.
 
 ## Lifecycle HTTP
 
@@ -148,30 +121,9 @@ public/index.php
   -> ResponseEmitter
 ```
 
-## Desenvolvimento
-
-O ecossistema completo e testado diretamente dentro do Dev Container:
-
-```bash
-sh .devcontainer/check.sh
-```
-
-O Dockerfile distribuido com o skeleton resolve pacotes pelo repositorio
-Composer publicado. Durante desenvolvimento deste monorepo, use a verificacao
-modular acima, que injeta dependencias locais por `path`.
-
-Uma maquina de desenvolvimento precisa apenas de Docker, Visual Studio Code e
-a extensao Dev Containers. O ambiente em `.devcontainer/` instala PHP,
-Composer e extensoes, alem de subir Redis, MySQL e PostgreSQL.
-
 ## Documentacao
 
 - [Documentacao humana](docs/html/index.html)
-- [Documentacao para IAs](docs/ias/index.md)
-
-A documentacao humana em `docs/html/` e publicada no GitHub Pages quando a
-branch `main` recebe alteracoes ou quando o workflow de release dispara
-`tag-created`.
 
 ## Licenca
 

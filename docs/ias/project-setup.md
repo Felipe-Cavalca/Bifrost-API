@@ -39,8 +39,11 @@ docker compose up --build
 - Entrypoint HTTP e `public/index.php`.
 - Boot da aplicacao e `core/bootstrap/app.php`.
 - Extensoes opcionais ficam em `core/config/extensions.php`.
-- Rotas ficam em `core/routes/api.php`.
+- Aliases e URLs fora da convencao `/controller/action` ficam em
+  `app/Http/HttpRoutes.php`.
 - Overlays Docker Compose ficam em `core/compose/`.
+- Ative overlays com multiplos argumentos `-f`; nao copie seu conteudo para o
+  `docker-compose.yml` principal.
 - Codigo do app segue as pastas `Attributes`, `Contracts`, `DataTypes`,
   `Enums`, `Http/Controller`, `Integrations`, `Repositories`, `Services`,
   `Support` e `Worker`.

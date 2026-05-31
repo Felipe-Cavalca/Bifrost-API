@@ -40,8 +40,10 @@ Instale apenas o pacote necessario para a feature usada pelo projeto.
 
 O projeto criado por `bifrost/skeleton` separa:
 
-- `core/bootstrap/`, `core/config/`, `core/routes/` e `core/compose/` para
-  infraestrutura basica do projeto;
+- `core/bootstrap/`, `core/config/` e `core/compose/` para infraestrutura
+  basica do projeto;
+- `app/Http/HttpRoutes.php` para aliases e URLs fora da convencao
+  `/controller/action`;
 - `public/` como unica pasta exposta pelo servidor HTTP;
 - `app/` para codigo do produto;
 - `tests/` para testes da aplicacao.

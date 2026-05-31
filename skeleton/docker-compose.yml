@@ -1,7 +1,8 @@
 services:
   api:
-    # Servico minimo da API. Combine este arquivo com overlays em core/compose
-    # somente quando o projeto precisar de cache, Redis ou banco de dados.
+    # Servico minimo da API. Ative overlays opcionais com multiplos argumentos
+    # `-f`, por exemplo: docker compose -f docker-compose.yml -f core/compose/redis.yml up
+    # Nao copie o conteudo dos overlays para este arquivo.
     build:
       context: .
       dockerfile: Dockerfile

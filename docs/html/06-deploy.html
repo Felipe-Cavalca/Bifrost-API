@@ -28,6 +28,10 @@
                 <h2>Instalação de produção</h2>
                 <pre><code class="language-bash">composer install --no-dev --optimize-autoloader</code></pre>
 
+                <h2>Overlays do Docker Compose</h2>
+                <p>Os arquivos em <code>core/compose/</code> complementam o <code>docker-compose.yml</code> principal. Não copie e cole o conteúdo: informe cada overlay com <code>-f</code>. O Docker Compose aplica os arquivos na ordem recebida.</p>
+                <pre><code class="language-bash">docker compose -f docker-compose.yml -f core/compose/redis.yml up --build</code></pre>
+
                 <h2>Logs</h2>
                 <p>Para containers, prefira logs em stdout/stderr. Isso facilita coleta por Docker, Kubernetes ou ferramentas da plataforma.</p>
                 <pre><code class="language-bash">composer require bifrost/log-stdout</code></pre>
