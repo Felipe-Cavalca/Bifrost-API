@@ -24,6 +24,7 @@ O bootstrap registra automaticamente os pacotes instalados:
 
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
+composer require bifrost/queue-worker
 composer require bifrost/cache-apcu
 composer require bifrost/database-mysql
 # ou
@@ -37,6 +38,8 @@ composer require bifrost/cache-apcu
 docker compose -f docker-compose.yml -f compose/apcu.yml up --build
 composer require bifrost/cache-redis bifrost/queue-redis
 docker compose -f docker-compose.yml -f compose/redis.yml up --build
+composer require bifrost/queue-worker
+php worker.php --queue=default
 composer require bifrost/database-mysql
 docker compose -f docker-compose.yml -f compose/mysql.yml up --build
 composer require bifrost/database-postgresql
@@ -69,4 +72,6 @@ routes/api.php
 - `public/index.php` recebe e emite HTTP.
 - `bootstrap/app.php` cria a aplicacao e registra rotas/extensoes.
 - `config/extensions.php` ativa somente extensoes instaladas.
+- `worker.php` consome tarefas da fila configurada em Redis.
+- `app/Worker/tasks.php` registra handlers de tarefas do worker.
 - `app/` contem o codigo da aplicacao, usando o namespace `App\`.
