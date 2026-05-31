@@ -65,10 +65,19 @@ jobs:
           MYSQL_HOST: 127.0.0.1
           POSTGRES_HOST: 127.0.0.1
         run: |
-          for package in datatypes cache-redis cache-apcu queue-redis queue-worker database-pdo log-mongodb storage-local storage-s3; do
+          for package in datatypes redis cache-apcu queue-worker database-pdo log-mongodb storage-local storage-s3; do
             cd "$GITHUB_WORKSPACE/packages/$package"
             composer config minimum-stability dev
             composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+            composer update --no-interaction --no-progress --prefer-dist
+            composer validate --strict --no-check-publish
+            composer test
+          done
+          for package in cache-redis queue-redis; do
+            cd "$GITHUB_WORKSPACE/packages/$package"
+            composer config minimum-stability dev
+            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+            composer config repositories.redis '{"type":"path","url":"../redis","options":{"versions":{"bifrost/redis":"1.0.0"}}}'
             composer update --no-interaction --no-progress --prefer-dist
             composer validate --strict --no-check-publish
             composer test
