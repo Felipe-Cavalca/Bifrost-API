@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bifrost\Framework\Http;
 
 use Bifrost\Framework\Exceptions\HttpException;
+use Bifrost\Framework\Routing\ConventionRouteResolver;
 use Bifrost\Framework\Routing\ControllerResolver;
 use Bifrost\Framework\Routing\Router;
 use JsonException;
@@ -24,11 +25,13 @@ final class HttpKernel
     /**
      * @param Router $router Roteador HTTP da aplicacao.
      * @param ControllerResolver $controllerResolver Resolvedor de handlers e controllers.
+     * @param ConventionRouteResolver $conventionRouteResolver Resolvedor fallback para URLs /controller/action.
      * @param bool $debug Quando true, respostas 500 podem expor a mensagem da excecao.
      */
     public function __construct(
         private readonly Router $router,
         private readonly ControllerResolver $controllerResolver,
+        private readonly ConventionRouteResolver $conventionRouteResolver,
         private readonly bool $debug = false
     ) {
     }
@@ -85,7 +88,14 @@ final class HttpKernel
                 );
             }
 
-            return Response::notFound();
+            $conventionHandler = $this->conventionRouteResolver->resolve($request);
+            if ($conventionHandler === null) {
+                return Response::notFound();
+            }
+
+            return Response::fromResult(
+                $this->controllerResolver->invoke($conventionHandler, $request)
+            );
         }
 
         return Response::fromResult(

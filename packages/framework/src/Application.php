@@ -11,6 +11,7 @@ use Bifrost\Framework\Http\Request;
 use Bifrost\Framework\Http\Response;
 use Bifrost\Framework\Http\ResponseEmitter;
 use Bifrost\Framework\Routing\ControllerResolver;
+use Bifrost\Framework\Routing\ConventionRouteResolver;
 use Bifrost\Framework\Routing\Router;
 
 /**
@@ -32,6 +33,7 @@ final class Application
         $this->kernel = new HttpKernel(
             router: $this->router,
             controllerResolver: new ControllerResolver($this->container),
+            conventionRouteResolver: new ConventionRouteResolver(),
             debug: $debug
         );
         $this->emitter = new ResponseEmitter();
