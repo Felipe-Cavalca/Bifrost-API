@@ -136,4 +136,4 @@ separadas ou balanceamento devem trocar a implementacao de `RedisClient`.
 4. Registrar contratos no container.
 5. Encapsular fornecedor externo atras de factory/adapter.
 6. Criar testes do pacote.
-7. Atualizar `docs/human` e `docs/ias`.
+7. Atualizar `docs/html` e `docs/ias`.

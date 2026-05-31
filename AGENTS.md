@@ -24,7 +24,7 @@
 - `packages/datatype-*/`: DataTypes modulares para tipagem forte e validacao.
 - `packages/datatypes/`: pacote agregador dos DataTypes.
 - `skeleton/`: projeto base publicado como `bifrost/skeleton`.
-- `docs/human/`: documentacao visual para humanos.
+- `docs/html/`: documentacao visual para humanos e publicacao no GitHub Pages.
 - `docs/ias/`: documentacao objetiva para agentes e IAs.
 
 ## Ambiente
@@ -32,7 +32,9 @@
 - Use Docker, Docker Compose ou Dev Container para comandos do projeto sempre que possivel.
 - Nao instale dependencias na maquina local; instale apenas dentro de container.
 - Dentro de containers do projeto, instalacoes e comandos necessarios para a tarefa estao liberados.
-- O ambiente modular oficial e `docker/modular/docker-compose.test.yml`.
+- O ambiente modular oficial e o Dev Container em `.devcontainer/`.
+- Execute a suite completa diretamente dentro do Dev Container com
+  `sh .devcontainer/check.sh`.
 - O Docker em `api/Docker/` e referencia antiga; nao use como modelo do Composer novo.
 
 ## Codigo orientado a agentes
@@ -77,7 +79,7 @@
 
 ## Verificacoes
 
-- Monorepo modular: `docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests`.
+- Monorepo modular: `sh .devcontainer/check.sh` dentro do Dev Container.
 - Pacote especifico: rode `composer check` ou `composer test` dentro do pacote alterado.
 - Mudancas em core, contratos, lifecycle HTTP, attributes ou DataTypes exigem testes no pacote afetado.
 - Rode checks de `api/` apenas quando alterar `api/`.
@@ -88,8 +90,8 @@
 - Mudancas de padrao do projeto devem atualizar `docs/ias/coding-rules.md`.
 - Mudancas de arquitetura, core, observabilidade, ambiente ou contratos publicos devem atualizar `docs/ias/framework-map.md`.
 - Mudancas de distribuicao Composer devem atualizar `docs/ias/packages.md`.
-- Mudancas que afetam como usuarios usam o framework devem atualizar os guias humanos em `docs/human/`.
-- Mudancas em classes, metodos, parametros, retornos ou PHPDoc de API publica devem regenerar a referencia humana com `tools/generate-human-reference.php`.
+- Mudancas que afetam como usuarios usam o framework devem atualizar os guias humanos em `docs/html/`.
+- Mudancas em classes, metodos, parametros, retornos ou PHPDoc de API publica devem regenerar a referencia humana com `php docs/generate-reference.php`.
 - Guias para IAs/agentes ficam em `docs/ias/`.
 - Se uma mudanca nao exigir documentacao, registre objetivamente o motivo no resumo final.
 

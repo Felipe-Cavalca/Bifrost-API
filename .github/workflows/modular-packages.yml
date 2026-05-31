@@ -6,7 +6,7 @@ on:
       - 'packages/**'
       - 'skeleton/**'
       - 'docs/**'
-      - 'docs/modular-distribution.md'
+      - '.devcontainer/check.sh'
       - '.github/workflows/modular-packages.yml'
 
 jobs:
@@ -52,78 +52,9 @@ jobs:
           coverage: none
           extensions: json, redis, apcu, mongodb, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite
 
-      - name: Install framework dependencies
-        run: composer install --working-dir=packages/framework --no-interaction --no-progress --prefer-dist
-
-      - name: Test framework
-        run: composer check
-        working-directory: packages/framework
-
-      - name: Test optional packages
+      - name: Validar monorepo Composer
         env:
           REDIS_HOST: 127.0.0.1
           MYSQL_HOST: 127.0.0.1
           POSTGRES_HOST: 127.0.0.1
-        run: |
-          datatype_packages="
-          datatype-core
-          datatype-email
-          datatype-url
-          datatype-base64
-          datatype-json
-          datatype-uuid
-          datatype-date-time
-          datatype-cpf
-          datatype-cnpj
-          datatype-file-name
-          datatype-folder-name
-          datatype-file-path
-          datatype-folder-path
-          datatype-storage-key
-          "
-          for package in $datatype_packages datatypes; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
-            for repository in $datatype_packages; do
-              composer config "repositories.$repository" "{\"type\":\"path\",\"url\":\"../$repository\",\"options\":{\"versions\":{\"bifrost/$repository\":\"1.0.0\"}}}"
-            done
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-          for package in redis cache-apcu queue-worker database-pdo log-mongodb storage-local storage-s3; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-          for package in cache-redis queue-redis; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
-            composer config repositories.redis '{"type":"path","url":"../redis","options":{"versions":{"bifrost/redis":"1.0.0"}}}'
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-          for package in database-mysql database-postgresql database-sqlite; do
-            cd "$GITHUB_WORKSPACE/packages/$package"
-            composer config minimum-stability dev
-            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
-            composer config repositories.database-pdo '{"type":"path","url":"../database-pdo","options":{"versions":{"bifrost/database-pdo":"1.0.0"}}}'
-            composer update --no-interaction --no-progress --prefer-dist
-            composer validate --strict --no-check-publish
-            composer test
-          done
-
-      - name: Install skeleton dependencies
-        run: |
-          cd skeleton
-          composer config minimum-stability dev
-          composer config repositories.framework '{"type":"path","url":"../packages/framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
-          composer update --no-interaction --no-progress --prefer-dist
-          composer validate --strict --no-check-publish
-          composer test
+        run: sh .devcontainer/check.sh

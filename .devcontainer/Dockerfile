@@ -9,10 +9,11 @@ RUN apt-get update \
         git \
         unzip \
         libpq-dev \
+        libsqlite3-dev \
         libcurl4-openssl-dev \
-    && docker-php-ext-install curl pdo_mysql pdo_pgsql \
-    && pecl install redis apcu xdebug \
-    && docker-php-ext-enable redis apcu xdebug \
+    && docker-php-ext-install curl pdo_mysql pdo_pgsql pdo_sqlite \
+    && pecl install redis apcu mongodb xdebug \
+    && docker-php-ext-enable redis apcu mongodb xdebug \
     && mkdir -p /usr/local/etc/php/conf.d \
     && echo "apc.enable_cli=1" > /usr/local/etc/php/conf.d/apcu.ini \
     && apt-get clean \

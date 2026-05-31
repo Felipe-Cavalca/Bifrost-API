@@ -12,13 +12,16 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | `bifrost/redis` | Conexao Redis reutilizavel para extensoes opcionais |
 | `bifrost/cache-redis` | Cache Redis opcional |
 | `bifrost/queue-redis` | Fila Redis opcional |
+| `bifrost/queue-worker` | Worker opcional para consumo de filas |
 | `bifrost/database-pdo` | Fabrica PDO generica opcional |
 | `bifrost/database-mysql` | Banco MySQL opcional |
 | `bifrost/database-postgresql` | Banco PostgreSQL opcional |
+| `bifrost/database-sqlite` | Banco SQLite opcional |
 | `bifrost/datatype-core` | Base comum para DataTypes |
-| `bifrost/datatype-email` | DataType Email opcional |
-| `bifrost/datatype-cpf` | DataType CPF opcional |
+| `bifrost/datatype-*` | DataTypes opcionais instalados individualmente |
 | `bifrost/datatypes` | Agregador opcional com todos os DataTypes |
+| `bifrost/log-stdout` | Logs em stdout/stderr |
+| `bifrost/log-file` | Logs em arquivo |
 | `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
 | `bifrost/storage-local` | Storage local opcional |
 | `bifrost/storage-s3` | Storage S3 opcional |
@@ -51,7 +54,7 @@ composer require bifrost/database-mysql
 composer require bifrost/database-postgresql
 ```
 
-O arquivo `config/extensions.php` do skeleton registra fila instalada e
+O arquivo `core/config/extensions.php` do skeleton registra fila instalada e
 adapters selecionados. Cache e selecionado por `CACHE_DRIVER=apcu|redis`;
 banco, por `DB_DRIVER=mysql|postgresql`.
 
@@ -67,28 +70,28 @@ Com cache APCu:
 
 ```bash
 composer require bifrost/cache-apcu
-docker compose -f docker-compose.yml -f compose/apcu.yml up --build
+docker compose -f docker-compose.yml -f core/compose/apcu.yml up --build
 ```
 
 Com Redis para cache e/ou fila:
 
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
-docker compose -f docker-compose.yml -f compose/redis.yml up --build
+docker compose -f docker-compose.yml -f core/compose/redis.yml up --build
 ```
 
 Com MySQL:
 
 ```bash
 composer require bifrost/database-mysql
-docker compose -f docker-compose.yml -f compose/mysql.yml up --build
+docker compose -f docker-compose.yml -f core/compose/mysql.yml up --build
 ```
 
 Com PostgreSQL:
 
 ```bash
 composer require bifrost/database-postgresql
-docker compose -f docker-compose.yml -f compose/postgresql.yml up --build
+docker compose -f docker-compose.yml -f core/compose/postgresql.yml up --build
 ```
 
 Cada complemento instala na imagem PHP somente a extensao exigida pelo
@@ -110,17 +113,20 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |   |-- datatype-core/
 |   |-- datatype-email/
 |   |-- datatypes/
+|   |-- log-stdout/
+|   |-- log-file/
 |   |-- log-mongodb/
 |   |-- storage-local/
 |   `-- storage-s3/
 |-- skeleton/
 |   |-- app/
-|   |-- bootstrap/
-|   |-- compose/
-|   |-- config/
-|   |-- public/
-|   `-- routes/
-|-- docker/modular/
+|   |-- core/
+|   |   |-- bootstrap/
+|   |   |-- compose/
+|   |   |-- config/
+|   |   `-- routes/
+|   `-- public/
+|-- .devcontainer/
 |-- docs/
 `-- .github/workflows/
 ```
@@ -144,20 +150,28 @@ public/index.php
 
 ## Desenvolvimento
 
-O ecossistema completo e testado em containers:
+O ecossistema completo e testado diretamente dentro do Dev Container:
 
 ```bash
-docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests
+sh .devcontainer/check.sh
 ```
 
 O Dockerfile distribuido com o skeleton resolve pacotes pelo repositorio
 Composer publicado. Durante desenvolvimento deste monorepo, use a verificacao
 modular acima, que injeta dependencias locais por `path`.
 
+Uma maquina de desenvolvimento precisa apenas de Docker, Visual Studio Code e
+a extensao Dev Containers. O ambiente em `.devcontainer/` instala PHP,
+Composer e extensoes, alem de subir Redis, MySQL e PostgreSQL.
+
 ## Documentacao
 
-- [Documentacao humana](docs/human/index.html)
+- [Documentacao humana](docs/html/index.html)
 - [Documentacao para IAs](docs/ias/index.md)
+
+A documentacao humana em `docs/html/` e publicada no GitHub Pages quando a
+branch `main` recebe alteracoes ou quando o workflow de release dispara
+`tag-created`.
 
 ## Licenca
 

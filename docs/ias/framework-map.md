@@ -59,3 +59,19 @@
 - Implementacoes futuras de cluster, roteamento de leitura/escrita ou balanceamento devem implementar `RedisClient`.
 - `bifrost/storage-s3` fornece `S3ClientFactory` e `S3ClientManager`.
 - Extensoes S3 devem usar `S3ClientFactory` em vez de criar `S3Client` diretamente.
+
+## Ambiente Local
+
+- O ambiente local oficial fica em `.devcontainer/`.
+- A maquina local precisa apenas de Docker, Visual Studio Code e Dev Containers.
+- O Dev Container instala PHP, Composer e extensoes necessarias aos pacotes.
+- Redis, MySQL e PostgreSQL sobem por `.devcontainer/docker-compose.services.yml`.
+- A suite modular completa roda dentro do Dev Container com
+  `sh .devcontainer/check.sh`.
+
+## Documentacao Publicada
+
+- A documentacao visual fica em `docs/html/`.
+- `php docs/generate-reference.php` regenera a referencia de API publica.
+- `.github/workflows/publish-docs-pages.yml` publica `docs/html/` no GitHub
+  Pages em mudancas da `main` e no evento `tag-created`.

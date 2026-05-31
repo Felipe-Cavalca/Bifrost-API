@@ -11,6 +11,9 @@ final class ExampleTaskHandler implements TaskHandler
 {
     /**
      * Processa uma tarefa de exemplo emitindo uma linha no stdout.
+     *
+     * Cada handler deve ter uma responsabilidade clara. Registre novos
+     * handlers em tasks.php para que o worker consiga localiza-los pelo nome.
      */
     public function handle(TaskPayload $payload): void
     {

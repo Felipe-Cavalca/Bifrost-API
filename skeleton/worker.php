@@ -15,8 +15,10 @@ if (!class_exists(QueueWorker::class)) {
 }
 
 /** @var Application $app */
-$app = require __DIR__ . '/bootstrap/app.php';
+$app = require __DIR__ . '/core/bootstrap/app.php';
 
+// Registre novos handlers em app/Worker/tasks.php. Este entrypoint somente
+// prepara o worker generico e entrega a execucao para o pacote queue-worker.
 /** @var TaskRegistry $tasks */
 $tasks = require __DIR__ . '/app/Worker/tasks.php';
 

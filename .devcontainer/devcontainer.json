@@ -1,5 +1,5 @@
 {
-  "name": "Bifrost API",
+  "name": "Bifrost Framework",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "build": {
@@ -7,14 +7,20 @@
     "context": ".."
   },
   "containerEnv": {
-    "BIFROST_WORKSPACE": "${localWorkspaceFolder}"
+    "BIFROST_WORKSPACE": "${localWorkspaceFolder}",
+    "REDIS_HOST": "redis",
+    "MYSQL_HOST": "mysql",
+    "POSTGRES_HOST": "postgres"
   },
+  "runArgs": [
+    "--network=bifrost-devcontainer"
+  ],
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
     }
   },
-  "initializeCommand": "docker compose -f ${localWorkspaceFolder}/docker/modular/docker-compose.test.yml up -d redis mysql postgres",
+  "initializeCommand": "docker compose -f ${localWorkspaceFolder}/.devcontainer/docker-compose.services.yml up -d",
   "customizations": {
     "vscode": {
       "extensions": [

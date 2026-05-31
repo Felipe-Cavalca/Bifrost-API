@@ -25,7 +25,7 @@ final class LogExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('LOG_DRIVER deve ser stdout, file ou mongodb.');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRequiresInstalledPackageForConfiguredStdoutLog(): void
@@ -35,7 +35,7 @@ final class LogExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Instale bifrost/log-stdout');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRequiresInstalledPackageForConfiguredFileLog(): void
@@ -45,7 +45,7 @@ final class LogExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Instale bifrost/log-file');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 
     public function testRequiresInstalledPackageForConfiguredMongoLog(): void
@@ -55,6 +55,6 @@ final class LogExtensionConfigurationTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Instale bifrost/log-mongodb');
 
-        require dirname(__DIR__) . '/config/extensions.php';
+        require dirname(__DIR__) . '/core/config/extensions.php';
     }
 }

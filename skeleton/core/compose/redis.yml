@@ -1,0 +1,22 @@
+services:
+  api:
+    # Instala ext-redis e configura os pacotes opcionais que usam Redis.
+    build:
+      args:
+        INSTALL_REDIS: 1
+    environment:
+      CACHE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    # Servico compartilhado por cache e filas quando ambos forem instalados.
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

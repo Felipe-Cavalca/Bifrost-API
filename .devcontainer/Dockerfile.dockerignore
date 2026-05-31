@@ -1,0 +1,16 @@
+.git
+.github
+.vscode
+
+**/vendor
+**/.phpunit.cache
+**/.phpstan.cache
+**/.php-cs-fixer.cache
+
+tmp
+storage
+
+*.log
+.env
+.env.*
+!skeleton/.env.example
