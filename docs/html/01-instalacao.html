@@ -26,25 +26,28 @@
                 <p class="lead">Para criar uma aplicação nova, use o skeleton. Ele é o projeto base para quem vai consumir o framework.</p>
 
                 <h2>Criar projeto</h2>
-                <p>Quando o pacote estiver publicado, o comando esperado é:</p>
-                <pre><code class="language-bash">composer create-project bifrost/skeleton minha-api</code></pre>
-
-                <p>Durante testes locais do monorepo, use um repositório Composer do tipo <code>path</code> apontando para o skeleton.</p>
-                <pre><code class="language-bash">composer create-project bifrost/skeleton minha-api 1.0.0 \
-  --repository='{"type":"path","url":"/repo/skeleton","options":{"symlink":false},"versions":{"bifrost/skeleton":"1.0.0"}}'</code></pre>
+                <p>Crie o diretório do sistema e instale o backend dentro de <code>api/</code>:</p>
+                <pre><code class="language-bash">mkdir minha-api
+cd minha-api
+mkdir api
+cd api
+composer create-project bifrost/skeleton .</code></pre>
 
                 <div class="callout">
-                    <p>O diretório de destino deve estar vazio ou não existir. Isso simula uma instalação real de usuário final.</p>
+                    <p>O diretório de destino deve estar vazio ou não existir.</p>
                 </div>
 
-                <h2>Instalar dependências</h2>
-                <p>Entre na pasta da aplicação e instale as dependências do projeto gerado.</p>
-                <pre><code class="language-bash">cd minha-api/api
-composer install</code></pre>
+                <h2>Entre na aplicação</h2>
+                <p>O Composer já instala as dependências ao criar o projeto. Entre na pasta gerada para executar os próximos comandos.</p>
+                <pre><code class="language-bash">cd minha-api/api</code></pre>
 
                 <h2>Dependências de desenvolvimento</h2>
                 <p>Em ambiente local, dependências de teste e qualidade podem aparecer em <code>vendor/</code>. Isso é normal. Em produção, instale sem dependências de desenvolvimento.</p>
                 <pre><code class="language-bash">composer install --no-dev --optimize-autoloader</code></pre>
+
+                <h2>Extensões opcionais</h2>
+                <p>O projeto inicial instala somente o framework. Cache, banco, filas, logs, storage e DataTypes são módulos independentes: instale apenas os pacotes exigidos pela aplicação.</p>
+                <p>Consulte <a href="modulos/index.html">Módulos opcionais</a> para escolher o pacote adequado. Pacotes de infraestrutura podem exigir configuração no <code>.env</code> e um overlay do Docker Compose.</p>
 
                 <div class="next">
                     <a href="index.html">Visão geral</a>

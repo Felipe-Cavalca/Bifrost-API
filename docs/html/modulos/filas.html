@@ -18,9 +18,11 @@
             <span class="eyebrow">Módulos</span>
             <h1>Filas</h1>
             <p class="lead">Use filas quando uma tarefa não precisa bloquear a resposta HTTP, como envio de e-mail, processamento assíncrono ou integração lenta.</p>
-            <h2>Pacote disponível</h2>
-            <pre><code class="language-bash">composer require bifrost/queue-redis</code></pre>
+            <h2>Pacotes disponíveis</h2>
+            <pre><code class="language-bash">composer require bifrost/queue-redis bifrost/queue-worker</code></pre>
             <p>O pacote usa Redis como backend. Se outra parte da aplicação também usa Redis com a mesma configuração, a conexão deve ser reutilizada pelo pacote base.</p>
+            <p>O pacote <code>bifrost/queue-redis</code> publica tarefas. O pacote <code>bifrost/queue-worker</code> permite consumi-las com o entrypoint <code>worker.php</code> do skeleton:</p>
+            <pre><code class="language-bash">php worker.php --queue=default</code></pre>
             <h2>Quando usar</h2>
             <ul><li>Operações demoradas que podem rodar depois.</li><li>Integrações externas que não precisam responder na hora.</li><li>Processamento que pode ser repetido em caso de falha.</li></ul>
             <div class="next"><a href="logs.html">Logs</a><a href="../06-deploy.html">Docker e deploy</a></div>

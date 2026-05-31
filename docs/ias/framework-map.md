@@ -11,8 +11,14 @@
 - `HttpMethod`: enum de metodos HTTP suportados.
 - `HttpStatusCode`: enum de status HTTP comuns e classificacao por familia.
 - `Router` e `Route`: roteamento HTTP.
+- `ConventionRouteResolver`: fallback `/controller/action` para actions publicas.
 - `ControllerResolver`: invoca controllers e valida attributes.
 - `HttpException`: excecao HTTP padronizada para respostas JSON com status, erros e headers.
+
+Rotas explicitas tem prioridade. Quando nenhuma rota corresponde a URL,
+`ConventionRouteResolver` procura `App\Http\Controller\{Nome}Controller` e uma
+action publica pela convencao `/controller/action`. Quando a action for
+omitida, usa `index`. Caminhos com segmentos adicionais nao sao expostos.
 
 ## Observabilidade HTTP
 
@@ -46,7 +52,6 @@
 - `BeforeRequestAttribute`
 - `AfterResponseAttribute`
 - `TransactionManager`
-- `LogWriter`
 - `Insertable`
 - `Responseable`
 

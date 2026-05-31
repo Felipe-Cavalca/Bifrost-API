@@ -37,14 +37,23 @@
 }</code></pre>
 
                 <h2>Registro de rota</h2>
-                <p>Use os atalhos da <a href="referencia/bifrost-framework-application.html"><code>Application</code></a>, como <a href="referencia/bifrost-framework-application.html#get"><code>get()</code></a>, <a href="referencia/bifrost-framework-application.html#post"><code>post()</code></a>, <a href="referencia/bifrost-framework-application.html#put"><code>put()</code></a>, <a href="referencia/bifrost-framework-application.html#patch"><code>patch()</code></a> e <a href="referencia/bifrost-framework-application.html#delete"><code>delete()</code></a>.</p>
-                <pre><code class="language-php">$app-&gt;get('/health', [HealthController::class, 'show']);</code></pre>
+                <p>Actions públicas de controllers seguem a convenção <code>/controller/action</code>. Assim, <code>HealthController::show()</code> responde em <code>/health/show</code> sem cadastro manual. Quando a action for omitida, o framework procura <code>index()</code>. Sem o attribute <a href="referencia/bifrost-framework-attributes-method.html"><code>#[Method(...)]</code></a>, uma action convencional aceita qualquer método HTTP suportado.</p>
+                <p>Use <code>app/Http/HttpRoutes.php</code> somente para aliases ou URLs que não seguem essa convenção. O método estático recebe a <a href="referencia/bifrost-framework-application.html"><code>Application</code></a> explicitamente.</p>
+                <pre><code class="language-php">final class HttpRoutes
+{
+    public static function register(Application $app): void
+    {
+        $app-&gt;get('/health', [HealthController::class, 'show']);
+        $app-&gt;post('/users', [UserController::class, 'create']);
+    }
+}</code></pre>
+                <p>Rotas explícitas têm prioridade. Use os atalhos <a href="referencia/bifrost-framework-application.html#get"><code>get()</code></a>, <a href="referencia/bifrost-framework-application.html#post"><code>post()</code></a>, <a href="referencia/bifrost-framework-application.html#put"><code>put()</code></a>, <a href="referencia/bifrost-framework-application.html#patch"><code>patch()</code></a> e <a href="referencia/bifrost-framework-application.html#delete"><code>delete()</code></a>.</p>
 
                 <h2>Validação de campos</h2>
                 <p>Use attributes como <a href="referencia/bifrost-framework-attributes-requiredfields.html"><code>RequiredFields</code></a> para declarar quais campos ou parâmetros são esperados pela rota.</p>
-                <pre><code class="language-php">#[RequiredFields(['email', 'name'])]
-final class CreateUserController
+                <pre><code class="language-php">final class CreateUserController
 {
+    #[RequiredFields(['email', 'name'])]
     public static function handle(Request $request): Response
     {
         return Response::json(['created' =&gt; true], 201);

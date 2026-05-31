@@ -24,16 +24,15 @@
             <article class="article">
                 <span class="eyebrow">Comece aqui</span>
                 <h1>Primeiros passos</h1>
-                <p class="lead">Depois de criar o projeto, o fluxo normal é instalar dependências, rodar a API e criar a primeira rota.</p>
+                <p class="lead">Depois de criar o projeto, o fluxo normal é entrar no backend, rodar a API e criar o primeiro controller.</p>
 
                 <h2>1. Entre na aplicação</h2>
-                <p>O skeleton cria a aplicação dentro de <code>api/</code>. Esse é o diretório onde você executa Composer e comandos da API.</p>
-                <pre><code class="language-bash">cd minha-api/api
-composer install</code></pre>
+                <p>O skeleton cria o backend dentro de <code>api/</code>. Esse é o diretório onde você executa Composer e comandos da API.</p>
+                <pre><code class="language-bash">cd minha-api/api</code></pre>
 
                 <h2>2. Suba o servidor local</h2>
                 <p>Para um teste simples, o servidor embutido do PHP já permite validar uma rota HTTP.</p>
-                <pre><code class="language-bash">php -S 0.0.0.0:8000 -t public</code></pre>
+                <pre><code class="language-bash">php -S 0.0.0.0:8000 -t public public/index.php</code></pre>
 
                 <h2>3. Crie um controller</h2>
                 <p>Controllers recebem uma <a href="referencia/bifrost-framework-http-request.html"><code>Request</code></a> e devolvem uma <a href="referencia/bifrost-framework-http-response.html"><code>Response</code></a>. Mantenha cada controller focado em uma intenção clara.</p>
@@ -41,23 +40,24 @@ composer install</code></pre>
 
 namespace App\Http\Controller;
 
+use Bifrost\Framework\Attributes\Method;
 use Bifrost\Framework\Http\Request;
 use Bifrost\Framework\Http\Response;
 
 final class HelloController
 {
+    #[Method('GET')]
     public static function show(Request $request): Response
     {
         return Response::json(['message' =&gt; 'Olá, Bifrost']);
     }
 }</code></pre>
 
-                <h2>4. Registre a rota</h2>
-                <p>No skeleton, rotas ficam em <code>core/routes/api.php</code> e são registradas na <a href="referencia/bifrost-framework-application.html"><code>Application</code></a>. Para uma rota GET, use <a href="referencia/bifrost-framework-application.html#get"><code>Application::get()</code></a>.</p>
-                <pre><code class="language-php">$app-&gt;get('/hello', [HelloController::class, 'show']);</code></pre>
+                <h2>4. Use a rota convencional</h2>
+                <p>Actions públicas seguem a convenção <code>/controller/action</code>. O método <code>HelloController::show()</code> responde em <code>/hello/show</code> sem cadastro manual. Use <a href="referencia/bifrost-framework-attributes-method.html"><code>#[Method('GET')]</code></a> para restringir os métodos HTTP aceitos. Quando precisar de um alias ou de uma URL diferente, registre-a em <code>app/Http/HttpRoutes.php</code> usando a <a href="referencia/bifrost-framework-application.html"><code>Application</code></a>.</p>
 
                 <h2>5. Teste a resposta</h2>
-                <pre><code class="language-bash">curl http://localhost:8000/hello</code></pre>
+                <pre><code class="language-bash">curl http://localhost:8000/hello/show</code></pre>
 
                 <div class="next">
                     <a href="01-instalacao.html">Instalação</a>

@@ -60,10 +60,10 @@ return $user;</code></pre>
 
                 <h2>Erros previsíveis</h2>
                 <p>Quando precisar interromper a request com um status HTTP, use <a href="referencia/bifrost-framework-exceptions-httpexception.html"><code>HttpException</code></a> para manter o formato de erro consistente.</p>
-                <pre><code class="language-php">throw new HttpException(404, 'Registro não encontrado.');</code></pre>
+                <pre><code class="language-php">throw HttpException::notFound('Registro não encontrado.');</code></pre>
 
                 <h2>Request ID</h2>
-                <p>O framework propaga <code>X-Request-Id</code>. Esse identificador ajuda a cruzar logs e respostas sem expor dados sensíveis.</p>
+                <p>O framework propaga <code>X-Request-Id</code> na resposta. Quando o cliente envia esse header, o identificador também pode ser reutilizado pelos logs para facilitar a correlação sem expor dados sensíveis.</p>
 
                 <div class="next">
                     <a href="03-rotas-e-controllers.html">Rotas e controllers</a>
