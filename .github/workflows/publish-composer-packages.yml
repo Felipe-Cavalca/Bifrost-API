@@ -1,0 +1,156 @@
+name: Publicar pacotes Composer
+
+on:
+  repository_dispatch:
+    types: [tag-created]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag existente no monorepo que sera publicada
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  split-and-publish:
+    name: Publicar ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: bifrost/framework
+            path: packages/framework
+            repository: bifrost-framework
+          - package: bifrost/cache-apcu
+            path: packages/cache-apcu
+            repository: bifrost-cache-apcu
+          - package: bifrost/redis
+            path: packages/redis
+            repository: bifrost-redis
+          - package: bifrost/cache-redis
+            path: packages/cache-redis
+            repository: bifrost-cache-redis
+          - package: bifrost/queue-redis
+            path: packages/queue-redis
+            repository: bifrost-queue-redis
+          - package: bifrost/queue-worker
+            path: packages/queue-worker
+            repository: bifrost-queue-worker
+          - package: bifrost/database-pdo
+            path: packages/database-pdo
+            repository: bifrost-database-pdo
+          - package: bifrost/database-mysql
+            path: packages/database-mysql
+            repository: bifrost-database-mysql
+          - package: bifrost/database-postgresql
+            path: packages/database-postgresql
+            repository: bifrost-database-postgresql
+          - package: bifrost/database-sqlite
+            path: packages/database-sqlite
+            repository: bifrost-database-sqlite
+          - package: bifrost/datatype-core
+            path: packages/datatype-core
+            repository: bifrost-datatype-core
+          - package: bifrost/datatype-email
+            path: packages/datatype-email
+            repository: bifrost-datatype-email
+          - package: bifrost/datatype-url
+            path: packages/datatype-url
+            repository: bifrost-datatype-url
+          - package: bifrost/datatype-base64
+            path: packages/datatype-base64
+            repository: bifrost-datatype-base64
+          - package: bifrost/datatype-json
+            path: packages/datatype-json
+            repository: bifrost-datatype-json
+          - package: bifrost/datatype-uuid
+            path: packages/datatype-uuid
+            repository: bifrost-datatype-uuid
+          - package: bifrost/datatype-date-time
+            path: packages/datatype-date-time
+            repository: bifrost-datatype-date-time
+          - package: bifrost/datatype-cpf
+            path: packages/datatype-cpf
+            repository: bifrost-datatype-cpf
+          - package: bifrost/datatype-cnpj
+            path: packages/datatype-cnpj
+            repository: bifrost-datatype-cnpj
+          - package: bifrost/datatype-file-name
+            path: packages/datatype-file-name
+            repository: bifrost-datatype-file-name
+          - package: bifrost/datatype-folder-name
+            path: packages/datatype-folder-name
+            repository: bifrost-datatype-folder-name
+          - package: bifrost/datatype-file-path
+            path: packages/datatype-file-path
+            repository: bifrost-datatype-file-path
+          - package: bifrost/datatype-folder-path
+            path: packages/datatype-folder-path
+            repository: bifrost-datatype-folder-path
+          - package: bifrost/datatype-storage-key
+            path: packages/datatype-storage-key
+            repository: bifrost-datatype-storage-key
+          - package: bifrost/datatypes
+            path: packages/datatypes
+            repository: bifrost-datatypes
+          - package: bifrost/log-stdout
+            path: packages/log-stdout
+            repository: bifrost-log-stdout
+          - package: bifrost/log-file
+            path: packages/log-file
+            repository: bifrost-log-file
+          - package: bifrost/log-mongodb
+            path: packages/log-mongodb
+            repository: bifrost-log-mongodb
+          - package: bifrost/storage-local
+            path: packages/storage-local
+            repository: bifrost-storage-local
+          - package: bifrost/storage-s3
+            path: packages/storage-s3
+            repository: bifrost-storage-s3
+          - package: bifrost/skeleton
+            path: skeleton
+            repository: bifrost-skeleton
+
+    steps:
+      - name: Checkout do monorepo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.client_payload.tag || inputs.tag }}
+
+      - name: Validar configuracao
+        env:
+          PACKAGE_PATH: ${{ matrix.path }}
+          PACKAGES_TOKEN: ${{ secrets.BIFROST_PACKAGES_TOKEN }}
+        run: |
+          test -n "$PACKAGES_TOKEN" || {
+            echo "::error::Configure o secret BIFROST_PACKAGES_TOKEN."
+            exit 1
+          }
+          test -f "$PACKAGE_PATH/composer.json" || {
+            echo "::error::composer.json ausente em $PACKAGE_PATH."
+            exit 1
+          }
+
+      - name: Separar historico do pacote
+        id: split
+        env:
+          PACKAGE_PATH: ${{ matrix.path }}
+        run: |
+          split_sha="$(git subtree split --prefix="$PACKAGE_PATH")"
+          echo "sha=$split_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar branch e tag
+        env:
+          PACKAGE_REPOSITORY: ${{ matrix.repository }}
+          PACKAGES_TOKEN: ${{ secrets.BIFROST_PACKAGES_TOKEN }}
+          SPLIT_SHA: ${{ steps.split.outputs.sha }}
+          TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+        run: |
+          remote="https://x-access-token:${PACKAGES_TOKEN}@github.com/${GITHUB_REPOSITORY_OWNER}/${PACKAGE_REPOSITORY}.git"
+          git push "$remote" "$SPLIT_SHA:refs/heads/main" --force
+          git push "$remote" "$SPLIT_SHA:refs/tags/$TAG" --force

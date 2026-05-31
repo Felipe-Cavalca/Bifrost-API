@@ -80,3 +80,5 @@ omitida, usa `index`. Caminhos com segmentos adicionais nao sao expostos.
 - `php docs/generate-reference.php` regenera a referencia de API publica.
 - `.github/workflows/publish-docs-pages.yml` publica `docs/html/` no GitHub
   Pages em mudancas da `main` e no evento `tag-created`.
+- `.github/workflows/publish-composer-packages.yml` separa `packages/*` e
+  `skeleton/` em repositorios distribuiveis quando recebe `tag-created`.
