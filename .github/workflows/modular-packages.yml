@@ -65,7 +65,34 @@ jobs:
           MYSQL_HOST: 127.0.0.1
           POSTGRES_HOST: 127.0.0.1
         run: |
-          for package in datatypes redis cache-apcu queue-worker database-pdo log-mongodb storage-local storage-s3; do
+          datatype_packages="
+          datatype-core
+          datatype-email
+          datatype-url
+          datatype-base64
+          datatype-json
+          datatype-uuid
+          datatype-date-time
+          datatype-cpf
+          datatype-cnpj
+          datatype-file-name
+          datatype-folder-name
+          datatype-file-path
+          datatype-folder-path
+          datatype-storage-key
+          "
+          for package in $datatype_packages datatypes; do
+            cd "$GITHUB_WORKSPACE/packages/$package"
+            composer config minimum-stability dev
+            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+            for repository in $datatype_packages; do
+              composer config "repositories.$repository" "{\"type\":\"path\",\"url\":\"../$repository\",\"options\":{\"versions\":{\"bifrost/$repository\":\"1.0.0\"}}}"
+            done
+            composer update --no-interaction --no-progress --prefer-dist
+            composer validate --strict --no-check-publish
+            composer test
+          done
+          for package in redis cache-apcu queue-worker database-pdo log-mongodb storage-local storage-s3; do
             cd "$GITHUB_WORKSPACE/packages/$package"
             composer config minimum-stability dev
             composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'

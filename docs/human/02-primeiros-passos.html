@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primeiros passos - Bifrost Framework</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="mobile-bar"><strong>Bifrost</strong><button class="menu-button" data-menu-toggle>Menu</button></div>
+    <div class="layout">
+        <aside class="sidebar">
+            <a class="brand" href="index.html"><span class="brand-mark">B</span><span><span class="brand-name">Bifrost</span><span class="brand-subtitle">Framework Composer</span></span></a>
+            <button class="theme-button" data-theme-toggle>Tema escuro</button>
+            <nav>
+                <section class="nav-section"><p class="nav-title">Comece aqui</p><a href="index.html" class="nav-link">Visão geral</a><a href="01-instalacao.html" class="nav-link">Instalação</a><a href="02-primeiros-passos.html" class="nav-link">Primeiros passos</a></section>
+                <section class="nav-section"><p class="nav-title">Usando o framework</p><a href="03-rotas-e-controllers.html" class="nav-link">Rotas e controllers</a><a href="04-request-response.html" class="nav-link">Request e response</a><a href="05-datatypes.html" class="nav-link">DataTypes</a></section>
+                <section class="nav-section"><p class="nav-title">Módulos</p><a href="modulos/index.html" class="nav-link">Todos os módulos</a><a href="modulos/cache.html" class="nav-link">Cache</a><a href="modulos/redis.html" class="nav-link">Redis</a><a href="modulos/database.html" class="nav-link">Banco de dados</a><a href="modulos/storage.html" class="nav-link">Storage</a><a href="modulos/logs.html" class="nav-link">Logs</a><a href="modulos/filas.html" class="nav-link">Filas</a></section>
+                <section class="nav-section"><p class="nav-title">Entrega</p><a href="06-deploy.html" class="nav-link">Docker e deploy</a></section>
+            </nav>
+        </aside>
+        <main class="content">
+            <article class="article">
+                <span class="eyebrow">Comece aqui</span>
+                <h1>Primeiros passos</h1>
+                <p class="lead">Depois de criar o projeto, o fluxo normal é instalar dependências, rodar a API e criar a primeira rota.</p>
+
+                <h2>1. Entre na aplicação</h2>
+                <p>O skeleton cria a aplicação dentro de <code>api/</code>. Esse é o diretório onde você executa Composer e comandos da API.</p>
+                <pre><code class="language-bash">cd minha-api/api
+composer install</code></pre>
+
+                <h2>2. Suba o servidor local</h2>
+                <p>Para um teste simples, o servidor embutido do PHP já permite validar uma rota HTTP.</p>
+                <pre><code class="language-bash">php -S 0.0.0.0:8000 -t public</code></pre>
+
+                <h2>3. Crie um controller</h2>
+                <p>Controllers recebem a request e devolvem uma response. Mantenha cada controller focado em uma intenção clara.</p>
+                <pre><code class="language-php">&lt;?php
+
+namespace App\Controllers;
+
+use Bifrost\Framework\Http\Request;
+use Bifrost\Framework\Http\Response;
+
+final class HelloController
+{
+    public static function show(Request $request): Response
+    {
+        return Response::json(['message' =&gt; 'Olá, Bifrost']);
+    }
+}</code></pre>
+
+                <h2>4. Registre a rota</h2>
+                <p>O arquivo exato depende do skeleton, mas a ideia é mapear método e caminho para o controller.</p>
+                <pre><code class="language-php">$router-&gt;get('/hello', [HelloController::class, 'show']);</code></pre>
+
+                <h2>5. Teste a resposta</h2>
+                <pre><code class="language-bash">curl http://localhost:8000/hello</code></pre>
+
+                <div class="next">
+                    <a href="01-instalacao.html">Instalação</a>
+                    <a href="03-rotas-e-controllers.html">Rotas e controllers</a>
+                </div>
+            </article>
+        </main>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,8 +1,17 @@
 # bifrost/datatypes
 
-DataTypes reutilizaveis para aplicacoes Bifrost.
+Pacote agregador dos DataTypes Bifrost.
 
 ## Uso
+
+Instale apenas o DataType que sua aplicacao usa:
+
+```bash
+composer require bifrost/datatype-email
+composer require bifrost/datatype-cpf
+```
+
+Se quiser todos os DataTypes mantidos pelo Bifrost, use o agregador:
 
 ```bash
 composer require bifrost/datatypes

@@ -4,7 +4,21 @@
 | --- | --- |
 | `bifrost/framework` | Core HTTP |
 | `bifrost/skeleton` | Projeto inicial |
-| `bifrost/datatypes` | DataTypes reutilizaveis |
+| `bifrost/datatype-core` | Base para DataTypes |
+| `bifrost/datatype-email` | DataType Email |
+| `bifrost/datatype-url` | DataType Url |
+| `bifrost/datatype-base64` | DataType Base64 |
+| `bifrost/datatype-json` | DataType Json |
+| `bifrost/datatype-uuid` | DataType Uuid |
+| `bifrost/datatype-date-time` | DataType DateTime |
+| `bifrost/datatype-cpf` | DataType CPF |
+| `bifrost/datatype-cnpj` | DataType CNPJ |
+| `bifrost/datatype-file-name` | DataType FileName |
+| `bifrost/datatype-folder-name` | DataType FolderName |
+| `bifrost/datatype-file-path` | DataType FilePath |
+| `bifrost/datatype-folder-path` | DataType FolderPath |
+| `bifrost/datatype-storage-key` | DataType StorageKey |
+| `bifrost/datatypes` | Agregador com todos os DataTypes |
 | `bifrost/cache-apcu` | Cache local APCu |
 | `bifrost/redis` | Conexao Redis reutilizavel para extensoes |
 | `bifrost/cache-redis` | Cache Redis |

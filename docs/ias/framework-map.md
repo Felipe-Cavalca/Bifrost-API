@@ -45,6 +45,7 @@
 - `AfterResponseAttribute`
 - `TransactionManager`
 - `LogWriter`
+- `Insertable`
 
 ## Extensoes de Infraestrutura
 

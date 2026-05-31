@@ -17,6 +17,7 @@ use Bifrost\DataTypes\Json;
 use Bifrost\DataTypes\Storage\StorageKey;
 use Bifrost\DataTypes\Url;
 use Bifrost\DataTypes\Uuid;
+use Bifrost\Framework\Contracts\Insertable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -70,5 +71,13 @@ final class DataTypesTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         Email::from('invalid');
+    }
+
+    public function testDataTypesAreInsertable(): void
+    {
+        $email = Email::from('team@bifrost.dev');
+
+        self::assertInstanceOf(Insertable::class, $email);
+        self::assertSame('team@bifrost.dev', $email->value());
     }
 }

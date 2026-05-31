@@ -1,16 +1,23 @@
 {
   "name": "bifrost/datatypes",
-  "description": "DataTypes reutilizaveis para aplicacoes Bifrost.",
+  "description": "Pacote agregador dos DataTypes Bifrost.",
   "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=8.1",
-    "bifrost/framework": "^1.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Bifrost\\DataTypes\\": "src/"
-    }
+    "bifrost/datatype-base64": "^1.0",
+    "bifrost/datatype-cnpj": "^1.0",
+    "bifrost/datatype-cpf": "^1.0",
+    "bifrost/datatype-date-time": "^1.0",
+    "bifrost/datatype-email": "^1.0",
+    "bifrost/datatype-file-name": "^1.0",
+    "bifrost/datatype-file-path": "^1.0",
+    "bifrost/datatype-folder-name": "^1.0",
+    "bifrost/datatype-folder-path": "^1.0",
+    "bifrost/datatype-json": "^1.0",
+    "bifrost/datatype-storage-key": "^1.0",
+    "bifrost/datatype-url": "^1.0",
+    "bifrost/datatype-uuid": "^1.0"
   },
   "autoload-dev": {
     "psr-4": {
@@ -21,7 +28,7 @@
     "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
   },
   "scripts": {
-    "lint": "find src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
+    "lint": "find tests -name '*.php' -print0 | xargs -0 -n1 php -l",
     "test": "phpunit -c phpunit.xml",
     "check": [
       "@lint",
