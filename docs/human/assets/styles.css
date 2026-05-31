@@ -302,6 +302,43 @@ pre code {
     padding: 0;
 }
 
+.token-keyword {
+    color: #93c5fd;
+}
+
+.token-type {
+    color: #67e8f9;
+}
+
+.token-string {
+    color: #86efac;
+}
+
+.token-number {
+    color: #fcd34d;
+}
+
+.token-variable {
+    color: #f9a8d4;
+}
+
+.token-function {
+    color: #c4b5fd;
+}
+
+.token-comment {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.token-operator {
+    color: #fca5a5;
+}
+
+.token-attribute {
+    color: #fde68a;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

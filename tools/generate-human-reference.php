@@ -105,7 +105,10 @@ function publicMethods(string $source): array
     foreach ($matches as $match) {
         $docRaw = methodDoc($source, $match[0][1]);
         $paramsRaw = trim($match[3][0]);
-        $returnType = trim($match[4][0] ?? 'mixed');
+        $return = returnDoc($docRaw);
+        $returnType = $match[2][0] === '__construct'
+            ? 'void'
+            : normalizeType($return['type'] !== '' ? $return['type'] : trim($match[4][0] ?? 'mixed'));
         $methods[] = [
             'name' => $match[2][0],
             'static' => trim($match[1][0] ?? '') !== '',
@@ -114,7 +117,7 @@ function publicMethods(string $source): array
             'line' => lineNumber($source, $match[0][0]),
             'description' => cleanDoc($docRaw),
             'paramDocs' => paramDocs($docRaw),
-            'returnDoc' => returnDoc($docRaw),
+            'returnDoc' => $return['description'],
             'signature' => methodSignature($match[0][0]),
         ];
     }
@@ -146,11 +149,11 @@ function paramDocs(string $doc): array
 {
     $params = [];
 
-    if (preg_match_all('/@param\s+([^\s]+)\s+\$([A-Za-z_][A-Za-z0-9_]*)\s*(.*)/', $doc, $matches, PREG_SET_ORDER)) {
+    if (preg_match_all('/@param\s+(.+?)\s+\$([A-Za-z_][A-Za-z0-9_]*)[ \t]*(.*)$/m', $doc, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $match) {
             $params[$match[2]] = [
-                'type' => $match[1],
-                'description' => trim($match[3]),
+                'type' => normalizeType($match[1]),
+                'description' => cleanInlineDoc($match[3]),
             ];
         }
     }
@@ -158,13 +161,83 @@ function paramDocs(string $doc): array
     return $params;
 }
 
-function returnDoc(string $doc): string
+function returnDoc(string $doc): array
 {
-    if (preg_match('/@return\s+(.+)/', $doc, $match)) {
-        return trim($match[1]);
+    if (!preg_match('/@return\s+(.+)$/m', $doc, $match)) {
+        return ['type' => '', 'description' => ''];
     }
 
-    return '';
+    return parseTypeAndDescription(cleanInlineDoc($match[1]));
+}
+
+function parseTypeAndDescription(string $text): array
+{
+    $text = trim($text);
+    if ($text === '') {
+        return ['type' => '', 'description' => ''];
+    }
+
+    $typeEnd = typeEndPosition($text);
+    if ($typeEnd >= 0) {
+        return [
+            'type' => normalizeType(substr($text, 0, $typeEnd + 1)),
+            'description' => trim(substr($text, $typeEnd + 1)),
+        ];
+    }
+
+    if (preg_match('/^([^\s]+)(?:\s+(.*))?$/', $text, $match)) {
+        return [
+            'type' => normalizeType($match[1]),
+            'description' => trim($match[2] ?? ''),
+        ];
+    }
+
+    return ['type' => normalizeType($text), 'description' => ''];
+}
+
+function typeEndPosition(string $text): int
+{
+    $angleDepth = 0;
+    $shapeDepth = 0;
+    $last = strlen($text) - 1;
+
+    for ($i = 0; $i <= $last; $i++) {
+        $char = $text[$i];
+
+        if ($char === '<') {
+            $angleDepth++;
+            continue;
+        }
+
+        if ($char === '{') {
+            $shapeDepth++;
+            continue;
+        }
+
+        if ($char === '>' && $angleDepth > 0) {
+            $angleDepth--;
+            continue;
+        }
+
+        if ($char === '}' && $shapeDepth > 0) {
+            $shapeDepth--;
+            continue;
+        }
+
+        if (ctype_space($char) && $angleDepth === 0 && $shapeDepth === 0) {
+            return $i - 1;
+        }
+    }
+
+    return $last;
+}
+
+function cleanInlineDoc(string $text): string
+{
+    $text = trim($text);
+    $text = preg_replace('#\s*\*/$#', '', $text) ?? $text;
+
+    return trim($text);
 }
 
 function cleanDoc(string $doc): string
@@ -280,11 +353,21 @@ function methodParams(string $raw): array
 
         $params[] = [
             'name' => $match[2],
-            'type' => trim($match[1] ?? 'mixed') ?: 'mixed',
+            'type' => normalizeType(trim($match[1] ?? 'mixed') ?: 'mixed'),
         ];
     }
 
     return $params;
+}
+
+function normalizeType(string $type): string
+{
+    $type = trim($type);
+    $type = preg_replace('/\b(private|protected|public|readonly|static)\b\s*/', '', $type) ?? $type;
+    $type = preg_replace('/\s+/', ' ', $type) ?? $type;
+    $type = str_replace(', ', ',', $type);
+
+    return trim($type) === '' ? 'mixed' : trim($type);
 }
 
 function typeLinks(string $type, array $classes, array $shortNameIndex): string
@@ -307,10 +390,56 @@ function typeLinks(string $type, array $classes, array $shortNameIndex): string
             continue;
         }
 
+        $externalUrl = externalTypeUrl($clean);
+        if ($externalUrl !== null) {
+            $html .= '<a href="' . e($externalUrl) . '" target="_blank" rel="noreferrer"><code>' . e($part) . '</code></a>';
+            continue;
+        }
+
         $html .= e($part);
     }
 
     return $html === '' ? 'mixed' : $html;
+}
+
+function externalTypeUrl(string $type): ?string
+{
+    $type = ltrim($type, '\\');
+    $aliases = [
+        'AWS\S3\S3Client' => 'Aws\S3\S3Client',
+    ];
+    $type = $aliases[$type] ?? $type;
+
+    $links = [
+        'ArrayAccess' => 'https://www.php.net/manual/pt_BR/class.arrayaccess.php',
+        'BackedEnum' => 'https://www.php.net/manual/pt_BR/class.backedenum.php',
+        'DateTimeImmutable' => 'https://www.php.net/manual/pt_BR/class.datetimeimmutable.php',
+        'DateTimeInterface' => 'https://www.php.net/manual/pt_BR/class.datetimeinterface.php',
+        'Exception' => 'https://www.php.net/manual/pt_BR/class.exception.php',
+        'InvalidArgumentException' => 'https://www.php.net/manual/pt_BR/class.invalidargumentexception.php',
+        'IteratorAggregate' => 'https://www.php.net/manual/pt_BR/class.iteratoraggregate.php',
+        'JsonSerializable' => 'https://www.php.net/manual/pt_BR/class.jsonserializable.php',
+        'PDO' => 'https://www.php.net/manual/pt_BR/class.pdo.php',
+        'PDOStatement' => 'https://www.php.net/manual/pt_BR/class.pdostatement.php',
+        'Redis' => 'https://github.com/phpredis/phpredis',
+        'Result' => 'https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.Result.html',
+        'RuntimeException' => 'https://www.php.net/manual/pt_BR/class.runtimeexception.php',
+        'S3Client' => 'https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.S3.S3Client.html',
+        'Stringable' => 'https://www.php.net/manual/pt_BR/class.stringable.php',
+        'Throwable' => 'https://www.php.net/manual/pt_BR/class.throwable.php',
+        'Traversable' => 'https://www.php.net/manual/pt_BR/class.traversable.php',
+        'UnexpectedValueException' => 'https://www.php.net/manual/pt_BR/class.unexpectedvalueexception.php',
+        'BulkWrite' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-bulkwrite.php',
+        'Manager' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-manager.php',
+        'WriteConcern' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-writeconcern.php',
+        'Aws\Result' => 'https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.Result.html',
+        'Aws\S3\S3Client' => 'https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.S3.S3Client.html',
+        'MongoDB\Driver\BulkWrite' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-bulkwrite.php',
+        'MongoDB\Driver\Manager' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-manager.php',
+        'MongoDB\Driver\WriteConcern' => 'https://www.php.net/manual/pt_BR/class.mongodb-driver-writeconcern.php',
+    ];
+
+    return $links[$type] ?? null;
 }
 
 function layout(string $title, string $body, string $assetPrefix): string

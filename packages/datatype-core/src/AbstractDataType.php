@@ -6,10 +6,10 @@ namespace Bifrost\DataTypes;
 
 use Bifrost\Framework\Contracts\DataType;
 use Bifrost\Framework\Contracts\Insertable;
+use Bifrost\Framework\Contracts\Responseable;
 use InvalidArgumentException;
-use JsonSerializable;
 
-abstract readonly class AbstractDataType implements DataType, Insertable, JsonSerializable
+abstract readonly class AbstractDataType implements DataType, Insertable, Responseable
 {
     final protected function __construct(protected mixed $value)
     {

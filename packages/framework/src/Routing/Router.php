@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bifrost\Framework\Routing;
 
 use Bifrost\Framework\Http\Request;
+use Bifrost\Framework\Http\HttpMethod;
 
 /**
  * Registro e busca de rotas HTTP.
@@ -17,11 +18,13 @@ final class Router
     /**
      * Registra uma rota.
      *
+     * @param string|HttpMethod $method Metodo HTTP aceito pela rota.
+     * @param string $path Path da rota, com ou sem barra inicial.
      * @param mixed $handler Callable ou par [Controller::class, 'metodo'].
      */
-    public function add(string $method, string $path, mixed $handler): void
+    public function add(string|HttpMethod $method, string $path, mixed $handler): void
     {
-        $method = strtoupper($method);
+        $method = HttpMethod::fromValue($method)->value;
         $path = self::normalizePath($path);
         $this->routes[$path][$method] = new Route(method: $method, path: $path, handler: $handler);
     }

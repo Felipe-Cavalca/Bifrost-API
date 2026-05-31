@@ -157,14 +157,6 @@ final class ControllerResolver
 
     private function responseFromResult(mixed $result): Response
     {
-        if ($result instanceof Response) {
-            return $result;
-        }
-
-        if (is_array($result)) {
-            return Response::json(payload: $result);
-        }
-
-        return Response::text((string) $result);
+        return Response::fromResult($result);
     }
 }

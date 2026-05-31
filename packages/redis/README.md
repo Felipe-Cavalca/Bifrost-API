@@ -1,10 +1,11 @@
 # bifrost/redis
 
-Cliente Redis opcional e reutilizavel para extensoes do Bifrost Framework.
+Cliente Redis opcional, encapsulado e reutilizavel para extensoes do Bifrost Framework.
 
-Use este pacote quando uma extensao precisar de Redis sem duplicar a logica de
-conexao. `RedisConnectionManager` reutiliza a mesma conexao para configuracoes
-iguais e permite trocar a factory por uma implementacao futura de cluster.
+Use este pacote quando uma extensao precisar de Redis sem depender da classe
+nativa `Redis`. `RedisConnectionManager` reutiliza o mesmo cliente para
+configuracoes iguais e permite trocar a factory por uma implementacao futura
+de cluster, roteamento de leitura/escrita ou balanceamento.
 
 ```php
 use Bifrost\Extension\Redis\RedisConfig;

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\CacheRedis;
 
+use Bifrost\Extension\Redis\Contracts\RedisClient;
 use Bifrost\Framework\Contracts\CacheStore;
-use Redis;
 
 final class RedisCache implements CacheStore
 {
     /**
-     * @param Redis $redis Conexao Redis reutilizavel.
+     * @param RedisClient $redis Cliente Redis reutilizavel.
      * @param string $prefix Prefixo aplicado nas chaves.
      */
     public function __construct(
-        private readonly Redis $redis,
+        private readonly RedisClient $redis,
         private readonly string $prefix = ''
     ) {
     }

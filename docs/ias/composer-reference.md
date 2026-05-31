@@ -20,7 +20,7 @@ curl http://localhost:8080/health
 ## Lifecycle HTTP
 
 1. `public/index.php` cria `Request::fromGlobals()`.
-2. `bootstrap/app.php` cria `Application`, registra extensoes e rotas.
+2. `core/bootstrap/app.php` cria `Application`, registra extensoes e rotas.
 3. `HttpKernel` executa middlewares e resolve a rota.
 4. `ControllerResolver` valida attributes e chama o handler.
 5. O resultado vira `Response`.
@@ -31,9 +31,13 @@ Toda resposta recebe `X-Request-Id`. Erros JSON tambem recebem `request_id`.
 ## Controllers e Responses
 
 - Controllers recebem `Bifrost\Framework\Http\Request`.
-- Controllers retornam `Response`, array ou string.
+- Controllers retornam `Response`, `Responseable`, array ou string.
 - Use helpers de `Response`: `json`, `text`, `created`, `notFound`,
   `badRequest`, `internalServerError`.
+- Implemente `Bifrost\Framework\Contracts\Responseable` em objetos de dominio
+  que podem ser enviados diretamente como JSON, como usuarios ou arquivos.
+- `Responseable` e opt-in explicito: exponha somente campos seguros em
+  `jsonSerialize()`.
 - `HttpException` padroniza erro HTTP com status, erros e headers.
 
 ## Attributes
@@ -48,15 +52,25 @@ Toda resposta recebe `X-Request-Id`. Erros JSON tambem recebem `request_id`.
 Attributes de lifecycle implementam `BeforeRequestAttribute` ou
 `AfterResponseAttribute`.
 
+Projetos podem criar attributes proprios em `app/Attributes/`. Use isso para
+regras como permissao, autenticacao ou validacoes especificas do produto.
+
 ## DataTypes
 
 DataTypes implementam `Bifrost\Framework\Contracts\DataType`.
 DataTypes reutilizaveis tambem implementam `Insertable`, entao podem ser
 passados para o banco e convertidos para `value()` antes de executar SQL.
+DataTypes baseados em `AbstractDataType` tambem implementam `Responseable` e
+podem ser retornados diretamente por controllers.
 
 Use quando o valor possui regra propria ou aparece em mais de um fluxo.
 Exemplos: `Email`, `Uuid`, `Cpf`, `Cnpj`, `Url`, `Json`, `Base64`,
 `FileName`, `FilePath`, `FolderName`, `FolderPath`, `StorageKey`.
+
+DataTypes especificos do produto ficam em `app/DataTypes/`. Se puderem ser
+persistidos, implemente tambem `Insertable`.
+Se puderem ser retornados diretamente como JSON, implemente tambem
+`Responseable`.
 
 ## Cache
 
@@ -70,13 +84,17 @@ Exemplos: `Email`, `Uuid`, `Cpf`, `Cnpj`, `Url`, `Json`, `Base64`,
 `bifrost/redis` fornece:
 
 - `RedisConfig`
+- `RedisClient`
 - `RedisConnectionFactory`
+- `NativeRedisClient`
 - `NativeRedisConnectionFactory`
 - `RedisConnectionManager`
 - `RedisExtension`
 
-Extensoes Redis devem pedir `RedisConnectionFactory` ao container. O manager
-reutiliza a mesma conexao para configuracoes iguais.
+Extensoes Redis devem receber `RedisClient` pela factory compartilhada e nao
+usar a classe nativa `Redis` diretamente. O manager reutiliza o mesmo cliente
+para configuracoes iguais. Implementacoes futuras de cluster, leitura/escrita
+separadas ou balanceamento devem trocar a implementacao de `RedisClient`.
 
 ## Fila e Worker
 
