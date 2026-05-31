@@ -1,235 +1,157 @@
-# Padrao de arquitetura
-
-Este documento define o padrao de arquitetura do Bifrost-API para orientar a evolucao do framework e manter o core pequeno, previsivel e reutilizavel.
+# Arquitetura
 
 ## Objetivo
 
-O Bifrost-API e um micro-framework PHP para APIs HTTP. A arquitetura deve favorecer:
+O Bifrost-API possui um runtime compativel consumido pelo repositorio agregador
+`Felipe-Cavalca/Bifrost` e uma distribuicao Composer modular em evolucao. O
+novo nucleo deve ser pequeno e independente de regras de aplicacao sem quebrar
+a superficie existente em `api/`.
 
-- separacao clara entre entrada HTTP, core, contratos, integracoes e utilitarios;
-- baixo acoplamento com fornecedores externos;
-- comportamento previsivel para roteamento, respostas, atributos, cache, fila, banco, storage e logs;
-- evolucao incremental sem misturar melhorias de core com regras de produto;
-- testes focados em contratos publicos, regressao e integracoes criticas.
-
-## Visao geral
+## Estrutura Oficial
 
 ```text
 .
-|-- api/                  # Framework PHP, contratos, core, integracoes e testes
-|-- docs/                 # Documentacao tecnica do projeto
-|-- .github/workflows/    # Pipelines e automacoes
-|-- .devcontainer/        # Ambiente de desenvolvimento
-|-- .env.example          # Configuracao local de referencia
-`-- README.md             # Documentacao de uso
+|-- api/                            # Runtime compativel atual
+|-- packages/framework/             # Nucleo e contratos publicos
+|-- packages/cache-apcu/            # Adaptador de cache APCu
+|-- packages/cache-redis/           # Adaptador de cache Redis
+|-- packages/queue-redis/           # Adaptador de fila Redis
+|-- packages/database-pdo/          # Base PDO
+|-- packages/database-mysql/        # Configuracao PDO para MySQL
+|-- packages/database-postgresql/   # Configuracao PDO para PostgreSQL
+|-- packages/log-mongodb/           # Sink MongoDB para log estruturado
+|-- packages/storage-local/         # Storage local modular
+|-- packages/storage-s3/            # Storage S3 modular
+|-- skeleton/                       # Aplicacao inicial consumidora
+|-- docker/modular/                 # Ambiente de verificacao do monorepo
+|-- docs/                           # Padroes e guias
+`-- .github/workflows/              # CI
 ```
 
-Areas principais:
+## Compatibilidade com o Agregador
 
-- `api/`: codigo PHP do framework.
-- `docs/`: padroes tecnicos e decisoes de arquitetura.
-- `.github/`: workflows, templates, labels e automacoes.
-- `.devcontainer/` e `api/Docker/`: ambiente de desenvolvimento e imagens da API.
+O repositorio `Felipe-Cavalca/Bifrost` combina historicos de modulos como
+`Bifrost-API`, `Bifrost-Database` e `Bifrost-Front`. Enquanto esse fluxo nao
+for migrado para Composer:
 
-## Mapa rapido de alteracao
+- `api/` preserva os namespaces `Bifrost\*`, entrypoint e Docker existentes;
+- os checks existentes de `api/` continuam obrigatorios para alteracoes nessa
+  superficie;
+- `packages/` usa `Bifrost\Framework\*` e `Bifrost\Extension\*` sem
+  substituir classes legadas;
+- remover artefatos de `api/` exige migracao coordenada nos consumidores.
 
-- Entrada HTTP: `api/index.php`, `api/Core/Request.php`, `api/Core/Get.php`, `api/Core/Post.php` e `api/Controller/`.
-- Respostas HTTP: `api/Class/HttpResponse.php` e `api/Interface/Responseable.php`.
-- Attributes: `api/Attributes/` e contratos em `api/Interface/Attribute*.php`.
-- Configuracao: `api/Core/Settings.php`, `.env.example` e arquivos Docker.
-- Observabilidade: `api/Core/Logger.php`, headers de request id e testes de core.
-- Cache e fila: `api/Core/Cache.php`, `api/Core/Queue.php`, `api/Integration/Cache/` e `api/Integration/Queue/`.
-- Banco de dados: `api/Core/Database.php`, `api/Integration/Database/` e `api/Interface/Database.php`.
-- Storage: `api/Integration/Storage/`, `api/Integration/S3Storage.php`, `api/Interface/Storage.php` e adapters relacionados.
-- DataTypes e validacoes: `api/DataTypes/`, `api/Enum/Field.php` e `api/Include/`.
-- Testes: `api/tests/`.
+Superficie compativel preservada:
 
-## Camadas do framework
+| Area atual | Caminhos preservados |
+| --- | --- |
+| Entry point e request | `api/index.php`, `api/Core/Request.php` |
+| Routing/controllers | `api/Enum/Routes.php`, `api/Controller/` |
+| Cache e fila | `api/Core/Cache.php`, `api/Core/Queue.php`, `api/Worker.php` |
+| Banco e storage | `api/Core/Database.php`, `api/Integration/` |
+| Configuracao e observabilidade | `api/Core/Settings.php`, `api/Core/Logger.php` |
+| Testes e imagem | `api/tests/`, `api/Docker/` |
 
-### Entrada HTTP
+## Separacao Framework e Aplicacao
 
-Responsavel por receber a requisicao, resolver controller/action, executar atributos e devolver uma resposta serializavel.
+`bifrost/framework` contem:
 
-Diretorios e arquivos relacionados:
+- `Application`, `HttpKernel` e `Container`;
+- `Request`, `Response` e `ResponseEmitter`;
+- `Router`, `Route` e resolucao de controllers;
+- contratos `Extension`, `CacheStore`, `Queue` e
+  `DatabaseConnectionFactory` e `Storage`.
 
-- `api/index.php`
-- `api/Core/Request.php`
-- `api/Core/Get.php`
-- `api/Core/Post.php`
-- `api/Controller/`
-- `api/Attributes/`
-- `api/Class/HttpResponse.php`
+`bifrost/framework` nao contem:
 
-Regras:
+- controllers da aplicacao;
+- rotas reais;
+- entrypoint publico;
+- configuracao de ambiente;
+- clientes Redis ou conexoes PDO concretas.
 
-- Controllers devem ser finos e demonstrar o contrato HTTP esperado.
-- Controllers do framework nao devem concentrar regra de produto.
-- Validacoes transversais devem ficar em attributes, DataTypes ou objetos dedicados.
-- Respostas HTTP devem usar `HttpResponse` ou outro `Responseable`.
-- O ciclo de request deve preservar compatibilidade com attributes `before` e `after`.
-- Rotas mapeadas em `Bifrost\Enum\Routes` podem usar o caminho rapido do core: o framework trata controller/action como confiaveis e evita validacoes dinamicas redundantes. Rotas livres continuam validando controller/action em tempo de execucao.
+`bifrost/skeleton` contem os elementos de aplicacao:
 
-### Core
+- `public/index.php`;
+- `bootstrap/app.php`;
+- `config/extensions.php`;
+- `routes/api.php`;
+- controllers sob `app/`;
+- compose base e complementos opcionais.
 
-Responsavel pelos comportamentos centrais do framework.
+O runtime compativel em `api/` mantem suas camadas atuais de request,
+attributes, settings, storage, logging, fila e banco ate que cada contrato
+tenha caminho de migracao consumivel pelo agregador.
 
-Diretorios e arquivos relacionados:
+## Bootstrap e Lifecycle
 
-- `api/Core/Request.php`
-- `api/Core/Settings.php`
-- `api/Core/Logger.php`
-- `api/Core/Cache.php`
-- `api/Core/Queue.php`
-- `api/Core/Database.php`
-- `api/Core/Autoload.php`
-- `api/Core/AppError.php`
+O entrypoint deve permanecer minimo:
 
-Regras:
+```text
+public/index.php
+  -> vendor/autoload.php
+  -> bootstrap/app.php
+  -> Request::fromGlobals()
+  -> Application::handle()
+  -> Application::emit()
+```
 
-- O core deve manter responsabilidades pequenas e pesquisaveis.
-- O core pode orquestrar contratos e adapters, mas nao deve depender de regra de produto.
-- Melhorias de observabilidade devem evitar exposicao de segredos, tokens, query strings sensiveis e caminhos internos.
-- Mudancas em `Request`, `Settings`, `Logger`, `Cache`, `Queue` ou `Database` exigem testes focados e, quando possivel, a suite completa.
+O bootstrap cria a aplicacao, carrega extensoes instaladas e registra rotas.
+O kernel aplica middleware, resolve a rota, invoca o controller e sempre
+entrega um `Response`.
 
-### Contratos
+## Extensoes
 
-Responsaveis por estabilizar pontos de extensao do framework.
+Integracoes externas implementam `Bifrost\Framework\Contracts\Extension` e
+registram seus contratos no container. Uma aplicacao sem extensoes executa
+HTTP normalmente.
 
-Diretorios relacionados:
+| Necessidade | Contrato do core | Pacote |
+| --- | --- | --- |
+| Cache APCu | `CacheStore` | `bifrost/cache-apcu` |
+| Cache Redis | `CacheStore` | `bifrost/cache-redis` |
+| Fila Redis | `Queue` | `bifrost/queue-redis` |
+| PDO generico | `DatabaseConnectionFactory` | `bifrost/database-pdo` |
+| MySQL | `DatabaseConnectionFactory` | `bifrost/database-mysql` |
+| PostgreSQL | `DatabaseConnectionFactory` | `bifrost/database-postgresql` |
+| Log MongoDB | contrato local do pacote | `bifrost/log-mongodb` |
+| Storage local | `Storage` | `bifrost/storage-local` |
+| Storage S3 | `Storage` | `bifrost/storage-s3` |
 
-- `api/Interface/`
+Novos fornecedores devem nascer como pacotes separados quando adicionarem
+extensao PHP, SDK, servico externo ou configuracao propria.
 
-Contratos atuais:
+`cache-apcu` e `cache-redis` implementam o mesmo contrato; uma aplicacao deve
+selecionar somente um provider de cache. `log-mongodb` permanece aditivo com
+contrato local ate existir contrato comum de logging no framework.
 
-- `Attribute`
-- `AttributeBefore`
-- `AttributeAfter`
-- `Cache`
-- `Controller`
-- `Database`
-- `Insertable`
-- `NoSqlDatabase`
-- `PdoDriverAdapter`
-- `Queue`
-- `Responseable`
-- `Storage`
-- `Task`
+O contrato modular `Storage` nao e substituto binario do contrato legado:
+recebe chave `string`, usa `DateTimeImmutable` e expoe `temporaryUrl()`,
+enquanto `Bifrost\Interface\Storage` permanece compativel em `api/`.
 
-Regras:
+## Composer e Namespaces
 
-- Crie interface quando houver mais de uma implementacao provavel ou quando a dependencia externa for relevante.
-- Evite interfaces para classes simples sem variacao prevista.
-- Classes de core e integracao devem depender de contratos quando isso reduzir acoplamento real.
+- Todo pacote possui seu proprio `composer.json`.
+- O autoload publico usa somente PSR-4; nao use `classmap` para codigo fonte.
+- Nucleo: `Bifrost\Framework\`.
+- Extensoes: `Bifrost\Extension\<Modulo>\`.
+- Aplicacao gerada: `App\`.
+- Dependencias opcionais nao devem entrar em `bifrost/framework`.
 
-### Integracoes
+## Verificacoes
 
-Responsaveis por detalhes tecnicos de fornecedores externos.
+A verificacao oficial do monorepo executa os pacotes e o skeleton com Redis,
+MySQL e PostgreSQL reais temporarios:
 
-Diretorios relacionados:
+```bash
+docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests
+```
 
-- `api/Integration/`
-- `api/Docker/`
+Alteracoes em core, contrato ou lifecycle devem incluir testes no pacote
+afetado e validar o conjunto modular completo. Alteracoes sob `api/` tambem
+devem executar os checks e testes legados correspondentes.
 
-Regras:
-
-- Redis, S3, MongoDB, banco e outros fornecedores devem ficar atras de contratos ou adapters.
-- Codigo de core nao deve depender diretamente de SDKs quando houver contrato interno aplicavel.
-- Adapters devem traduzir detalhes externos para estruturas e excecoes coerentes com o framework.
-- Integracoes que dependem de ambiente externo devem ter testes que possam ser pulados claramente quando o ambiente nao estiver configurado, sem mascarar testes unitarios de configuracao.
-- Testes reais de integracao podem usar servicos temporarios, como SeaweedFS para S3 compativel, desde que esses containers e bootstraps auxiliares nao sejam versionados quando forem apenas apoio local.
-- Contratos que retornam arrays devem documentar o shape minimo esperado. Trocar arrays por objetos dedicados em contrato publico deve ser tratado como `upgrade`.
-
-### DataTypes
-
-Responsaveis por validar valores reutilizaveis e dar significado a dados importantes.
-
-Diretorios relacionados:
-
-- `api/DataTypes/`
-- `api/Enum/Field.php`
-- `api/Include/AbstractFieldValue.php`
-
-Regras:
-
-- Use DataTypes em assinaturas quando o valor tiver validacao propria ou significado de dominio tecnico, como `UUID`, `Url`, `FilePath` e `Base64`.
-- Nao crie DataType apenas para embrulhar primitivo sem regra.
-- Novos DataTypes devem ter testes.
-- DataTypes devem evitar I/O e efeitos colaterais.
-
-### Observabilidade
-
-Responsavel por correlacionar execucoes, registrar eventos e facilitar diagnostico.
-
-Arquivos relacionados:
-
-- `api/Core/Logger.php`
-- `api/Core/Request.php`
-- `api/Class/HttpResponse.php`
-- `.env.example`
-
-Regras:
-
-- Request id deve existir quando logs estiverem ativos.
-- Quando logs estiverem desativados, o framework deve evitar gerar e expor request id sem necessidade.
-- Logs devem ter contexto suficiente para diagnostico sem expor segredos, tokens, dados privados, query strings completas ou caminhos internos sensiveis.
-- O logger deve ser generico e poder ser chamado por qualquer parte do framework.
-- Drivers de log externos, como MongoDB, devem ser opcionais e ter fallback para nao quebrar o fluxo de request quando a integracao estiver indisponivel.
-- O `Request` decide quando associar informacao de request a uma resposta HTTP; `HttpResponse` define como essa informacao entra no payload.
-
-### Testes
-
-Estratégia:
-
-- Testes unitários para DataTypes, respostas, attributes e helpers.
-- Testes de core para request, settings, logger, cache, queue e database.
-- Testes de integração para Redis, S3 e PDO quando houver ambiente configurado.
-- Testes de regressão para bugs corrigidos.
-- Análise estática e formatação devem começar conservadoras, porque o Bifrost é um framework e precisa preservar compatibilidade pública enquanto melhora a qualidade.
-
-Regras:
-
-- Nova função pública deve ter teste correspondente.
-- Mudança de comportamento existente deve preservar compatibilidade quando possível.
-- Testes devem focar comportamento, não detalhes internos frágeis.
-- Testes dependentes de serviço externo devem declarar skip quando o ambiente não estiver configurado.
-- A verificação padrão da API deve ser `composer check` dentro de `api/`.
-- O `composer check` deve validar Composer, formato mínimo, lint, PHPStan e PHPUnit.
-
-## Variaveis de ambiente
-
-Regras:
-
-- Use prefixo `BFR_API_`.
-- Documente novas variaveis no `.env.example`.
-- Variaveis sensiveis nao devem aparecer com valores reais.
-- Ao adicionar variavel usada pelo codigo, atualize tambem README quando ela fizer parte da configuracao publica.
-
-## Seguranca operacional
-
-Regras minimas:
-
-- Nao exponha segredos, tokens ou credenciais em logs, respostas, commits ou PRs.
-- Nao registre query string completa por padrao.
-- Nao exponha detalhes internos de infraestrutura em mensagens de erro publicas sem decisao explicita.
-- Falhas de integracao devem produzir erros claros para diagnostico sem vazar dados sensiveis.
-
-## Como adicionar uma melhoria de core
-
-Fluxo recomendado:
-
-1. Criar branch propria no formato `module/function`.
-2. Identificar a camada afetada.
-3. Ler os contratos e testes existentes da area.
-4. Fazer a menor mudanca coerente com o padrao local.
-5. Criar testes focados.
-6. Atualizar `.env.example`, README ou docs quando a mudanca afetar configuracao, uso ou arquitetura.
-7. Rodar `composer check` dentro do container ou ambiente aprovado.
-
-## Regras de decisao
-
-- Prefira solucao simples enquanto o framework nao exigir abstracao maior.
-- Introduza abstracoes apenas quando reduzirem acoplamento real ou duplicacao relevante.
-- Nao misture melhoria funcional com migracao arquitetural ampla.
-- Preserve compatibilidade publica sempre que possivel.
-- Ao tocar area legada, siga o padrao local se a migracao nao fizer parte da tarefa.
-- Se uma regra nova conflitar com codigo legado, registre a excecao em `docs/conventions.md`.
+```bash
+docker compose -f api/Docker/docker-compose.dev.yml run --rm api1 composer check
+docker compose -f api/Docker/docker-compose.dev.yml run --rm api1 composer test
+```

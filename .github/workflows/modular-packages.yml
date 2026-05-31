@@ -1,0 +1,92 @@
+name: Modular Packages Quality
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'skeleton/**'
+      - 'docs/modular-distribution.md'
+      - '.github/workflows/modular-packages.yml'
+
+jobs:
+  framework-check:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: bifrost
+          MYSQL_USER: bifrost
+          MYSQL_PASSWORD: bifrost
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: bifrost
+          POSTGRES_USER: bifrost
+          POSTGRES_PASSWORD: bifrost
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U bifrost -d bifrost"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:2
+          coverage: none
+          extensions: json, redis, apcu, mongodb, pdo, pdo_mysql, pdo_pgsql
+
+      - name: Install framework dependencies
+        run: composer install --working-dir=packages/framework --no-interaction --no-progress --prefer-dist
+
+      - name: Test framework
+        run: composer check
+        working-directory: packages/framework
+
+      - name: Test optional packages
+        env:
+          REDIS_HOST: 127.0.0.1
+          MYSQL_HOST: 127.0.0.1
+          POSTGRES_HOST: 127.0.0.1
+        run: |
+          for package in cache-redis cache-apcu queue-redis database-pdo log-mongodb storage-local storage-s3; do
+            cd "$GITHUB_WORKSPACE/packages/$package"
+            composer config minimum-stability dev
+            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+            composer update --no-interaction --no-progress --prefer-dist
+            composer validate --strict --no-check-publish
+            composer test
+          done
+          for package in database-mysql database-postgresql; do
+            cd "$GITHUB_WORKSPACE/packages/$package"
+            composer config minimum-stability dev
+            composer config repositories.framework '{"type":"path","url":"../framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+            composer config repositories.database-pdo '{"type":"path","url":"../database-pdo","options":{"versions":{"bifrost/database-pdo":"1.0.0"}}}'
+            composer update --no-interaction --no-progress --prefer-dist
+            composer validate --strict --no-check-publish
+            composer test
+          done
+
+      - name: Install skeleton dependencies
+        run: |
+          cd skeleton
+          composer config minimum-stability dev
+          composer config repositories.framework '{"type":"path","url":"../packages/framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
+          composer update --no-interaction --no-progress --prefer-dist
+          composer validate --strict --no-check-publish
+          composer test

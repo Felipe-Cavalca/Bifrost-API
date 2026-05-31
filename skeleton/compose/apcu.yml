@@ -1,0 +1,7 @@
+services:
+  api:
+    build:
+      args:
+        INSTALL_APCU: 1
+    environment:
+      CACHE_DRIVER: apcu
