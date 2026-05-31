@@ -29,6 +29,43 @@ final class Response
         );
     }
 
+    /**
+     * @throws JsonException
+     */
+    public static function created(array $payload = [], array $headers = []): self
+    {
+        return self::json(payload: $payload, status: 201, headers: $headers);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function badRequest(string $message = 'Bad Request', array $errors = [], array $headers = []): self
+    {
+        $payload = ['message' => $message];
+        if ($errors !== []) {
+            $payload['errors'] = $errors;
+        }
+
+        return self::json(payload: $payload, status: 400, headers: $headers);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function notFound(string $message = 'Not Found', array $headers = []): self
+    {
+        return self::json(payload: ['message' => $message], status: 404, headers: $headers);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function internalServerError(string $message = 'Internal Server Error', array $headers = []): self
+    {
+        return self::json(payload: ['message' => $message], status: 500, headers: $headers);
+    }
+
     public static function text(string $body, int $status = 200, array $headers = []): self
     {
         $headers['Content-Type'] ??= 'text/plain; charset=utf-8';
@@ -43,6 +80,11 @@ final class Response
             status: $this->status,
             headers: array_merge($this->headers, [$name => $value])
         );
+    }
+
+    public function withBody(string $body): self
+    {
+        return new self(body: $body, status: $this->status, headers: $this->headers);
     }
 
     public function body(): string

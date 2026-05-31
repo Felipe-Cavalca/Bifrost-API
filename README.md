@@ -1,12 +1,7 @@
 # Bifrost Framework
 
-O Bifrost-API fornece o runtime PHP utilizado pelo repositorio agregador
-[`Felipe-Cavalca/Bifrost`](https://github.com/Felipe-Cavalca/Bifrost) e uma
-nova distribuicao Composer modular para novas aplicacoes.
-
-O runtime existente em `api/` permanece compativel com o fluxo de mesclagem
-do Bifrost. Os pacotes em `packages/` sao aditivos e nao removem namespaces,
-entrypoints ou integracoes publicas atuais.
+O Bifrost e um framework PHP distribuido por Composer para criar APIs novas
+com core pequeno, extensoes opcionais e um skeleton de projeto.
 
 ## Pacotes
 
@@ -19,33 +14,20 @@ entrypoints ou integracoes publicas atuais.
 | `bifrost/database-pdo` | Fabrica PDO generica opcional |
 | `bifrost/database-mysql` | Banco MySQL opcional |
 | `bifrost/database-postgresql` | Banco PostgreSQL opcional |
+| `bifrost/datatypes` | DataTypes reutilizaveis para validação e tipagem forte |
 | `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
 | `bifrost/storage-local` | Storage local opcional |
 | `bifrost/storage-s3` | Storage S3 opcional |
 | `bifrost/skeleton` | Projeto inicial para novas APIs |
-
-## Compatibilidade Atual
-
-O repositorio agregador Bifrost combina `Bifrost-API`, `Bifrost-Database` e
-outros modulos por merge de branches `latest-release`. Por isso:
-
-- `api/` continua sendo o runtime compativel existente;
-- o workflow e a imagem Docker existentes continuam atendendo esse runtime;
-- `packages/` evolui em paralelo ate uma migracao coordenada dos consumidores.
-
-Validacao do runtime compativel:
-
-```bash
-docker compose -f api/Docker/docker-compose.dev.yml run --rm api1 composer test
-```
 
 ## Inicio Rapido
 
 Depois de publicados os pacotes Composer:
 
 ```bash
-composer create-project bifrost/skeleton minha-api
-cd minha-api
+mkdir api
+cd api
+composer create-project bifrost/skeleton .
 cp .env.example .env
 docker compose up --build
 curl http://localhost:8080/health
@@ -57,6 +39,7 @@ infraestrutura, instale apenas o adaptador necessario:
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
 composer require bifrost/cache-apcu
+composer require bifrost/datatypes
 composer require bifrost/database-mysql
 # ou
 composer require bifrost/database-postgresql
@@ -109,7 +92,6 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 
 ```text
 .
-|-- api/                      # Runtime compativel consumido pelo Bifrost
 |-- packages/
 |   |-- framework/
 |   |-- cache-apcu/
@@ -118,6 +100,7 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 |   |-- database-pdo/
 |   |-- database-mysql/
 |   |-- database-postgresql/
+|   |-- datatypes/
 |   |-- log-mongodb/
 |   |-- storage-local/
 |   `-- storage-s3/
@@ -133,11 +116,8 @@ pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 `-- .github/workflows/
 ```
 
-Aplicacoes novas podem usar o skeleton modular. Aplicacoes integradas ao
-repositorio Bifrost continuam usando `api/` ate a migracao ser coordenada.
-
-Storage modular e opt-in: seus contratos nao substituem automaticamente o
-contrato existente em `api/`.
+Aplicacoes novas usam o skeleton modular dentro da pasta `api/` do sistema
+consumidor.
 
 ## Lifecycle HTTP
 
@@ -167,10 +147,8 @@ modular acima, que injeta dependencias locais por `path`.
 
 ## Documentacao
 
-- [Arquitetura](docs/architecture.md)
-- [Convencoes](docs/conventions.md)
-- [Distribuicao modular](docs/modular-distribution.md)
-- [Publicacao e versionamento](docs/releasing.md)
+- [Documentacao humana](docs/human/index.html)
+- [Documentacao para IAs](docs/ias/index.md)
 
 ## Licenca
 

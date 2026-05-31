@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Bifrost\Framework\Http;
 
+use Bifrost\Framework\Exceptions\HttpException;
 use Bifrost\Framework\Routing\ControllerResolver;
 use Bifrost\Framework\Routing\Router;
+use JsonException;
 use Throwable;
 
 final class HttpKernel
@@ -35,14 +37,9 @@ final class HttpKernel
         }
 
         try {
-            return $dispatcher($request);
+            return $this->finalizeResponse($request, $dispatcher($request));
         } catch (Throwable $exception) {
-            return Response::json(
-                payload: [
-                    'message' => $this->debug ? $exception->getMessage() : 'Internal Server Error',
-                ],
-                status: 500
-            );
+            return $this->finalizeResponse($request, $this->exceptionResponse($exception));
         }
     }
 
@@ -51,6 +48,16 @@ final class HttpKernel
         $route = $this->router->match($request);
         if ($route === null) {
             $allowedMethods = $this->router->allowedMethods($request->path());
+            if ($request->method() === 'OPTIONS' && $allowedMethods !== []) {
+                $routeForOptions = $this->router->firstRouteForPath($request->path());
+
+                return Response::json(payload: [
+                    'attributes' => $routeForOptions === null
+                        ? []
+                        : $this->controllerResolver->options($routeForOptions->handler()),
+                ]);
+            }
+
             if ($allowedMethods !== []) {
                 return Response::json(
                     payload: ['message' => 'Method Not Allowed'],
@@ -59,7 +66,7 @@ final class HttpKernel
                 );
             }
 
-            return Response::json(payload: ['message' => 'Not Found'], status: 404);
+            return Response::notFound();
         }
 
         $result = $this->controllerResolver->invoke($route->handler(), $request);
@@ -72,5 +79,69 @@ final class HttpKernel
         }
 
         return Response::text((string) $result);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function exceptionResponse(Throwable $exception): Response
+    {
+        if ($exception instanceof HttpException) {
+            $payload = ['message' => $exception->getMessage()];
+            if ($exception->errors() !== []) {
+                $payload['errors'] = $exception->errors();
+            }
+
+            return Response::json(
+                payload: $payload,
+                status: $exception->status(),
+                headers: $exception->headers()
+            );
+        }
+
+        return Response::internalServerError(
+            message: $this->debug ? $exception->getMessage() : 'Internal Server Error'
+        );
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function finalizeResponse(Request $request, Response $response): Response
+    {
+        return $this->withRequestIdPayload($request, $response)
+            ->withHeader('X-Request-Id', $request->requestId());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function withRequestIdPayload(Request $request, Response $response): Response
+    {
+        if ($response->status() < 400 || !$this->isJsonResponse($response)) {
+            return $response;
+        }
+
+        $payload = json_decode($response->body(), true);
+        if (!is_array($payload) || array_key_exists('request_id', $payload)) {
+            return $response;
+        }
+
+        $payload['request_id'] = $request->requestId();
+
+        return Response::json(payload: $payload, status: $response->status(), headers: $response->headers());
+    }
+
+    private function isJsonResponse(Response $response): bool
+    {
+        foreach ($response->headers() as $name => $value) {
+            if (strtolower((string) $name) !== 'content-type') {
+                continue;
+            }
+
+            return str_contains(strtolower((string) $value), 'application/json');
+        }
+
+        return false;
     }
 }

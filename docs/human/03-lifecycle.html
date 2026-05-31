@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lifecycle - Bifrost</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <main>
+    <a href="index.html">← voltar</a>
+    <section class="section panel">
+      <h1>Lifecycle HTTP</h1>
+      <p>Da entrada da request ate a resposta final.</p>
+      <div class="flow">
+        <div class="step" style="--i:0"><b>public/index.php</b><span>Entrypoint unico.</span></div>
+        <div class="step" style="--i:1"><b>bootstrap/app.php</b><span>Monta a aplicacao.</span></div>
+        <div class="step" style="--i:2"><b>extensions</b><span>Registra pacotes.</span></div>
+        <div class="step" style="--i:3"><b>attributes</b><span>Valida metodo e dados.</span></div>
+        <div class="step" style="--i:4"><b>controller</b><span>Executa regra do app.</span></div>
+        <div class="step" style="--i:5"><b>response</b><span>Emite HTTP.</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attributes e DataTypes - Bifrost</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <main>
+    <a href="index.html">← voltar</a>
+    <section class="section panel">
+      <h1>Attributes e DataTypes</h1>
+      <p>Attributes descrevem o contrato HTTP. DataTypes carregam validacao e valor tipado.</p>
+      <div class="grid">
+        <div class="card"><h2>Method</h2><p>Garante o verbo HTTP esperado.</p></div>
+        <div class="card"><h2>RequiredFields</h2><p>Valida corpo obrigatorio.</p></div>
+        <div class="card"><h2>DataTypes</h2><p>Ex.: <code>Email</code>, <code>Cpf</code>, <code>Uuid</code>.</p></div>
+      </div>
+    </section>
+    <section class="section panel terminal">
+      <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+      <pre>#[Method('POST')]
+#[RequiredFields([
+    'email' => Email::class,
+    'cpf' => Cpf::class,
+])]
+public function store(Request $request): Response</pre>
+    </section>
+  </main>
+</body>
+</html>

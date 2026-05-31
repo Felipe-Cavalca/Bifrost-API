@@ -1,73 +1,95 @@
 # AGENTS.md local
 
-## Convenções do projeto
+## Convencoes do projeto
 
-- Antes de nomear branch, arquivo, classe, endpoint, tabela, coluna ou variável de ambiente, consulte `docs/conventions.md`.
+- Antes de nomear branch, arquivo, classe, endpoint, tabela, coluna ou variavel de ambiente, consulte `docs/ias/coding-rules.md`.
 - Cada tarefa diferente deve usar uma branch diferente.
-- Branches devem seguir o formato `module/function`, conforme `docs/conventions.md`.
+- Branches devem seguir o formato `module/function`.
 - Antes de abrir ou editar PR, consulte `.github/PULL_REQUEST_TEMPLATE.md`.
-- Use português do Brasil em mensagens finais, commits, PRs e documentação.
-- Não faça commit, push ou PR sem autorização explícita.
-- Preserve o padrão existente do módulo alterado.
-- Se uma instrução do usuário contrariar ou divergir de `AGENTS.md` ou da documentação em `docs/`, questione antes de executar e explique objetivamente o conflito.
-- Antes de alterar core, integrações, DataTypes, variáveis de ambiente, observabilidade ou fluxo HTTP, consulte `docs/architecture.md`.
+- Use portugues do Brasil em mensagens finais, commits, PRs e documentacao.
+- Nao faca commit, push ou PR sem autorizacao explicita.
+- Preserve o padrao existente do modulo alterado.
+- Antes de alterar core, integracoes, DataTypes, variaveis de ambiente, observabilidade ou fluxo HTTP, consulte `docs/ias/framework-map.md` e `docs/ias/packages.md`.
+
+## Direcao arquitetural
+
+- O alvo novo e distribuicao por Composer, com `packages/` e `skeleton/`.
+- A documentacao deve falar apenas da versao nova.
+- Projeto novo cria backend dentro de `api/` usando `bifrost/skeleton`.
+- Implementacoes novas vivem em `packages/` e `skeleton/`.
+
+## Areas do repositorio
+
+- `packages/framework/`: nucleo Composer do framework.
+- `packages/*/`: extensoes Composer opcionais.
+- `packages/datatypes/`: DataTypes reutilizaveis para tipagem forte e validacao.
+- `skeleton/`: projeto base publicado como `bifrost/skeleton`.
+- `docs/human/`: documentacao visual para humanos.
+- `docs/ias/`: documentacao objetiva para agentes e IAs.
 
 ## Ambiente
 
-- Use Docker, Docker Compose ou Dev Container para comandos do projeto sempre que possível.
-- Não instale dependências na máquina local; instale apenas dentro de container.
-- Se o container não estiver disponível e a tarefa exigir dependência local, peça autorização antes.
-- Dentro de containers do projeto, instalações e comandos necessários para a tarefa estão liberados.
+- Use Docker, Docker Compose ou Dev Container para comandos do projeto sempre que possivel.
+- Nao instale dependencias na maquina local; instale apenas dentro de container.
+- Dentro de containers do projeto, instalacoes e comandos necessarios para a tarefa estao liberados.
+- O ambiente modular oficial e `docker/modular/docker-compose.test.yml`.
+- O Docker em `api/Docker/` e referencia antiga; nao use como modelo do Composer novo.
 
-## Código orientado a agentes
+## Codigo orientado a agentes
 
-- Prefira arquivos pequenos e coesos; evite concentrar muitas responsabilidades no mesmo arquivo.
-- Prefira funções curtas, com uma responsabilidade clara e nomes específicos.
+- Prefira arquivos pequenos e coesos.
+- Prefira funcoes curtas, com uma responsabilidade clara e nomes especificos.
 - Evite aninhamento profundo; use retornos antecipados quando isso simplificar a leitura.
-- Use nomes pesquisáveis e alinhados ao domínio. Evite nomes genéricos como `data`, `handler`, `manager` ou `service` sem contexto.
-- Antes de criar abstração nova, procure duplicação real com `rg`.
-- Não duplique regra de negócio; extraia para classe, função ou DataType apropriado.
-- Comentários devem explicar decisões, restrições, exceções ou contexto não óbvio.
-- Mensagens de erro devem ter contexto suficiente para debug sem expor dados sensíveis.
-- Melhorias de core devem manter responsabilidades pequenas e não devem introduzir regra de produto no framework.
+- Use nomes pesquisaveis e alinhados ao dominio.
+- Antes de criar abstracao nova, procure duplicacao real com `rg`.
+- Nao duplique regra de negocio; extraia para classe, funcao ou DataType apropriado.
+- Comentarios devem explicar decisoes, restricoes, excecoes ou contexto nao obvio.
+- Mensagens de erro devem ter contexto suficiente para debug sem expor dados sensiveis.
+- Melhorias de core nao devem introduzir regra de produto no framework.
 
 ## DataTypes
 
-- Sempre que possível, use DataTypes do domínio em assinaturas e regras de negócio em vez de tipos primitivos genéricos.
-- Crie DataType quando o valor tiver validação própria, aparecer em mais de um fluxo ou representar conceito do domínio.
-- Não crie DataType apenas para embrulhar primitivo sem regra.
-- Controllers podem receber dados brutos da requisição, mas devem convertê-los para DataTypes antes de chamar classes de negócio.
+- Use DataTypes do dominio em DTOs, services e regras de negocio.
+- Crie DataType quando o valor tiver validacao propria, aparecer em mais de um fluxo ou representar conceito do dominio.
+- Nao crie DataType apenas para embrulhar primitivo sem regra.
+- Controllers podem receber dados brutos da request, mas devem converte-los antes de chamar classes de negocio.
+- DataTypes genericos ficam em `packages/datatypes/`.
+- DataTypes especificos de infraestrutura ou fornecedor devem ficar no pacote da extensao correspondente.
 
-## Dependências
+## Dependencias
 
-- Injete dependências por construtor ou parâmetro quando a classe tiver regra de negócio testável.
-- Não instancie integrações externas diretamente dentro do domínio.
-- Encapsule fornecedores externos atrás de interfaces ou adapters do projeto.
+- Injete dependencias por construtor ou parametro quando a classe tiver regra de negocio testavel.
+- Nao instancie integracoes externas diretamente dentro do dominio.
+- Encapsule fornecedores externos atras de interfaces ou adapters do projeto.
 - Use fakes nomeados em testes quando precisar substituir I/O externo.
+- Dependencias opcionais nao entram em `bifrost/framework`; elas ficam em pacotes separados.
 
 ## Git e pull requests
 
 - PRs devem receber labels existentes em `.github/labels.yml`.
-- Antes de criar ou atualizar labels de um PR, consulte `.github/labels.yml` e use somente labels listadas nesse arquivo, salvo orientação explícita diferente.
-- As labels são usadas por workflows e automações; não deixe PR criado por agente sem label quando a ferramenta permitir aplicar labels.
-- PRs de documentação devem usar a label `documentation` e PRs feitos por agente devem usar também a label `IA`, quando a ferramenta permitir aplicar labels.
+- Antes de criar ou atualizar labels de um PR, consulte `.github/labels.yml`.
+- PRs de documentacao devem usar a label `documentation`.
+- PRs feitos por agente devem usar tambem a label `IA`, quando a ferramenta permitir aplicar labels.
+- Commits feitos por agente devem usar:
+  - Nome: `ScriptPlayerAgent`
+  - E-mail: `scriptPlayerAgent@felipecavalca.dev`
 
-## Verificações
+## Verificacoes
 
-- API: execute `cd api && composer check`.
-- Testes da API: execute `cd api && composer test`.
-- Para mudanças pequenas, rode primeiro o check do módulo alterado.
-- Antes de commit autorizado, rode todos os checks aplicáveis.
-- Execute comandos preferencialmente dentro do container quando o ambiente Docker estiver disponível.
+- Monorepo modular: `docker compose -f docker/modular/docker-compose.test.yml run --rm --build tests`.
+- Pacote especifico: rode `composer check` ou `composer test` dentro do pacote alterado.
+- Mudancas em core, contratos, lifecycle HTTP, attributes ou DataTypes exigem testes no pacote afetado.
+- Rode checks de `api/` apenas quando alterar `api/`.
 
-## Documentação
+## Documentacao
 
-- Mudanças de padrão do projeto devem ser registradas em `docs/conventions.md`.
-- Mudanças de arquitetura, core, observabilidade, ambiente ou contratos públicos devem ser registradas em `docs/architecture.md` quando alterarem o padrão esperado do projeto.
-- Se uma regra nova conflitar com código legado, mantenha compatibilidade e registre a exceção no documento de convenções.
+- Mudancas de padrao do projeto devem atualizar `docs/ias/coding-rules.md`.
+- Mudancas de arquitetura, core, observabilidade, ambiente ou contratos publicos devem atualizar `docs/ias/framework-map.md`.
+- Mudancas de distribuicao Composer devem atualizar `docs/ias/packages.md`.
+- Guias para humanos ficam em `docs/human/`.
+- Guias para IAs/agentes ficam em `docs/ias/`.
 
 ## Escopo
 
-- Ao tocar área legada, preserve o padrão local se a migração não fizer parte da tarefa.
-- Não misture mudança funcional com migração arquitetural ampla.
-- Se encontrar violação arquitetural fora do escopo, informe no final e não altere sem autorização.
+- Nao misture mudanca funcional com mudanca arquitetural ampla sem registrar a decisao.
+- Se uma feature nova nao tiver pacote correto, crie ou proponha o pacote antes de acoplar no framework.

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Criar projeto - Bifrost</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <main>
+    <a href="index.html">← voltar</a>
+    <section class="section panel">
+      <h1>Criar um projeto novo</h1>
+      <p>O sistema pode ter frontend, banco, app mobile e outros modulos. O backend PHP fica dentro da pasta <code>api/</code>.</p>
+      <div class="grid">
+        <div class="card"><h2>1. Pasta</h2><p>Crie <code>api/</code> na raiz do sistema.</p></div>
+        <div class="card"><h2>2. Skeleton</h2><p>Instale <code>bifrost/skeleton</code> dentro dela.</p></div>
+        <div class="card"><h2>3. Rodar</h2><p>Suba Docker e acesse <code>/health</code>.</p></div>
+      </div>
+    </section>
+    <section class="section panel terminal">
+      <div class="bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+      <pre>mkdir api
+cd api
+composer create-project bifrost/skeleton .
+cp .env.example .env
+docker compose up --build
+curl http://localhost:8080/health</pre>
+    </section>
+  </main>
+</body>
+</html>
