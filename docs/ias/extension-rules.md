@@ -2,11 +2,11 @@
 
 ## Objetivo
 
-Padronizar novos modulos opcionais do Bifrost.
+Padronizar extensoes opcionais registradas no boot do Bifrost.
 
 ## Quando criar extensao
 
-Crie pacote separado quando a feature:
+Crie uma extensao de boot em pacote separado quando a feature:
 
 - usa servico externo;
 - exige extensao PHP;
@@ -30,3 +30,6 @@ packages/nome-do-pacote/
 - Extensao implementa `Bifrost\Framework\Contracts\Extension`.
 - Extensao registra servicos no container.
 - Core nao pode depender da extensao.
+
+Pacotes que nao participam do boot, como DataTypes e `bifrost/queue-worker`,
+continuam opcionais, mas nao precisam implementar `Extension`.

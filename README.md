@@ -1,7 +1,7 @@
 # Bifrost Framework
 
-O Bifrost e um framework PHP distribuido por Composer para criar APIs novas
-com core pequeno, extensoes opcionais e um skeleton de projeto.
+O Bifrost é um framework PHP distribuído por Composer para criar APIs novas
+com core pequeno, extensões opcionais e um skeleton de projeto.
 
 ## Pacotes
 
@@ -9,11 +9,11 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | --- | --- |
 | `bifrost/framework` | Kernel HTTP, request/response, rotas, middleware, container e contratos |
 | `bifrost/cache-apcu` | Cache APCu opcional |
-| `bifrost/redis` | Conexao Redis reutilizavel para extensoes opcionais |
+| `bifrost/redis` | Conexão Redis reutilizável para extensões opcionais |
 | `bifrost/cache-redis` | Cache Redis opcional |
 | `bifrost/queue-redis` | Fila Redis opcional |
 | `bifrost/queue-worker` | Worker opcional para consumo de filas |
-| `bifrost/database-pdo` | Fabrica PDO generica opcional |
+| `bifrost/database-pdo` | Fábrica PDO genérica opcional |
 | `bifrost/database-mysql` | Banco MySQL opcional |
 | `bifrost/database-postgresql` | Banco PostgreSQL opcional |
 | `bifrost/database-sqlite` | Banco SQLite opcional |
@@ -22,12 +22,12 @@ com core pequeno, extensoes opcionais e um skeleton de projeto.
 | `bifrost/datatypes` | Agregador opcional com todos os DataTypes |
 | `bifrost/log-stdout` | Logs em stdout/stderr |
 | `bifrost/log-file` | Logs em arquivo |
-| `bifrost/log-mongodb` | Persistencia MongoDB opcional para documentos de log |
+| `bifrost/log-mongodb` | Persistência MongoDB opcional para documentos de log |
 | `bifrost/storage-local` | Storage local opcional |
 | `bifrost/storage-s3` | Storage S3 opcional |
 | `bifrost/skeleton` | Projeto inicial para novas APIs |
 
-## Inicio Rapido
+## Início rápido
 
 ```bash
 mkdir api
@@ -38,9 +38,9 @@ docker compose up --build
 curl http://localhost:8080/health
 ```
 
-A aplicacao inicial instala somente `bifrost/framework`. Para acrescentar
-infraestrutura, instale apenas o adaptador necessario. Os pacotes nao formam
-uma lista obrigatoria:
+A aplicação inicial instala somente `bifrost/framework`. Para acrescentar
+infraestrutura, instale apenas o adaptador necessário. Os pacotes não formam
+uma lista obrigatória:
 
 | Necessidade | Pacote |
 | --- | --- |
@@ -50,12 +50,15 @@ uma lista obrigatoria:
 | Worker para consumir filas | `bifrost/queue-worker` |
 | Banco MySQL | `bifrost/database-mysql` |
 | Banco PostgreSQL | `bifrost/database-postgresql` |
-| Um DataType especifico | `bifrost/datatype-email` |
+| Um DataType específico | `bifrost/datatype-email` |
 | Todos os DataTypes | `bifrost/datatypes` |
 
 O arquivo `core/config/extensions.php` do skeleton registra fila instalada e
-adapters selecionados. Cache e selecionado por `CACHE_DRIVER=apcu|redis`;
-banco, por `DB_DRIVER=mysql|postgresql`.
+adapters selecionados. Cache é selecionado por `CACHE_DRIVER=apcu|redis`;
+banco, por `DB_DRIVER=mysql|postgresql`; logs, por
+`LOG_DRIVER=stdout|file|mongodb`.
+
+SQLite também é opcional, mas exige registro explícito no boot da aplicação.
 
 ## Variantes Docker
 
@@ -65,9 +68,9 @@ Sem fila, cache ou banco:
 docker compose up --build
 ```
 
-Os arquivos em `core/compose/` sao overlays opcionais. Para ativa-los, informe
-cada arquivo com `-f`; o Docker Compose combina as configuracoes na ordem
-recebida. Nao e necessario copiar e colar o conteudo no `docker-compose.yml`.
+Os arquivos em `core/compose/` são overlays opcionais. Para ativá-los, informe
+cada arquivo com `-f`; o Docker Compose combina as configurações na ordem
+recebida. Não é necessário copiar e colar o conteúdo no `docker-compose.yml`.
 
 Com cache APCu:
 
@@ -76,12 +79,16 @@ composer require bifrost/cache-apcu
 docker compose -f docker-compose.yml -f core/compose/apcu.yml up --build
 ```
 
-Com Redis para cache e/ou fila:
+Com cache Redis e fila Redis opcional:
 
 ```bash
 composer require bifrost/cache-redis bifrost/queue-redis
 docker compose -f docker-compose.yml -f core/compose/redis.yml up --build
 ```
+
+O overlay atual de Redis ativa `CACHE_DRIVER=redis`; por isso ele exige
+`bifrost/cache-redis`. Um perfil Docker para fila Redis isolada ainda não faz
+parte do skeleton.
 
 Com MySQL:
 
@@ -97,14 +104,14 @@ composer require bifrost/database-postgresql
 docker compose -f docker-compose.yml -f core/compose/postgresql.yml up --build
 ```
 
-Cada complemento instala na imagem PHP somente a extensao exigida pelo
+Cada complemento instala na imagem PHP somente a extensão exigida pelo
 pacote escolhido (`apcu`, `redis`, `pdo_mysql` ou `pdo_pgsql`).
 
-## Estrutura da aplicacao
+## Estrutura da aplicação
 
-O skeleton cria a estrutura inicial da API dentro da pasta escolhida. O codigo
-da aplicacao fica em `app/`, configuracoes de boot ficam em `core/`, e o
-servidor HTTP expoe somente `public/`. Actions seguem a convencao
+O skeleton cria a estrutura inicial da API dentro da pasta escolhida. O código
+da aplicação fica em `app/`, configurações de boot ficam em `core/`, e o
+servidor HTTP expõe somente `public/`. Actions seguem a convenção
 `/controller/action`; aliases opcionais ficam em `app/Http/HttpRoutes.php`.
 
 ## Lifecycle HTTP
@@ -121,10 +128,10 @@ public/index.php
   -> ResponseEmitter
 ```
 
-## Documentacao
+## Documentação
 
-- [Documentacao humana](docs/html/index.html)
+- [Documentação humana](docs/html/index.html)
 
-## Licenca
+## Licença
 
-Distribuido sob a licenca MIT. Consulte [LICENSE](LICENSE).
+Distribuído sob a licença MIT. Consulte [LICENSE](LICENSE).

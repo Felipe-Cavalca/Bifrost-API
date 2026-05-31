@@ -13,14 +13,15 @@ meu-sistema/
 |   |-- core/
 |   |   |-- bootstrap/
 |   |   |-- compose/
-|   |   |-- config/
-|   |   `-- routes/
+|   |   `-- config/
 |   |-- public/
 |   |-- tests/
 |   `-- composer.json
-|-- database/
 `-- app/
 ```
+
+O diretório externo `app/` representa o frontend ou outro cliente do sistema e
+é opcional. O backend criado pelo skeleton fica integralmente em `api/`.
 
 ## Comandos
 

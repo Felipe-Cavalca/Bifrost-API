@@ -26,17 +26,20 @@
                 <p class="lead">Para criar uma aplicação nova, use o skeleton. Ele é o projeto base para quem vai consumir o framework.</p>
 
                 <h2>Criar projeto</h2>
-                <p>Crie a pasta da aplicação com o skeleton:</p>
-                <pre><code class="language-bash">composer create-project bifrost/skeleton minha-api</code></pre>
+                <p>Crie o diretório do sistema e instale o backend dentro de <code>api/</code>:</p>
+                <pre><code class="language-bash">mkdir minha-api
+cd minha-api
+mkdir api
+cd api
+composer create-project bifrost/skeleton .</code></pre>
 
                 <div class="callout">
                     <p>O diretório de destino deve estar vazio ou não existir.</p>
                 </div>
 
-                <h2>Instalar dependências</h2>
-                <p>Entre na pasta da aplicação e instale as dependências do projeto gerado.</p>
-                <pre><code class="language-bash">cd minha-api
-composer install</code></pre>
+                <h2>Entre na aplicação</h2>
+                <p>O Composer já instala as dependências ao criar o projeto. Entre na pasta gerada para executar os próximos comandos.</p>
+                <pre><code class="language-bash">cd minha-api/api</code></pre>
 
                 <h2>Dependências de desenvolvimento</h2>
                 <p>Em ambiente local, dependências de teste e qualidade podem aparecer em <code>vendor/</code>. Isso é normal. Em produção, instale sem dependências de desenvolvimento.</p>

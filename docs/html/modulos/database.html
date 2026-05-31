@@ -19,11 +19,11 @@
             <h1>Banco de dados</h1>
             <p class="lead">O Bifrost usa PDO como base para conexões relacionais e oferece pacotes específicos para fornecedores.</p>
             <h2>Pacotes</h2>
-            <table><thead><tr><th>Pacote</th><th>Uso</th></tr></thead><tbody><tr><td><code>bifrost/database-pdo</code></td><td>Base compartilhada para conexão PDO.</td></tr><tr><td><code>bifrost/database-mysql</code></td><td>Conexão MySQL.</td></tr><tr><td><code>bifrost/database-postgresql</code></td><td>Conexão PostgreSQL.</td></tr></tbody></table>
+            <table><thead><tr><th>Pacote</th><th>Uso</th></tr></thead><tbody><tr><td><code>bifrost/database-pdo</code></td><td>Base compartilhada para conexão PDO.</td></tr><tr><td><code>bifrost/database-mysql</code></td><td>Conexão MySQL.</td></tr><tr><td><code>bifrost/database-postgresql</code></td><td>Conexão PostgreSQL.</td></tr><tr><td><code>bifrost/database-sqlite</code></td><td>Conexão SQLite. Registre-a explicitamente na aplicação quando precisar; o skeleton não a seleciona por <code>DB_DRIVER</code>.</td></tr></tbody></table>
             <h2>DataTypes no banco</h2>
             <p>Valores que implementam <code>Insertable</code> podem ser enviados para operações de persistência sem perder o tipo no domínio.</p>
             <pre><code class="language-php">$database-&gt;insert('users', [
-    'email' =&gt; new Email('dev@example.com'),
+    'email' =&gt; Email::from('dev@example.com'),
 ]);</code></pre>
             <div class="next"><a href="redis.html">Redis</a><a href="storage.html">Storage</a></div>
         </article></main>

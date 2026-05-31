@@ -37,7 +37,7 @@
 }</code></pre>
 
                 <h2>Registro de rota</h2>
-                <p>Actions públicas de controllers seguem a convenção <code>/controller/action</code>. Assim, <code>HealthController::show()</code> responde em <code>/health/show</code> sem cadastro manual. Quando a action for omitida, o framework procura <code>index()</code>.</p>
+                <p>Actions públicas de controllers seguem a convenção <code>/controller/action</code>. Assim, <code>HealthController::show()</code> responde em <code>/health/show</code> sem cadastro manual. Quando a action for omitida, o framework procura <code>index()</code>. Sem o attribute <a href="referencia/bifrost-framework-attributes-method.html"><code>#[Method(...)]</code></a>, uma action convencional aceita qualquer método HTTP suportado.</p>
                 <p>Use <code>app/Http/HttpRoutes.php</code> somente para aliases ou URLs que não seguem essa convenção. O método estático recebe a <a href="referencia/bifrost-framework-application.html"><code>Application</code></a> explicitamente.</p>
                 <pre><code class="language-php">final class HttpRoutes
 {

@@ -13,7 +13,8 @@ O foco e criar e manter projetos novos usando Composer, `bifrost/framework`,
 
 - Projeto novo cria backend dentro de `api/` usando `bifrost/skeleton`.
 - Core fica em `packages/framework`.
-- DataTypes ficam em `packages/datatypes`.
+- DataTypes reutilizaveis ficam em pacotes `packages/datatype-*`.
+- `packages/datatypes` apenas agrega todos os DataTypes publicados.
 - Infra opcional fica em extensoes Composer.
 - Sempre atualize `docs/html` e `docs/ias` quando mudar comportamento publico.
 

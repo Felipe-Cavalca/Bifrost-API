@@ -111,6 +111,9 @@ separadas ou balanceamento devem trocar a implementacao de `RedisClient`.
 - Drivers: `database-mysql`, `database-postgresql`, `database-sqlite`.
 - `PdoConnectionFactory` reutiliza conexoes por nome.
 - `PdoDatabase` tambem implementa `TransactionManager`.
+- O skeleton seleciona automaticamente apenas MySQL e PostgreSQL por
+  `DB_DRIVER`. Para SQLite, registre `SqliteExtension` explicitamente no boot
+  da aplicacao.
 
 ## Storage
 

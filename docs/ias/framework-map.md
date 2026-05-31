@@ -52,7 +52,6 @@ omitida, usa `index`. Caminhos com segmentos adicionais nao sao expostos.
 - `BeforeRequestAttribute`
 - `AfterResponseAttribute`
 - `TransactionManager`
-- `LogWriter`
 - `Insertable`
 - `Responseable`
 
