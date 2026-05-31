@@ -8,7 +8,8 @@ composer check --working-dir=packages/framework
 
 configure_repository() {
     repository="$1"
-    composer config "repositories.$repository" path "../$repository"
+    package_name="$(php -r '$composer = json_decode(file_get_contents($argv[1]), true, flags: JSON_THROW_ON_ERROR); echo $composer["name"];' "../$repository/composer.json")"
+    composer config "repositories.$repository" "{\"type\":\"path\",\"url\":\"../$repository\",\"options\":{\"versions\":{\"$package_name\":\"1.0.0\"}}}"
 }
 
 test_package() {
@@ -69,7 +70,7 @@ done
     cd skeleton
     composer validate --strict --no-check-publish composer.json
     composer config minimum-stability dev
-    composer config repositories.framework path ../packages/framework
+    composer config repositories.framework '{"type":"path","url":"../packages/framework","options":{"versions":{"bifrost/framework":"1.0.0"}}}'
     composer update --no-interaction --no-progress --prefer-dist
     composer test
 )
