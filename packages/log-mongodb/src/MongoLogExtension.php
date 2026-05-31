@@ -7,6 +7,8 @@ namespace Bifrost\Extension\LogMongoDb;
 use Bifrost\Extension\LogMongoDb\Contracts\LogWriter;
 use Bifrost\Framework\Application;
 use Bifrost\Framework\Contracts\Extension;
+use Bifrost\Framework\Contracts\LogWriter as FrameworkLogWriter;
+use Bifrost\Framework\Logging\Logger;
 use Closure;
 
 final class MongoLogExtension implements Extension
@@ -29,6 +31,14 @@ final class MongoLogExtension implements Extension
         $application->container()->bind(
             LogWriter::class,
             fn (): LogWriter => $this->createWriter()
+        );
+        $application->container()->bind(
+            FrameworkLogWriter::class,
+            fn (): FrameworkLogWriter => $application->container()->get(LogWriter::class)
+        );
+        $application->container()->bind(
+            Logger::class,
+            fn (): Logger => new Logger($application->container()->get(LogWriter::class))
         );
     }
 

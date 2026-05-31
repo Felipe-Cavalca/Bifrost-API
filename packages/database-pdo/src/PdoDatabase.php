@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\DatabasePdo;
 
+use Bifrost\Framework\Contracts\TransactionManager;
 use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 
-final class PdoDatabase
+final class PdoDatabase implements TransactionManager
 {
     public function __construct(private readonly PDO $connection)
     {

@@ -11,12 +11,28 @@ use Bifrost\Framework\Http\Response;
 use Bifrost\Framework\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_METHOD)]
+/**
+ * Declara parametros obrigatorios na query string.
+ *
+ * Aceita uma lista simples de nomes ou um mapa nome => regra.
+ *
+ * Exemplo: #[RequiredParams(['page' => 'int-string', 'filter'])]
+ */
 final class RequiredParams implements RequestValidatorAttribute
 {
+    /**
+     * @param array<int|string, mixed> $params Parametros obrigatorios. Use ['param'] para aceitar qualquer valor
+     *                                        ou ['param' => 'string'] para validar tipo/regra.
+     */
     public function __construct(private readonly array $params)
     {
     }
 
+    /**
+     * Valida os parametros obrigatorios da query string.
+     *
+     * @return Response|null Retorna null quando os parametros sao validos, ou resposta 400.
+     */
     public function validate(Request $request): ?Response
     {
         $errors = [];
@@ -45,6 +61,9 @@ final class RequiredParams implements RequestValidatorAttribute
         return Response::json(payload: ['message' => 'Invalid parameters', 'errors' => ['params' => $errors]], status: 400);
     }
 
+    /**
+     * @return array{params: array<string, string>} Metadados dos parametros obrigatorios.
+     */
     public function options(): array
     {
         $params = [];

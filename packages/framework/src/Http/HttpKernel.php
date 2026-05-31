@@ -10,6 +10,12 @@ use Bifrost\Framework\Routing\Router;
 use JsonException;
 use Throwable;
 
+/**
+ * Executa o lifecycle HTTP da aplicacao.
+ *
+ * Aplica middlewares, resolve rotas, converte resultados de controllers em Response
+ * e padroniza respostas de erro com X-Request-Id.
+ */
 final class HttpKernel
 {
     /** @var list<callable> */
@@ -22,11 +28,19 @@ final class HttpKernel
     ) {
     }
 
+    /**
+     * Registra um middleware no pipeline HTTP.
+     *
+     * O callable recebe Request e next callable, e deve retornar Response.
+     */
     public function middleware(callable $middleware): void
     {
         $this->middleware[] = $middleware;
     }
 
+    /**
+     * Processa uma request completa e sempre retorna uma Response.
+     */
     public function handle(Request $request): Response
     {
         $dispatcher = fn (Request $incoming): Response => $this->dispatch($incoming);

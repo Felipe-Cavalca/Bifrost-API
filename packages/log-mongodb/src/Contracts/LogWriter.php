@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Bifrost\Extension\LogMongoDb\Contracts;
 
-interface LogWriter
+use Bifrost\Framework\Contracts\LogWriter as FrameworkLogWriter;
+
+interface LogWriter extends FrameworkLogWriter
 {
-    public function write(array $entry): void;
 }

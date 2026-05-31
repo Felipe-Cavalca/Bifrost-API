@@ -1,0 +1,26 @@
+{
+  "name": "bifrost/log-file",
+  "description": "Logger opcional em arquivo para o Bifrost Framework",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "bifrost/framework": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bifrost\\Extension\\LogFile\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0-dev"
+    }
+  }
+}
